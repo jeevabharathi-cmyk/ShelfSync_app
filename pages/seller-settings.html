@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings | Seller Portal</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .dashboard-sidebar {
+            background-color: #0f172a;
+        }
+
+        .stat-card h3 {
+            color: var(--accent-color);
+        }
+
+        .settings-section {
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .settings-card {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            box-shadow: var(--shadow-md);
+            transition: all var(--transition-base);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .settings-card:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        .settings-card-header {
+            margin-bottom: var(--spacing-lg);
+            padding-bottom: var(--spacing-md);
+            border-bottom: 2px solid var(--border-light);
+        }
+
+        .settings-card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+            margin-bottom: var(--spacing-xs);
+            font-family: var(--font-display);
+        }
+
+        .settings-card-subtitle {
+            color: var(--text-light);
+            font-size: 0.9375rem;
+        }
+
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+            padding: var(--spacing-lg);
+            background-color: var(--background-color);
+            border-radius: var(--radius-lg);
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 700;
+            box-shadow: var(--shadow-md);
+            flex-shrink: 0;
+        }
+
+        .profile-info h3 {
+            margin-bottom: var(--spacing-xs);
+            font-size: 1.5rem;
+        }
+
+        .profile-info p {
+            margin: 0;
+            color: var(--text-light);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-lg);
+        }
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-md);
+            background-color: var(--background-color);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--spacing-md);
+            transition: background-color var(--transition-fast);
+        }
+
+        .toggle-switch:hover {
+            background-color: #F1F5F9;
+        }
+
+        .toggle-switch-label {
+            flex: 1;
+        }
+
+        .toggle-switch-title {
+            font-weight: 600;
+            color: var(--secondary-color);
+            margin-bottom: var(--spacing-xs);
+            font-size: 1rem;
+        }
+
+        .toggle-switch-desc {
+            font-size: 0.875rem;
+            color: var(--text-light);
+        }
+
+        .toggle-input {
+            position: relative;
+            width: 52px;
+            height: 28px;
+        }
+
+        .toggle-input input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #CBD5E0;
+            transition: var(--transition-base);
+            border-radius: 28px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: var(--transition-base);
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-input input:checked + .toggle-slider {
+            background-color: var(--primary-color);
+        }
+
+        .toggle-input input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        .file-upload {
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-2xl);
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            background-color: var(--background-color);
+        }
+
+        .file-upload:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(44, 82, 130, 0.05);
+        }
+
+        .file-upload-icon {
+            font-size: 3rem;
+            margin-bottom: var(--spacing-md);
+            opacity: 0.5;
+        }
+
+        .file-upload-text {
+            color: var(--text-light);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .file-upload-hint {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .danger-zone {
+            border: 2px solid var(--error-color);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            background-color: rgba(229, 62, 62, 0.05);
+        }
+
+        .danger-zone h3 {
+            color: var(--error-color);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .danger-zone p {
+            color: var(--text-light);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .btn-danger {
+            background-color: var(--error-color);
+            color: white;
+            border: none;
+        }
+
+        .btn-danger:hover {
+            background-color: #C53030;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .notification-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-md);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--spacing-md);
+            background-color: var(--surface-color);
+            transition: all var(--transition-fast);
+        }
+
+        .notification-item:hover {
+            border-color: var(--primary-light);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .notification-info {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            color: var(--secondary-color);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .notification-desc {
+            font-size: 0.875rem;
+            color: var(--text-light);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="dashboard-sidebar">
+            <a href="../index.html" class="logo">
+                <span>📚 Seller Portal</span>
+            </a>
+            <nav class="sidebar-nav">
+                <a href="seller-dashboard.html" class="sidebar-link">Overview</a>
+                <a href="inventory.html" class="sidebar-link">My Inventory</a>
+                <a href="seller-orders.html" class="sidebar-link">Orders</a>
+                <a href="seller-earnings.html" class="sidebar-link">Earnings</a>
+                <a href="seller-settings.html" class="sidebar-link active">Settings</a>
+                <a href="../index.html" class="sidebar-link"
+                    style="margin-top: auto; color: var(--error-color);">Logout</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <header class="dashboard-header">
+                <div>
+                    <h2>Settings</h2>
+                    <p class="text-light" style="margin: 0;">Manage your seller account settings</p>
+                </div>
+                <div style="display: flex; align-items: center; gap: var(--spacing-md);">
+                    <div
+                        style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--accent-color), var(--accent-light)); border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700;">
+                        S</div>
+                </div>
+            </header>
+
+            <!-- Profile Settings -->
+            <div class="settings-section">
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <h3 class="settings-card-title">Profile Information</h3>
+                        <p class="settings-card-subtitle">Update your seller profile details</p>
+                    </div>
+
+                    <div class="profile-section">
+                        <div class="profile-avatar">S</div>
+                        <div class="profile-info">
+                            <h3>BookStore Pro</h3>
+                            <p>seller@bookstorepro.com</p>
+                            <p style="margin-top: var(--spacing-xs);">Seller ID: #SELL-001</p>
+                        </div>
+                        <button class="btn btn-outline">Change Avatar</button>
+                    </div>
+
+                    <form>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Store Name</label>
+                                <input type="text" class="form-control" value="BookStore Pro">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Contact Email</label>
+                                <input type="email" class="form-control" value="seller@bookstorepro.com">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" value="+1 (555) 123-4567">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Business License</label>
+                                <input type="text" class="form-control" value="BL-2024-001">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Store Description</label>
+                            <textarea class="form-control" rows="4">We specialize in rare and collectible books, offering a curated selection of fiction, non-fiction, and academic titles.</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Store Address</label>
+                            <textarea class="form-control" rows="3">123 Main Street, Suite 100, New York, NY 10001</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Account Security -->
+            <div class="settings-section">
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <h3 class="settings-card-title">Account Security</h3>
+                        <p class="settings-card-subtitle">Manage your password and security settings</p>
+                    </div>
+
+                    <form>
+                        <div class="form-group">
+                            <label class="form-label">Current Password</label>
+                            <input type="password" class="form-control" placeholder="Enter current password">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">New Password</label>
+                                <input type="password" class="form-control" placeholder="Enter new password">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Confirm New Password</label>
+                                <input type="password" class="form-control" placeholder="Confirm new password">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-outline">Update Password</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Payment & Payout Settings -->
+            <div class="settings-section">
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <h3 class="settings-card-title">Payment & Payout</h3>
+                        <p class="settings-card-subtitle">Configure your payment methods and payout preferences</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Payout Method</label>
+                        <select class="form-control">
+                            <option>Bank Transfer</option>
+                            <option>PayPal</option>
+                            <option>Stripe</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Bank Account Number</label>
+                            <input type="text" class="form-control" placeholder="**** **** **** 1234">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Account Holder Name</label>
+                            <input type="text" class="form-control" value="BookStore Pro">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Payout Frequency</label>
+                        <select class="form-control">
+                            <option>Weekly</option>
+                            <option>Bi-weekly</option>
+                            <option>Monthly</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Payment Settings</button>
+                </div>
+            </div>
+
+            <!-- Notification Preferences -->
+            <div class="settings-section">
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <h3 class="settings-card-title">Notification Preferences</h3>
+                        <p class="settings-card-subtitle">Choose what notifications you want to receive</p>
+                    </div>
+
+                    <div class="notification-item">
+                        <div class="notification-info">
+                            <div class="notification-title">New Order Alerts</div>
+                            <div class="notification-desc">Get notified when you receive a new order</div>
+                        </div>
+                        <label class="toggle-input">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="notification-item">
+                        <div class="notification-info">
+                            <div class="notification-title">Payment Received</div>
+                            <div class="notification-desc">Notifications when payments are processed</div>
+                        </div>
+                        <label class="toggle-input">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="notification-item">
+                        <div class="notification-info">
+                            <div class="notification-title">Low Stock Warnings</div>
+                            <div class="notification-desc">Alert when inventory is running low</div>
+                        </div>
+                        <label class="toggle-input">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="notification-item">
+                        <div class="notification-info">
+                            <div class="notification-title">Customer Reviews</div>
+                            <div class="notification-desc">Notify when customers leave reviews</div>
+                        </div>
+                        <label class="toggle-input">
+                            <input type="checkbox">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="notification-item">
+                        <div class="notification-info">
+                            <div class="notification-title">Marketing Updates</div>
+                            <div class="notification-desc">Promotions and platform updates</div>
+                        </div>
+                        <label class="toggle-input">
+                            <input type="checkbox">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Danger Zone -->
+            <div class="settings-section">
+                <div class="danger-zone">
+                    <h3>Danger Zone</h3>
+                    <p>Once you delete your account, there is no going back. Please be certain.</p>
+                    <button class="btn btn-danger">Deactivate Account</button>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+</body>
+
+</html>
+

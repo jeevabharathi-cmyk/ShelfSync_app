@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShelfSync | Smart Bookstore</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Landing Page Specific Styles */
+        .hero {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 50%, var(--secondary-color) 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 15s ease infinite;
+            color: white;
+            padding: var(--spacing-3xl) 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(196, 86, 33, 0.15) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .hero .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .hero h1 {
+            color: white;
+            font-size: 3.75rem;
+            margin-bottom: var(--spacing-lg);
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+            letter-spacing: -0.03em;
+        }
+        
+        .hero p {
+            font-size: 1.375rem;
+            opacity: 0.95;
+            max-width: 700px;
+            margin: 0 auto var(--spacing-2xl);
+            line-height: 1.8;
+            font-weight: 400;
+            text-shadow: 0 1px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .features-icon {
+            font-size: 3rem;
+            margin-bottom: var(--spacing-lg);
+            color: var(--primary-color);
+            display: inline-block;
+            transition: transform var(--transition-base);
+        }
+
+        .features-icon:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .section-alt {
+            background-color: var(--surface-color);
+        }
+
+        .card:hover img {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <span>📚 ShelfSync</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html" class="nav-link active">Home</a></li>
+                <li><a href="pages/all-books.html" class="nav-link">Browse Books</a></li>
+                <li><a href="pages/login-customer.html" class="btn btn-outline">Login</a></li>
+                <li><a href="pages/signup.html" class="btn btn-primary">Sign Up</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="container">
+            <h1>Your Next Favorite Book Awaits</h1>
+            <p>Discover a world of stories, knowledge, and adventure. ShelfSync connects you with the best books from trusted sellers.</p>
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <a href="pages/all-books.html" class="btn" style="background-color: white; color: var(--primary-color);">Browse Collection</a>
+                <a href="pages/signup.html" class="btn" style="background-color: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.4);">Join Now</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Featured Books -->
+    <section class="section">
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: end; margin-bottom: var(--spacing-xl);">
+                <div>
+                    <h2>Trending Now</h2>
+                    <p class="text-light">Top picks for this week</p>
+                </div>
+                <a href="pages/all-books.html" class="btn btn-outline">View All</a>
+            </div>
+
+            <div class="grid-4">
+                <!-- Book Card 1 -->
+                <a href="pages/book-details.html" style="text-decoration: none; color: inherit;">
+                    <div class="card">
+                        <div style="height: 280px; overflow: hidden; border-radius: var(--radius-md) var(--radius-md) 0 0; position: relative;">
+                            <img src="https://covers.openlibrary.org/b/isbn/9780743273565-L.jpg" 
+                                 alt="The Great Gatsby" 
+                                 style="width: 100%; height: 100%; object-fit: cover; transition: transform var(--transition-base);"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div style="display: none; width: 100%; height: 100%; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.125rem; font-family: var(--font-display);">
+                                The Great Gatsby
+                            </div>
+                            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.1) 100%); pointer-events: none;"></div>
+                        </div>
+                        <div class="card-body">
+                            <h3 class="card-title" style="font-size: 1.1rem;">The Great Gatsby</h3>
+                            <p class="card-subtitle">F. Scott Fitzgerald</p>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-weight: 700; color: var(--primary-color);">$12.99</span>
+                                <span class="badge badge-success">In Stock</span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Book Card 2 -->
+                <a href="pages/book-details.html" style="text-decoration: none; color: inherit;">
+                    <div class="card">
+                        <div style="height: 280px; overflow: hidden; border-radius: var(--radius-md) var(--radius-md) 0 0; position: relative;">
+                            <img src="https://covers.openlibrary.org/b/isbn/9780451524935-L.jpg" 
+                                 alt="1984" 
+                                 style="width: 100%; height: 100%; object-fit: cover; transition: transform var(--transition-base);"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div style="display: none; width: 100%; height: 100%; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.125rem; font-family: var(--font-display);">
+                                1984
+                            </div>
+                            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.1) 100%); pointer-events: none;"></div>
+                        </div>
+                        <div class="card-body">
+                            <h3 class="card-title" style="font-size: 1.1rem;">1984</h3>
+                            <p class="card-subtitle">George Orwell</p>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-weight: 700; color: var(--primary-color);">$10.50</span>
+                                <span class="badge badge-warning">Low Stock</span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Book Card 3 -->
+                <a href="pages/book-details.html" style="text-decoration: none; color: inherit;">
+                    <div class="card">
+                        <div style="height: 280px; overflow: hidden; border-radius: var(--radius-md) var(--radius-md) 0 0; position: relative;">
+                            <img src="https://covers.openlibrary.org/b/isbn/9780132350884-L.jpg" 
+                                 alt="Clean Code" 
+                                 style="width: 100%; height: 100%; object-fit: cover; transition: transform var(--transition-base);"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div style="display: none; width: 100%; height: 100%; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.125rem; font-family: var(--font-display);">
+                                Clean Code
+                            </div>
+                            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.1) 100%); pointer-events: none;"></div>
+                        </div>
+                        <div class="card-body">
+                            <h3 class="card-title" style="font-size: 1.1rem;">Clean Code</h3>
+                            <p class="card-subtitle">Robert C. Martin</p>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-weight: 700; color: var(--primary-color);">$35.00</span>
+                                <span class="badge badge-success">In Stock</span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Book Card 4 -->
+                <a href="pages/book-details.html" style="text-decoration: none; color: inherit;">
+                    <div class="card">
+                        <div style="height: 280px; overflow: hidden; border-radius: var(--radius-md) var(--radius-md) 0 0; position: relative;">
+                            <img src="https://covers.openlibrary.org/b/isbn/9780201633610-L.jpg" 
+                                 alt="Design Patterns" 
+                                 style="width: 100%; height: 100%; object-fit: cover; transition: transform var(--transition-base);"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div style="display: none; width: 100%; height: 100%; background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.125rem; font-family: var(--font-display);">
+                                Design Patterns
+                            </div>
+                            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.1) 100%); pointer-events: none;"></div>
+                        </div>
+                        <div class="card-body">
+                            <h3 class="card-title" style="font-size: 1.1rem;">Design Patterns</h3>
+                            <p class="card-subtitle">Gang of Four</p>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-weight: 700; color: var(--primary-color);">$42.00</span>
+                                <span class="badge badge-success">In Stock</span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="section section-alt">
+        <div class="container">
+            <div class="text-center" style="margin-bottom: var(--spacing-3xl);">
+                <h2>Why Choose ShelfSync?</h2>
+                <p class="text-light" style="font-size: 1.125rem;">The best platform for book lovers and sellers.</p>
+            </div>
+            
+            <div class="grid-3">
+                <div class="text-center">
+                    <div class="features-icon">🚀</div>
+                    <h3>Fast Delivery</h3>
+                    <p>Get your books delivered to your doorstep in record time with our dedicated partners.</p>
+                </div>
+                <div class="text-center">
+                    <div class="features-icon">🛡️</div>
+                    <h3>Secure Payments</h3>
+                    <p>Experience hassle-free and secure transactions for every purchase you make.</p>
+                </div>
+                <div class="text-center">
+                    <div class="features-icon">📚</div>
+                    <h3>Huge Collection</h3>
+                    <p>Browse through thousands of titles across various genres and categories.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>ShelfSync</h4>
+                    <p style="color: var(--text-light);">Connecting readers with their next favorite story. The smart way to buy and sell books.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="pages/all-books.html">Browse Books</a></li>
+                        <li><a href="pages/login-customer.html">Login</a></li>
+                        <li><a href="pages/signup.html">Sign Up</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Support</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>For Sellers</h4>
+                    <ul class="footer-links">
+                        <li><a href="pages/login-seller.html">Seller Login</a></li>
+                        <li><a href="pages/signup.html">Become a Seller</a></li>
+                        <li><a href="#">Seller Guidelines</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 ShelfSync. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

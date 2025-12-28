@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Inventory | ShelfSync Admin</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="dashboard-sidebar">
+            <a href="../index.html" class="logo">
+                <span>📚 ShelfSync Admin</span>
+            </a>
+            <nav class="sidebar-nav">
+                <a href="admin-dashboard.html" class="sidebar-link">Dashboard Overview</a>
+                <a href="admin-users.html" class="sidebar-link">User Management</a>
+                <a href="admin-inventory.html" class="sidebar-link active">All Inventory</a>
+                <a href="admin-reports.html" class="sidebar-link">Reports</a>
+                <a href="admin-settings.html" class="sidebar-link">Settings</a>
+                <a href="../index.html" class="sidebar-link"
+                    style="margin-top: auto; color: var(--error-color);">Logout</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <header class="dashboard-header">
+                <h2>All Inventory</h2>
+                <div style="display: flex; align-items: center; gap: var(--spacing-md);">
+                    <div
+                        style="width: 40px; height: 40px; background-color: var(--secondary-color); border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center;">
+                        A
+                    </div>
+                </div>
+            </header>
+
+            <!-- Filters -->
+            <div class="card mb-lg">
+                <div class="card-body" style="flex-direction: row; align-items: center; gap: var(--spacing-md);">
+                    <div class="form-group" style="margin-bottom: 0; flex: 1;">
+                        <input type="text" class="form-control" placeholder="Search books by title, ISBN, or seller...">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <select class="form-control">
+                            <option>All Categories</option>
+                            <option>Fiction</option>
+                            <option>Non-Fiction</option>
+                            <option>Academic</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <select class="form-control">
+                            <option>All Status</option>
+                            <option>In Stock</option>
+                            <option>Low Stock</option>
+                            <option>Out of Stock</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-outline">Filter</button>
+                </div>
+            </div>
+
+            <!-- Inventory Table -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Book Title</th>
+                            <th>Seller</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: var(--spacing-sm);">
+                                    <div
+                                        style="width: 40px; height: 60px; background-color: #e2e8f0; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 0.75rem;">
+                                        Img</div>
+                                    <div>
+                                        <div style="font-weight: 600;">The Great Gatsby</div>
+                                        <div class="text-light" style="font-size: 0.8rem;">ISBN: 978-0743273565</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>BookHaven Store</td>
+                            <td>Fiction</td>
+                            <td style="font-weight: 600;">$12.99</td>
+                            <td>45</td>
+                            <td><span class="badge badge-success">In Stock</span></td>
+                            <td>
+                                <button class="btn btn-outline"
+                                    style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">View</button>
+                                <button class="btn btn-outline"
+                                    style="padding: 0.25rem 0.5rem; font-size: 0.75rem; color: var(--error-color); border-color: var(--error-color);">Remove</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: var(--spacing-sm);">
+                                    <div
+                                        style="width: 40px; height: 60px; background-color: #e2e8f0; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 0.75rem;">
+                                        Img</div>
+                                    <div>
+                                        <div style="font-weight: 600;">Clean Code</div>
+                                        <div class="text-light" style="font-size: 0.8rem;">ISBN: 978-0132350884</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>TechBooks Inc.</td>
+                            <td>Academic</td>
+                            <td style="font-weight: 600;">$35.00</td>
+                            <td>12</td>
+                            <td><span class="badge badge-success">In Stock</span></td>
+                            <td>
+                                <button class="btn btn-outline"
+                                    style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">View</button>
+                                <button class="btn btn-outline"
+                                    style="padding: 0.25rem 0.5rem; font-size: 0.75rem; color: var(--error-color); border-color: var(--error-color);">Remove</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: var(--spacing-sm);">
+                                    <div
+                                        style="width: 40px; height: 60px; background-color: #e2e8f0; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 0.75rem;">
+                                        Img</div>
+                                    <div>
+                                        <div style="font-weight: 600;">1984</div>
+                                        <div class="text-light" style="font-size: 0.8rem;">ISBN: 978-0451524935</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Classic Reads</td>
+                            <td>Fiction</td>
+                            <td style="font-weight: 600;">$10.50</td>
+                            <td>3</td>
+                            <td><span class="badge badge-warning">Low Stock</span></td>
+                            <td>
+                                <button class="btn btn-outline"
+                                    style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">View</button>
+                                <button class="btn btn-outline"
+                                    style="padding: 0.25rem 0.5rem; font-size: 0.75rem; color: var(--error-color); border-color: var(--error-color);">Remove</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: var(--spacing-sm);">
+                                    <div
+                                        style="width: 40px; height: 60px; background-color: #e2e8f0; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 0.75rem;">
+                                        Img</div>
+                                    <div>
+                                        <div style="font-weight: 600;">Rare First Edition</div>
+                                        <div class="text-light" style="font-size: 0.8rem;">ISBN: N/A</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Antique Books</td>
+                            <td>Collectibles</td>
+                            <td style="font-weight: 600;">$150.00</td>
+                            <td>0</td>
+                            <td><span class="badge badge-error">Out of Stock</span></td>
+                            <td>
+                                <button class="btn btn-outline"
+                                    style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">View</button>
+                                <button class="btn btn-outline"
+                                    style="padding: 0.25rem 0.5rem; font-size: 0.75rem; color: var(--error-color); border-color: var(--error-color);">Remove</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; margin-top: var(--spacing-lg);">
+                <span class="text-light" style="font-size: var(--small-size);">Showing 1-4 of 8500 books</span>
+                <div style="display: flex; gap: var(--spacing-xs);">
+                    <button class="btn btn-outline" style="padding: 0.5rem 1rem;" disabled>Previous</button>
+                    <button class="btn btn-outline" style="padding: 0.5rem 1rem;">Next</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+
+</html>

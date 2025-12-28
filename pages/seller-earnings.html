@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Earnings | Seller Portal</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .dashboard-sidebar {
+            background-color: #0f172a;
+        }
+
+        .stat-card h3 {
+            color: var(--accent-color);
+        }
+
+        .earnings-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: var(--spacing-2xl);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--spacing-xl);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .earnings-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .earnings-header .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .total-earnings {
+            font-size: 3rem;
+            font-weight: 800;
+            font-family: var(--font-display);
+            margin-bottom: var(--spacing-sm);
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .earnings-period {
+            opacity: 0.9;
+            font-size: 1.125rem;
+        }
+
+        .chart-container {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-xl);
+            box-shadow: var(--shadow-md);
+        }
+
+        .chart-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: var(--spacing-lg);
+            color: var(--secondary-color);
+            font-family: var(--font-display);
+        }
+
+        .revenue-chart {
+            height: 400px;
+            position: relative;
+            padding: var(--spacing-lg);
+            background: linear-gradient(135deg, rgba(248, 250, 252, 0.5), rgba(241, 245, 249, 0.3));
+            border-radius: var(--radius-md);
+        }
+
+        .chart-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .chart-grid-line {
+            stroke: var(--border-color);
+            stroke-width: 1;
+            stroke-dasharray: 4, 4;
+            opacity: 0.6;
+        }
+
+        .chart-line {
+            fill: none;
+            stroke: url(#lineGradient);
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            filter: drop-shadow(0 2px 4px rgba(44, 82, 130, 0.2));
+        }
+
+        .chart-area {
+            fill: url(#areaGradient);
+            opacity: 0.3;
+        }
+
+        .chart-point {
+            fill: var(--primary-color);
+            stroke: white;
+            stroke-width: 2;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            r: 5;
+        }
+
+        .chart-point:hover {
+            r: 8;
+            fill: var(--accent-color);
+            filter: drop-shadow(0 4px 8px rgba(196, 86, 33, 0.4));
+        }
+
+        .chart-label {
+            font-size: 0.8125rem;
+            fill: var(--text-light);
+            font-weight: 500;
+            text-anchor: middle;
+        }
+
+        .chart-value-label {
+            font-size: 0.75rem;
+            fill: var(--text-light);
+            font-weight: 600;
+            text-anchor: middle;
+        }
+
+        .chart-tooltip {
+            position: absolute;
+            background-color: var(--secondary-color);
+            color: white;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            font-weight: 600;
+            pointer-events: none;
+            opacity: 0;
+            transform: translate(-50%, -100%) translateY(-10px);
+            transition: opacity var(--transition-base), transform var(--transition-base);
+            box-shadow: var(--shadow-lg);
+            white-space: nowrap;
+            z-index: 100;
+        }
+
+        .chart-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: var(--secondary-color);
+        }
+
+        .chart-tooltip.show {
+            opacity: 1;
+            transform: translate(-50%, -100%) translateY(-5px);
+        }
+
+        .chart-legend {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: var(--spacing-xl);
+            margin-top: var(--spacing-md);
+            padding-top: var(--spacing-md);
+            border-top: 1px solid var(--border-light);
+        }
+
+        .chart-legend-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-size: 0.875rem;
+            color: var(--text-color);
+        }
+
+        .chart-legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        .chart-legend-color.primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+        }
+
+        .earnings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .earnings-card {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            box-shadow: var(--shadow-md);
+            transition: all var(--transition-base);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .earnings-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+        }
+
+        .earnings-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .earnings-card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .earnings-card-icon.primary {
+            background: rgba(44, 82, 130, 0.1);
+            color: var(--primary-color);
+        }
+
+        .earnings-card-icon.success {
+            background: rgba(56, 161, 105, 0.1);
+            color: var(--success-color);
+        }
+
+        .earnings-card-icon.warning {
+            background: rgba(196, 86, 33, 0.1);
+            color: var(--accent-color);
+        }
+
+        .earnings-card-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+            margin-bottom: var(--spacing-xs);
+            font-family: var(--font-display);
+        }
+
+        .earnings-card-label {
+            color: var(--text-light);
+            font-size: 0.9375rem;
+            font-weight: 500;
+        }
+
+        .earnings-card-change {
+            margin-top: var(--spacing-sm);
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .earnings-card-change.positive {
+            color: var(--success-color);
+        }
+
+        .earnings-card-change.negative {
+            color: var(--error-color);
+        }
+
+        .transaction-table {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+
+        .transaction-header {
+            padding: var(--spacing-lg);
+            border-bottom: 2px solid var(--border-light);
+            background: linear-gradient(to bottom, #F8FAFC, #F1F5F9);
+        }
+
+        .transaction-header h3 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-family: var(--font-display);
+        }
+
+        .transaction-filters {
+            display: flex;
+            gap: var(--spacing-md);
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid var(--border-light);
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background-color: var(--surface-color);
+            color: var(--text-color);
+            font-family: inherit;
+            font-size: 0.9375rem;
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+
+        .filter-select:hover {
+            border-color: var(--primary-color);
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(44, 82, 130, 0.1);
+        }
+
+        .transaction-row {
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid var(--border-light);
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr 1fr 1fr;
+            gap: var(--spacing-md);
+            align-items: center;
+            transition: background-color var(--transition-fast);
+        }
+
+        .transaction-row:hover {
+            background-color: var(--background-color);
+        }
+
+        .transaction-row:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-id {
+            font-weight: 700;
+            color: var(--primary-color);
+            font-family: 'Courier New', monospace;
+        }
+
+        .transaction-book {
+            color: var(--secondary-color);
+            font-weight: 500;
+        }
+
+        .transaction-amount {
+            font-weight: 700;
+            color: var(--accent-color);
+            font-size: 1.125rem;
+        }
+
+        .transaction-date {
+            color: var(--text-light);
+            font-size: 0.9375rem;
+        }
+
+        .transaction-status {
+            display: inline-block;
+        }
+
+        @media (max-width: 1024px) {
+            .transaction-row {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-sm);
+            }
+
+            .transaction-row > div::before {
+                content: attr(data-label) ': ';
+                font-weight: 600;
+                color: var(--text-light);
+                margin-right: var(--spacing-xs);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="dashboard-sidebar">
+            <a href="../index.html" class="logo">
+                <span>📚 Seller Portal</span>
+            </a>
+            <nav class="sidebar-nav">
+                <a href="seller-dashboard.html" class="sidebar-link">Overview</a>
+                <a href="inventory.html" class="sidebar-link">My Inventory</a>
+                <a href="seller-orders.html" class="sidebar-link">Orders</a>
+                <a href="seller-earnings.html" class="sidebar-link active">Earnings</a>
+                <a href="seller-settings.html" class="sidebar-link">Settings</a>
+                <a href="../index.html" class="sidebar-link"
+                    style="margin-top: auto; color: var(--error-color);">Logout</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <header class="dashboard-header">
+                <div>
+                    <h2>Earnings & Analytics</h2>
+                    <p class="text-light" style="margin: 0;">Track your sales and revenue</p>
+                </div>
+                <div style="display: flex; align-items: center; gap: var(--spacing-md);">
+                    <button class="btn btn-outline">Export Report</button>
+                    <div
+                        style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--accent-color), var(--accent-light)); border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700;">
+                        S</div>
+                </div>
+            </header>
+
+            <!-- Total Earnings Header -->
+            <div class="earnings-header">
+                <div class="container" style="max-width: 100%; padding: 0;">
+                    <div class="total-earnings">$8,450.00</div>
+                    <div class="earnings-period">Total Earnings (Last 30 Days)</div>
+                    <div style="margin-top: var(--spacing-md); opacity: 0.9;">
+                        <span style="background: rgba(255, 255, 255, 0.2); padding: 0.25rem 0.75rem; border-radius: var(--radius-full); font-size: 0.875rem;">
+                            ↑ 12.5% from last month
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Earnings Cards -->
+            <div class="earnings-grid">
+                <div class="earnings-card">
+                    <div class="earnings-card-icon primary">💰</div>
+                    <div class="earnings-card-value">$2,340</div>
+                    <div class="earnings-card-label">This Week</div>
+                    <div class="earnings-card-change positive">↑ +8.2%</div>
+                </div>
+                <div class="earnings-card">
+                    <div class="earnings-card-icon success">📦</div>
+                    <div class="earnings-card-value">45</div>
+                    <div class="earnings-card-label">Books Sold</div>
+                    <div class="earnings-card-change positive">↑ +15%</div>
+                </div>
+                <div class="earnings-card">
+                    <div class="earnings-card-icon warning">💳</div>
+                    <div class="earnings-card-value">$156</div>
+                    <div class="earnings-card-label">Average Order</div>
+                    <div class="earnings-card-change positive">↑ +3.1%</div>
+                </div>
+                <div class="earnings-card">
+                    <div class="earnings-card-icon primary">🎯</div>
+                    <div class="earnings-card-value">$890</div>
+                    <div class="earnings-card-label">Pending Payout</div>
+                    <div class="earnings-card-change" style="color: var(--text-light);">Processing</div>
+                </div>
+            </div>
+
+            <!-- Revenue Chart -->
+            <div class="chart-container">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg);">
+                    <div class="chart-title">Revenue Trend (Last 6 Months)</div>
+                    <select class="filter-select" style="width: auto;">
+                        <option>Last 6 Months</option>
+                        <option>Last 3 Months</option>
+                        <option>Last Year</option>
+                        <option>All Time</option>
+                    </select>
+                </div>
+                <div class="revenue-chart">
+                    <svg class="chart-svg" viewBox="0 0 800 350" preserveAspectRatio="xMidYMid meet">
+                        <defs>
+                            <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color: #2C5282; stop-opacity: 1" />
+                                <stop offset="100%" style="stop-color: #C05621; stop-opacity: 1" />
+                            </linearGradient>
+                            <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color: #2C5282; stop-opacity: 0.4" />
+                                <stop offset="100%" style="stop-color: #2C5282; stop-opacity: 0.05" />
+                            </linearGradient>
+                        </defs>
+                        
+                        <!-- Grid Lines -->
+                        <line class="chart-grid-line" x1="80" y1="50" x2="80" y2="280" />
+                        <line class="chart-grid-line" x1="80" y1="280" x2="750" y2="280" />
+                        <line class="chart-grid-line" x1="80" y1="230" x2="750" y2="230" />
+                        <line class="chart-grid-line" x1="80" y1="180" x2="750" y2="180" />
+                        <line class="chart-grid-line" x1="80" y1="130" x2="750" y2="130" />
+                        <line class="chart-grid-line" x1="80" y1="80" x2="750" y2="80" />
+                        
+                        <!-- Y-axis Labels -->
+                        <text class="chart-value-label" x="75" y="285" text-anchor="end">$0</text>
+                        <text class="chart-value-label" x="75" y="235" text-anchor="end">$500</text>
+                        <text class="chart-value-label" x="75" y="185" text-anchor="end">$1,000</text>
+                        <text class="chart-value-label" x="75" y="135" text-anchor="end">$1,500</text>
+                        <text class="chart-value-label" x="75" y="85" text-anchor="end">$2,000</text>
+                        
+                        <!-- Area under curve -->
+                        <path class="chart-area" d="M 190 280 L 190 247 L 276 227 L 362 213 L 448 195 L 534 180 L 620 165 L 620 280 Z" />
+                        
+                        <!-- Line -->
+                        <path class="chart-line" d="M 190 247 L 276 227 L 362 213 L 448 195 L 534 180 L 620 165" />
+                        
+                        <!-- Data Points -->
+                        <circle class="chart-point" cx="190" cy="247" data-month="Jul" data-value="680" />
+                        <circle class="chart-point" cx="276" cy="227" data-month="Aug" data-value="720" />
+                        <circle class="chart-point" cx="362" cy="213" data-month="Sep" data-value="780" />
+                        <circle class="chart-point" cx="448" cy="195" data-month="Oct" data-value="850" />
+                        <circle class="chart-point" cx="534" cy="180" data-month="Nov" data-value="920" />
+                        <circle class="chart-point" cx="620" cy="165" data-month="Dec" data-value="1,040" />
+                        
+                        <!-- X-axis Labels -->
+                        <text class="chart-label" x="190" y="300">Jul</text>
+                        <text class="chart-label" x="276" y="300">Aug</text>
+                        <text class="chart-label" x="362" y="300">Sep</text>
+                        <text class="chart-label" x="448" y="300">Oct</text>
+                        <text class="chart-label" x="534" y="300">Nov</text>
+                        <text class="chart-label" x="620" y="300">Dec</text>
+                    </svg>
+                    <div class="chart-tooltip" id="chartTooltip"></div>
+                </div>
+                <div class="chart-legend">
+                    <div class="chart-legend-item">
+                        <div class="chart-legend-color primary"></div>
+                        <span>Revenue</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Transactions -->
+            <div class="transaction-table">
+                <div class="transaction-header">
+                    <h3>Recent Transactions</h3>
+                </div>
+                <div class="transaction-filters">
+                    <select class="filter-select">
+                        <option>All Transactions</option>
+                        <option>Sales</option>
+                        <option>Refunds</option>
+                        <option>Payouts</option>
+                    </select>
+                    <select class="filter-select">
+                        <option>Last 30 Days</option>
+                        <option>Last Week</option>
+                        <option>Last Month</option>
+                        <option>Last 3 Months</option>
+                    </select>
+                    <input type="text" class="form-control" placeholder="Search transactions..." style="flex: 1; max-width: 300px;">
+                </div>
+                <div style="overflow-x: auto;">
+                    <div class="transaction-row" style="background-color: #F8FAFC; font-weight: 600; color: var(--text-light); text-transform: uppercase; font-size: 0.8125rem; letter-spacing: 0.05em;">
+                        <div>ID</div>
+                        <div>Book</div>
+                        <div>Amount</div>
+                        <div>Date</div>
+                        <div>Status</div>
+                    </div>
+                    <div class="transaction-row">
+                        <div class="transaction-id" data-label="ID">#TXN-001</div>
+                        <div class="transaction-book" data-label="Book">The Great Gatsby</div>
+                        <div class="transaction-amount" data-label="Amount">$12.99</div>
+                        <div class="transaction-date" data-label="Date">Jan 15, 2024</div>
+                        <div class="transaction-status" data-label="Status"><span class="badge badge-success">Completed</span></div>
+                    </div>
+                    <div class="transaction-row">
+                        <div class="transaction-id" data-label="ID">#TXN-002</div>
+                        <div class="transaction-book" data-label="Book">1984 by George Orwell</div>
+                        <div class="transaction-amount" data-label="Amount">$21.00</div>
+                        <div class="transaction-date" data-label="Date">Jan 14, 2024</div>
+                        <div class="transaction-status" data-label="Status"><span class="badge badge-success">Completed</span></div>
+                    </div>
+                    <div class="transaction-row">
+                        <div class="transaction-id" data-label="ID">#TXN-003</div>
+                        <div class="transaction-book" data-label="Book">Clean Code</div>
+                        <div class="transaction-amount" data-label="Amount">$35.00</div>
+                        <div class="transaction-date" data-label="Date">Jan 13, 2024</div>
+                        <div class="transaction-status" data-label="Status"><span class="badge badge-warning">Pending</span></div>
+                    </div>
+                    <div class="transaction-row">
+                        <div class="transaction-id" data-label="ID">#TXN-004</div>
+                        <div class="transaction-book" data-label="Book">Design Patterns</div>
+                        <div class="transaction-amount" data-label="Amount">$42.00</div>
+                        <div class="transaction-date" data-label="Date">Jan 12, 2024</div>
+                        <div class="transaction-status" data-label="Status"><span class="badge badge-success">Completed</span></div>
+                    </div>
+                    <div class="transaction-row">
+                        <div class="transaction-id" data-label="ID">#TXN-005</div>
+                        <div class="transaction-book" data-label="Book">JavaScript: The Good Parts</div>
+                        <div class="transaction-amount" data-label="Amount">$28.50</div>
+                        <div class="transaction-date" data-label="Date">Jan 11, 2024</div>
+                        <div class="transaction-status" data-label="Status"><span class="badge badge-success">Completed</span></div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        // Chart tooltip functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const tooltip = document.getElementById('chartTooltip');
+            const points = document.querySelectorAll('.chart-point');
+            
+            points.forEach(point => {
+                point.addEventListener('mouseenter', function(e) {
+                    const month = this.getAttribute('data-month');
+                    const value = this.getAttribute('data-value');
+                    const rect = this.getBoundingClientRect();
+                    const chartRect = this.closest('.revenue-chart').getBoundingClientRect();
+                    
+                    tooltip.textContent = `${month}: $${value}`;
+                    tooltip.style.left = rect.left - chartRect.left + rect.width / 2 + 'px';
+                    tooltip.style.top = rect.top - chartRect.top + 'px';
+                    tooltip.classList.add('show');
+                });
+                
+                point.addEventListener('mouseleave', function() {
+                    tooltip.classList.remove('show');
+                });
+            });
+        });
+    </script>
+
+</body>
+
+</html>
+

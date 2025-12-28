@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings | ShelfSync Admin</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="dashboard-sidebar">
+            <a href="../index.html" class="logo">
+                <span>📚 ShelfSync Admin</span>
+            </a>
+            <nav class="sidebar-nav">
+                <a href="admin-dashboard.html" class="sidebar-link">Dashboard Overview</a>
+                <a href="admin-users.html" class="sidebar-link">User Management</a>
+                <a href="admin-inventory.html" class="sidebar-link">All Inventory</a>
+                <a href="admin-reports.html" class="sidebar-link">Reports</a>
+                <a href="admin-settings.html" class="sidebar-link active">Settings</a>
+                <a href="../index.html" class="sidebar-link"
+                    style="margin-top: auto; color: var(--error-color);">Logout</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <header class="dashboard-header">
+                <h2>Settings</h2>
+                <div style="display: flex; align-items: center; gap: var(--spacing-md);">
+                    <div
+                        style="width: 40px; height: 40px; background-color: var(--secondary-color); border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center;">
+                        A
+                    </div>
+                </div>
+            </header>
+
+            <div class="grid-2">
+                <!-- General Settings -->
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title">General Configuration</h3>
+                        <p class="card-subtitle">Manage site-wide settings</p>
+
+                        <form>
+                            <div class="form-group">
+                                <label class="form-label">Site Name</label>
+                                <input type="text" class="form-control" value="ShelfSync">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Support Email</label>
+                                <input type="email" class="form-control" value="support@shelfsync.com">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Maintenance Mode</label>
+                                <div style="display: flex; align-items: center; gap: var(--spacing-sm);">
+                                    <input type="checkbox" id="maintenance">
+                                    <label for="maintenance" style="margin: 0;">Enable Maintenance Mode</label>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary">Save Changes</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Security Settings -->
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title">Security & Access</h3>
+                        <p class="card-subtitle">Manage admin account security</p>
+
+                        <form>
+                            <div class="form-group">
+                                <label class="form-label">Current Password</label>
+                                <input type="password" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">New Password</label>
+                                <input type="password" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Confirm New Password</label>
+                                <input type="password" class="form-control">
+                            </div>
+                            <button class="btn btn-outline">Update Password</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notification Settings -->
+            <div class="card" style="margin-top: var(--spacing-xl);">
+                <div class="card-body">
+                    <h3 class="card-title">Notifications</h3>
+                    <p class="card-subtitle">Configure email alerts</p>
+
+                    <div style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; padding-bottom: var(--spacing-md); border-bottom: 1px solid var(--border-color);">
+                            <div>
+                                <h4 style="font-size: 1rem; margin-bottom: 0;">New User Registration</h4>
+                                <p style="margin-bottom: 0; font-size: 0.875rem; color: var(--text-light);">Receive an
+                                    email when a new user signs up</p>
+                            </div>
+                            <input type="checkbox" checked>
+                        </div>
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; padding-bottom: var(--spacing-md); border-bottom: 1px solid var(--border-color);">
+                            <div>
+                                <h4 style="font-size: 1rem; margin-bottom: 0;">New Seller Application</h4>
+                                <p style="margin-bottom: 0; font-size: 0.875rem; color: var(--text-light);">Receive an
+                                    email when a seller applies</p>
+                            </div>
+                            <input type="checkbox" checked>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h4 style="font-size: 1rem; margin-bottom: 0;">System Errors</h4>
+                                <p style="margin-bottom: 0; font-size: 0.875rem; color: var(--text-light);">Receive
+                                    alerts for critical system errors</p>
+                            </div>
+                            <input type="checkbox" checked>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+</body>
+
+</html>

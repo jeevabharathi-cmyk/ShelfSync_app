@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | ShelfSync</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="dashboard-sidebar">
+            <div class="logo">
+                <span>📚 Admin Portal</span>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="admin-dashboard.html" class="sidebar-link active">
+                    <span>Overview</span>
+                </a>
+                <a href="admin-users.html" class="sidebar-link">
+                    <span>User Management</span>
+                </a>
+                <a href="admin-inventory.html" class="sidebar-link">
+                    <span>Inventory</span>
+                </a>
+                <a href="admin-reports.html" class="sidebar-link">
+                    <span>Reports</span>
+                </a>
+                <a href="admin-settings.html" class="sidebar-link">
+                    <span>Settings</span>
+                </a>
+                <a href="../index.html" class="sidebar-link" style="margin-top: auto; color: var(--error-color);">
+                    <span>Logout</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <!-- Header -->
+            <header class="dashboard-header">
+                <h2>Admin Dashboard</h2>
+                <div style="display: flex; align-items: center; gap: var(--spacing-md);">
+                    <button class="btn btn-primary" style="background-color: var(--accent-color);">+ Add User</button>
+                    <div
+                        style="width: 40px; height: 40px; background-color: var(--secondary-color); border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-weight: 600;">
+                        A
+                    </div>
+                </div>
+            </header>
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3 class="text-accent">$45k</h3>
+                    <p>Total Revenue</p>
+                </div>
+                <div class="stat-card">
+                    <h3 class="text-accent">1,240</h3>
+                    <p>Total Users</p>
+                </div>
+                <div class="stat-card">
+                    <h3 class="text-accent">8,500</h3>
+                    <p>Books Listed</p>
+                </div>
+                <div class="stat-card">
+                    <h3 class="text-accent">4.8</h3>
+                    <p>Platform Rating</p>
+                </div>
+            </div>
+
+            <!-- Recent Registrations Table -->
+            <h3 style="margin-bottom: var(--spacing-md);">Recent Registrations</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>User ID</th>
+                            <th>Name</th>
+                            <th>Role</th>
+                            <th>Date Joined</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>#USR-001</td>
+                            <td>John Doe</td>
+                            <td>Customer</td>
+                            <td>Today</td>
+                            <td><span class="badge badge-success">Active</span></td>
+                            <td><button class="btn btn-primary"
+                                    style="padding: 0.25rem 0.75rem; font-size: 0.75rem;">View</button></td>
+                        </tr>
+                        <tr>
+                            <td>#USR-002</td>
+                            <td>BookHaven Store</td>
+                            <td>Seller</td>
+                            <td>Yesterday</td>
+                            <td><span class="badge badge-warning">Pending</span></td>
+                            <td><button class="btn btn-outline"
+                                    style="padding: 0.25rem 0.75rem; font-size: 0.75rem;">Approve</button></td>
+                        </tr>
+                        <tr>
+                            <td>#USR-003</td>
+                            <td>Jane Smith</td>
+                            <td>Customer</td>
+                            <td>Oct 22, 2025</td>
+                            <td><span class="badge badge-success">Active</span></td>
+                            <td><button class="btn btn-primary"
+                                    style="padding: 0.25rem 0.75rem; font-size: 0.75rem;">View</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+</body>
+
+</html>

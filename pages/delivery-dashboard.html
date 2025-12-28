@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Dashboard | ShelfSync</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .dashboard-sidebar {
+            background-color: #064e3b;
+            /* Green/Teal for Delivery */
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="dashboard-sidebar">
+            <a href="../index.html" class="logo">
+                <span>📚 Delivery</span>
+            </a>
+            <nav class="sidebar-nav">
+                <a href="#" class="sidebar-link active">Assigned Deliveries</a>
+                <a href="#" class="sidebar-link">History</a>
+                <a href="#" class="sidebar-link">Earnings</a>
+                <a href="#" class="sidebar-link">Profile</a>
+                <a href="../index.html" class="sidebar-link"
+                    style="margin-top: auto; color: var(--error-color);">Logout</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <header class="dashboard-header">
+                <h2>Assigned Deliveries</h2>
+                <div style="display: flex; align-items: center; gap: var(--spacing-md);">
+                    <span class="badge badge-success" style="font-size: 1rem; padding: 0.5rem 1rem;">Status:
+                        Online</span>
+                    <div
+                        style="width: 40px; height: 40px; background-color: #064e3b; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center;">
+                        D</div>
+                </div>
+            </header>
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3 style="color: #064e3b;">5</h3>
+                    <p>Pending Deliveries</p>
+                </div>
+                <div class="stat-card">
+                    <h3 style="color: #064e3b;">$120</h3>
+                    <p>Today's Earnings</p>
+                </div>
+                <div class="stat-card">
+                    <h3 style="color: #064e3b;">150</h3>
+                    <p>Total Delivered</p>
+                </div>
+            </div>
+
+            <!-- Deliveries Table -->
+            <h3 style="margin-bottom: var(--spacing-md);">Today's Route</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer Address</th>
+                            <th>Pickup From</th>
+                            <th>Est. Time</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>#ORD-002</td>
+                            <td>123 Main St, Springfield</td>
+                            <td>BookHaven Store</td>
+                            <td>2:00 PM</td>
+                            <td><span class="badge badge-warning">On the way</span></td>
+                            <td><button class="btn btn-primary"
+                                    style="padding: 0.25rem 0.5rem; font-size: 0.75rem; background-color: #064e3b;">Mark
+                                    Delivered</button></td>
+                        </tr>
+                        <tr>
+                            <td>#ORD-005</td>
+                            <td>456 Oak Ave, Springfield</td>
+                            <td>City Books</td>
+                            <td>3:30 PM</td>
+                            <td><span class="badge" style="background-color: #f1f5f9; color: var(--text-light);">Pending
+                                    Pickup</span></td>
+                            <td><button class="btn btn-outline"
+                                    style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Start</button></td>
+                        </tr>
+                        <tr>
+                            <td>#ORD-008</td>
+                            <td>789 Pine Ln, Springfield</td>
+                            <td>BookHaven Store</td>
+                            <td>4:15 PM</td>
+                            <td><span class="badge" style="background-color: #f1f5f9; color: var(--text-light);">Pending
+                                    Pickup</span></td>
+                            <td><button class="btn btn-outline"
+                                    style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Start</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+</body>
+
+</html>

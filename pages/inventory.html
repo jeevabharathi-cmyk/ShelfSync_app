@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management | ShelfSync</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .dashboard-sidebar {
+            background-color: #0f172a;
+            /* Seller theme */
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="dashboard-sidebar">
+            <a href="../index.html" class="logo">
+                <span>📚 Seller Portal</span>
+            </a>
+            <nav class="sidebar-nav">
+                <a href="seller-dashboard.html" class="sidebar-link">Overview</a>
+                <a href="inventory.html" class="sidebar-link active">My Inventory</a>
+                <a href="seller-orders.html" class="sidebar-link">Orders</a>
+                <a href="seller-earnings.html" class="sidebar-link">Earnings</a>
+                <a href="seller-settings.html" class="sidebar-link">Settings</a>
+                <a href="../index.html" class="sidebar-link"
+                    style="margin-top: auto; color: var(--error-color);">Logout</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <header class="dashboard-header">
+                <h2>My Inventory</h2>
+                <button class="btn btn-primary" style="background-color: var(--accent-color);">+ Add New Book</button>
+            </header>
+
+            <!-- Filters -->
+            <div style="display: flex; gap: var(--spacing-md); margin-bottom: var(--spacing-lg);">
+                <input type="text" class="form-control" placeholder="Search by title or ISBN..."
+                    style="max-width: 300px;">
+                <select class="form-control" style="width: auto;">
+                    <option>All Categories</option>
+                    <option>Fiction</option>
+                    <option>Non-Fiction</option>
+                </select>
+                <select class="form-control" style="width: auto;">
+                    <option>Status: All</option>
+                    <option>In Stock</option>
+                    <option>Low Stock</option>
+                    <option>Out of Stock</option>
+                </select>
+            </div>
+
+            <!-- Inventory Table -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Book Title</th>
+                            <th>ISBN</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="font-weight: 500;">The Great Gatsby</td>
+                            <td style="color: var(--text-light);">978-0743273565</td>
+                            <td>$12.99</td>
+                            <td>45</td>
+                            <td><span class="badge badge-success">In Stock</span></td>
+                            <td>
+                                <button class="btn btn-outline"
+                                    style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Edit</button>
+                                <button class="btn btn-outline"
+                                    style="padding: 0.25rem 0.5rem; font-size: 0.75rem; color: var(--error-color); border-color: var(--error-color);">Delete</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 500;">1984</td>
+                            <td style="color: var(--text-light);">978-0451524935</td>
+                            <td>$10.50</td>
+                            <td>5</td>
+                            <td><span class="badge badge-warning">Low Stock</span></td>
+                            <td>
+                                <button class="btn btn-outline"
+                                    style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Edit</button>
+                                <button class="btn btn-outline"
+                                    style="padding: 0.25rem 0.5rem; font-size: 0.75rem; color: var(--error-color); border-color: var(--error-color);">Delete</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 500;">Clean Code</td>
+                            <td style="color: var(--text-light);">978-0132350884</td>
+                            <td>$35.00</td>
+                            <td>0</td>
+                            <td><span class="badge" style="background-color: #f1f5f9; color: var(--text-light);">Out of
+                                    Stock</span></td>
+                            <td>
+                                <button class="btn btn-outline"
+                                    style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Edit</button>
+                                <button class="btn btn-outline"
+                                    style="padding: 0.25rem 0.5rem; font-size: 0.75rem; color: var(--error-color); border-color: var(--error-color);">Delete</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div
+                style="display: flex; justify-content: flex-end; gap: var(--spacing-sm); margin-top: var(--spacing-lg);">
+                <button class="btn btn-outline" disabled
+                    style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">Prev</button>
+                <button class="btn btn-outline" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">Next</button>
+            </div>
+        </main>
+    </div>
+
+</body>
+
+</html>

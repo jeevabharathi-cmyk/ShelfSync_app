@@ -1,0 +1,31 @@
+
+ShelfSync – Smart Bookstore Inventory & Marketplace Platform
+
+Project Overview:
+ShelfSync is a frontend-only bookstore inventory and marketplace web application developed as part of an internship project. It demonstrates how a modern bookstore system works using role-based pages.
+
+Technology Stack:
+- HTML5
+- CSS3
+- No Backend (UI-only for this phase)
+
+User Roles:
+1. Admin – Manages inventory, sellers, dashboards
+2. Customer – Browses and views books
+3. Seller – Lists books and manages stock
+4. Delivery Partner – Views delivery assignments
+
+Pages Included:
+- Landing Page
+- Login Page
+- Sign Up Page
+- All Books Page
+- Book Details Page
+- Seller Details Page
+- Admin Dashboard
+- Inventory Page
+- Seller Dashboard
+- Delivery Dashboard
+
+Internship Note:
+This project focuses on UI design, structure, and documentation. Backend integration is planned for future phases.

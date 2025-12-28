@@ -1,0 +1,49 @@
+{
+    "project_name": "ShelfSync",
+    "subtitle": "Smart Bookstore Inventory & Marketplace Platform",
+    "project_category": "Frontend Internship Project",
+    "project_description": "ShelfSync is a frontend-only bookstore inventory and marketplace web application built using HTML and CSS with static dummy data.",
+    "technology_stack": {
+      "frontend": ["HTML5", "CSS3"],
+      "backend": "Not required for this phase",
+      "database": "Not required"
+    },
+    "user_roles": [
+      "Admin",
+      "Customer",
+      "Seller",
+      "Delivery Partner"
+    ],
+    "interface_pages": {
+      "common_pages": [
+        "Landing Page",
+        "Login Page",
+        "Sign Up Page"
+      ],
+      "customer_pages": [
+        "All Books Page",
+        "Book Details Page",
+        "Seller Details Page"
+      ],
+      "admin_pages": [
+        "Admin Dashboard",
+        "Inventory Management Page"
+      ],
+      "seller_pages": [
+        "Seller Dashboard",
+        "Seller Inventory Page"
+      ],
+      "delivery_partner_pages": [
+        "Delivery Dashboard",
+        "Delivery Status Page"
+      ]
+    },
+    "design_guidelines": {
+      "ui_style": "Clean, simple, professional",
+      "responsiveness": "Basic CSS responsiveness",
+      "javascript_usage": "Not allowed",
+      "focus": "UI clarity and internship presentation"
+    },
+    "output_expectation": "Separate HTML and CSS files for each page with comments"
+  }
+  

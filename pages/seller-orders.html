@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders | Seller Portal</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .dashboard-sidebar {
+            background-color: #0f172a;
+        }
+
+        .stat-card h3 {
+            color: var(--accent-color);
+        }
+
+        .orders-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-xl);
+            flex-wrap: wrap;
+            gap: var(--spacing-md);
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-lg);
+            border-bottom: 2px solid var(--border-light);
+            padding-bottom: var(--spacing-md);
+        }
+
+        .filter-tab {
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border: none;
+            background: none;
+            color: var(--text-light);
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+            font-size: 0.9375rem;
+            transition: color var(--transition-base);
+            border-radius: var(--radius-md) var(--radius-md) 0 0;
+        }
+
+        .filter-tab::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: var(--accent-color);
+            transform: scaleX(0);
+            transition: transform var(--transition-base);
+        }
+
+        .filter-tab:hover {
+            color: var(--primary-color);
+        }
+
+        .filter-tab.active {
+            color: var(--primary-color);
+        }
+
+        .filter-tab.active::after {
+            transform: scaleX(1);
+        }
+
+        .search-bar {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .search-bar .form-control {
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .order-card {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-md);
+            transition: all var(--transition-base);
+            position: relative;
+        }
+
+        .order-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--primary-color);
+            border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+            opacity: 0;
+            transition: opacity var(--transition-base);
+        }
+
+        .order-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateX(4px);
+            border-color: var(--primary-light);
+        }
+
+        .order-card:hover::before {
+            opacity: 1;
+        }
+
+        .order-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--spacing-md);
+            flex-wrap: wrap;
+            gap: var(--spacing-md);
+        }
+
+        .order-info {
+            flex: 1;
+        }
+
+        .order-id {
+            font-weight: 700;
+            font-size: 1.125rem;
+            color: var(--secondary-color);
+            margin-bottom: var(--spacing-xs);
+            font-family: var(--font-display);
+        }
+
+        .order-date {
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        .order-status-badge {
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--radius-full);
+            font-weight: 600;
+            font-size: 0.8125rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .order-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+            padding: var(--spacing-md);
+            background-color: var(--background-color);
+            border-radius: var(--radius-md);
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-label {
+            font-size: 0.8125rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: var(--spacing-xs);
+            font-weight: 600;
+        }
+
+        .detail-value {
+            font-size: 1rem;
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        .order-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+            flex-wrap: wrap;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        .order-total {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            font-family: var(--font-display);
+        }
+
+        @media (max-width: 768px) {
+            .order-card-header {
+                flex-direction: column;
+            }
+
+            .order-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="dashboard-sidebar">
+            <a href="../index.html" class="logo">
+                <span>📚 Seller Portal</span>
+            </a>
+            <nav class="sidebar-nav">
+                <a href="seller-dashboard.html" class="sidebar-link">Overview</a>
+                <a href="inventory.html" class="sidebar-link">My Inventory</a>
+                <a href="seller-orders.html" class="sidebar-link active">Orders</a>
+                <a href="seller-earnings.html" class="sidebar-link">Earnings</a>
+                <a href="seller-settings.html" class="sidebar-link">Settings</a>
+                <a href="../index.html" class="sidebar-link"
+                    style="margin-top: auto; color: var(--error-color);">Logout</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <header class="dashboard-header">
+                <div>
+                    <h2>Order Management</h2>
+                    <p class="text-light" style="margin: 0;">Manage and track all your orders</p>
+                </div>
+                <div style="display: flex; align-items: center; gap: var(--spacing-md);">
+                    <div
+                        style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--accent-color), var(--accent-light)); border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700;">
+                        S</div>
+                </div>
+            </header>
+
+            <!-- Quick Stats -->
+            <div class="stats-grid" style="margin-bottom: var(--spacing-xl);">
+                <div class="stat-card">
+                    <h3>24</h3>
+                    <p>Pending Orders</p>
+                </div>
+                <div class="stat-card">
+                    <h3>156</h3>
+                    <p>Total Orders</p>
+                </div>
+                <div class="stat-card">
+                    <h3>12</h3>
+                    <p>Shipped Today</p>
+                </div>
+                <div class="stat-card">
+                    <h3>$3,450</h3>
+                    <p>This Month</p>
+                </div>
+            </div>
+
+            <!-- Filter Tabs -->
+            <div class="filter-tabs">
+                <button class="filter-tab active">All Orders</button>
+                <button class="filter-tab">Pending</button>
+                <button class="filter-tab">Processing</button>
+                <button class="filter-tab">Shipped</button>
+                <button class="filter-tab">Delivered</button>
+                <button class="filter-tab">Cancelled</button>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="search-bar">
+                <input type="text" class="form-control" placeholder="Search by Order ID, Customer name, or Book title...">
+                <button class="btn btn-primary">Search</button>
+                <button class="btn btn-outline">Export</button>
+            </div>
+
+            <!-- Orders List -->
+            <div>
+                <!-- Order Card 1 -->
+                <div class="order-card">
+                    <div class="order-card-header">
+                        <div class="order-info">
+                            <div class="order-id">#ORD-2024-001</div>
+                            <div class="order-date">Ordered on Jan 15, 2024 at 2:30 PM</div>
+                        </div>
+                        <div>
+                            <span class="badge badge-warning order-status-badge">Pending</span>
+                        </div>
+                    </div>
+                    <div class="order-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Customer</span>
+                            <span class="detail-value">Alice Johnson</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Book</span>
+                            <span class="detail-value">The Great Gatsby</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Quantity</span>
+                            <span class="detail-value">1</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Total Amount</span>
+                            <span class="order-total">$12.99</span>
+                        </div>
+                    </div>
+                    <div class="order-actions">
+                        <button class="btn btn-primary btn-sm">Process Order</button>
+                        <button class="btn btn-outline btn-sm">View Details</button>
+                        <button class="btn btn-outline btn-sm" style="color: var(--error-color); border-color: var(--error-color);">Cancel</button>
+                    </div>
+                </div>
+
+                <!-- Order Card 2 -->
+                <div class="order-card">
+                    <div class="order-card-header">
+                        <div class="order-info">
+                            <div class="order-id">#ORD-2024-002</div>
+                            <div class="order-date">Ordered on Jan 14, 2024 at 10:15 AM</div>
+                        </div>
+                        <div>
+                            <span class="badge badge-primary order-status-badge">Processing</span>
+                        </div>
+                    </div>
+                    <div class="order-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Customer</span>
+                            <span class="detail-value">Bob Smith</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Book</span>
+                            <span class="detail-value">1984 by George Orwell</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Quantity</span>
+                            <span class="detail-value">2</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Total Amount</span>
+                            <span class="order-total">$21.00</span>
+                        </div>
+                    </div>
+                    <div class="order-actions">
+                        <button class="btn btn-primary btn-sm">Mark as Shipped</button>
+                        <button class="btn btn-outline btn-sm">Print Label</button>
+                        <button class="btn btn-outline btn-sm">View Details</button>
+                    </div>
+                </div>
+
+                <!-- Order Card 3 -->
+                <div class="order-card">
+                    <div class="order-card-header">
+                        <div class="order-info">
+                            <div class="order-id">#ORD-2024-003</div>
+                            <div class="order-date">Ordered on Jan 13, 2024 at 4:45 PM</div>
+                        </div>
+                        <div>
+                            <span class="badge badge-success order-status-badge">Shipped</span>
+                        </div>
+                    </div>
+                    <div class="order-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Customer</span>
+                            <span class="detail-value">Charlie Brown</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Book</span>
+                            <span class="detail-value">Clean Code</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Tracking</span>
+                            <span class="detail-value">1Z999AA10123456784</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Total Amount</span>
+                            <span class="order-total">$35.00</span>
+                        </div>
+                    </div>
+                    <div class="order-actions">
+                        <button class="btn btn-outline btn-sm">Track Package</button>
+                        <button class="btn btn-outline btn-sm">View Details</button>
+                    </div>
+                </div>
+
+                <!-- Order Card 4 -->
+                <div class="order-card">
+                    <div class="order-card-header">
+                        <div class="order-info">
+                            <div class="order-id">#ORD-2024-004</div>
+                            <div class="order-date">Ordered on Jan 12, 2024 at 11:20 AM</div>
+                        </div>
+                        <div>
+                            <span class="badge badge-success order-status-badge">Delivered</span>
+                        </div>
+                    </div>
+                    <div class="order-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Customer</span>
+                            <span class="detail-value">Diana Prince</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Book</span>
+                            <span class="detail-value">Design Patterns</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Delivered On</span>
+                            <span class="detail-value">Jan 15, 2024</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Total Amount</span>
+                            <span class="order-total">$42.00</span>
+                        </div>
+                    </div>
+                    <div class="order-actions">
+                        <button class="btn btn-outline btn-sm">View Details</button>
+                        <button class="btn btn-outline btn-sm">Contact Customer</button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+</body>
+
+</html>
+

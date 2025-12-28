@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login | ShelfSync</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .auth-container {
+            max-width: 400px;
+            margin: var(--spacing-2xl) auto;
+            padding: var(--spacing-xl);
+            border-top: 4px solid var(--secondary-color);
+            /* Admin accent */
+        }
+
+        .auth-links {
+            text-align: center;
+            margin-top: var(--spacing-lg);
+            font-size: var(--small-size);
+        }
+
+        .auth-links a {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .role-switcher {
+            display: flex;
+            justify-content: center;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .role-switcher a {
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--radius-md);
+            font-size: var(--small-size);
+            color: var(--text-light);
+        }
+
+        .role-switcher a.active {
+            background-color: rgba(30, 41, 59, 0.1);
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="../index.html" class="logo">
+                <span>📚 ShelfSync</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="all-books.html" class="nav-link">Browse Books</a></li>
+                <li><a href="login-customer.html" class="btn btn-outline">Login</a></li>
+                <li><a href="signup.html" class="btn btn-primary">Sign Up</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Login Form -->
+    <div class="container">
+        <div class="card auth-container">
+            <div class="text-center" style="margin-bottom: var(--spacing-lg);">
+                <h2>Admin Access</h2>
+                <p class="text-light">Restricted Area</p>
+            </div>
+
+            <div class="role-switcher">
+                <a href="login-customer.html">Customer</a>
+                <a href="login-seller.html">Seller</a>
+                <a href="login-admin.html" class="active">Admin</a>
+            </div>
+
+            <form action="admin-dashboard.html"> <!-- Redirect to Admin Dashboard -->
+                <div class="form-group">
+                    <label class="form-label">Admin Username</label>
+                    <input type="text" class="form-control" placeholder="admin" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-control" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block"
+                    style="background-color: var(--secondary-color);">Access Dashboard</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2025 ShelfSync. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+
+</html>
