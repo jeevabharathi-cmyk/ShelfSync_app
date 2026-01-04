@@ -1,4 +1,4 @@
-/* Buttons */
+/* Enhanced Buttons */
 .btn {
     display: inline-flex;
     align-items: center;
@@ -15,6 +15,7 @@
     letter-spacing: 0.025em;
     text-transform: none;
     box-shadow: var(--shadow-sm);
+    transform: translateY(0);
 }
 
 .btn::before {
@@ -30,26 +31,52 @@
     transition: width 0.6s, height 0.6s;
 }
 
+.btn::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: inherit;
+    background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s;
+}
+
 .btn:hover::before {
     width: 300px;
     height: 300px;
 }
 
-.btn-primary {
-    background-color: var(--primary-color);
-    color: white;
-    box-shadow: var(--shadow-md);
+.btn:hover::after {
+    transform: translateX(100%);
 }
 
-.btn-primary:hover {
-    background-color: var(--primary-dark);
+.btn:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-lg);
 }
 
-.btn-primary:active {
+.btn:active {
     transform: translateY(0);
     box-shadow: var(--shadow-sm);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    box-shadow: var(--shadow-md);
+    position: relative;
+}
+
+.btn-primary::before {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+    box-shadow: 0 8px 25px rgba(44, 82, 130, 0.3);
 }
 
 .btn-outline {
@@ -57,32 +84,51 @@
     border: 2px solid var(--primary-color);
     color: var(--primary-color);
     box-shadow: none;
+    position: relative;
+}
+
+.btn-outline::before {
+    background: var(--primary-color);
 }
 
 .btn-outline:hover {
-    background-color: var(--primary-color);
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
     color: white;
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    border-color: var(--primary-dark);
+    box-shadow: 0 8px 25px rgba(44, 82, 130, 0.2);
 }
 
 .btn-accent {
-    background-color: var(--accent-color);
+    background: linear-gradient(135deg, var(--accent-color), var(--accent-light));
     color: white;
     box-shadow: var(--shadow-md);
+    position: relative;
+}
+
+.btn-accent::before {
+    background: rgba(255, 255, 255, 0.3);
 }
 
 .btn-accent:hover {
-    background-color: var(--accent-light);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
+    background: linear-gradient(135deg, var(--accent-light), var(--accent-color));
+    box-shadow: 0 8px 25px rgba(196, 86, 33, 0.3);
 }
 
 .btn-block {
     width: 100%;
 }
 
-/* Cards */
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+.btn-lg {
+    padding: 1rem 2rem;
+    font-size: 1.125rem;
+}
+
+/* Enhanced Cards */
 .card {
     background-color: var(--surface-color);
     border-radius: var(--radius-lg);
@@ -91,6 +137,7 @@
     transition: all var(--transition-base);
     border: 1px solid var(--border-color);
     position: relative;
+    transform: translateY(0);
 }
 
 .card::before {
@@ -105,8 +152,21 @@
     transition: opacity var(--transition-base);
 }
 
+.card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, transparent, rgba(44, 82, 130, 0.02), transparent);
+    opacity: 0;
+    transition: opacity var(--transition-base);
+    pointer-events: none;
+}
+
 .card:hover {
-    transform: translateY(-6px);
+    transform: translateY(-8px) scale(1.02);
     box-shadow: var(--shadow-xl);
     border-color: var(--primary-light);
 }
@@ -115,8 +175,14 @@
     opacity: 1;
 }
 
+.card:hover::after {
+    opacity: 1;
+}
+
 .card-body {
     padding: var(--spacing-lg);
+    position: relative;
+    z-index: 1;
 }
 
 .card-header {
@@ -124,6 +190,7 @@
     padding-bottom: var(--spacing-md);
     border-bottom: 1px solid var(--border-light);
     margin-bottom: var(--spacing-md);
+    background: linear-gradient(135deg, rgba(248, 250, 252, 0.5), rgba(241, 245, 249, 0.3));
 }
 
 .card-title {
@@ -133,6 +200,7 @@
     color: var(--secondary-color);
     font-weight: 700;
     line-height: 1.3;
+    position: relative;
 }
 
 .card-subtitle {
@@ -156,9 +224,10 @@
     background-color: var(--background-color);
 }
 
-/* Forms */
+/* Enhanced Forms */
 .form-group {
     margin-bottom: var(--spacing-lg);
+    position: relative;
 }
 
 .form-label {
@@ -168,6 +237,11 @@
     color: var(--secondary-color);
     font-size: 0.9375rem;
     letter-spacing: 0.01em;
+    transition: color var(--transition-base);
+}
+
+.form-group:focus-within .form-label {
+    color: var(--primary-color);
 }
 
 .form-control {
@@ -180,22 +254,31 @@
     transition: all var(--transition-base);
     background-color: var(--surface-color);
     color: var(--text-color);
+    position: relative;
 }
 
 .form-control:hover {
     border-color: var(--primary-light);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
 }
 
 .form-control:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 4px rgba(44, 82, 130, 0.1);
+    box-shadow: 0 0 0 4px rgba(44, 82, 130, 0.1), var(--shadow-md);
     background-color: var(--surface-color);
+    transform: translateY(-2px);
 }
 
 .form-control::placeholder {
     color: var(--text-muted);
     opacity: 0.7;
+    transition: opacity var(--transition-base);
+}
+
+.form-control:focus::placeholder {
+    opacity: 0.4;
 }
 
 textarea.form-control {
@@ -204,7 +287,7 @@ textarea.form-control {
     line-height: 1.6;
 }
 
-/* Badges */
+/* Enhanced Badges */
 .badge {
     display: inline-block;
     padding: 0.375rem 0.875rem;
@@ -214,28 +297,552 @@ textarea.form-control {
     letter-spacing: 0.025em;
     text-transform: uppercase;
     line-height: 1;
+    position: relative;
+    overflow: hidden;
+    transition: all var(--transition-base);
+}
+
+.badge::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.badge:hover::before {
+    left: 100%;
+}
+
+.badge:hover {
+    transform: scale(1.05);
 }
 
 .badge-primary {
-    background-color: rgba(44, 82, 130, 0.15);
+    background: linear-gradient(135deg, rgba(44, 82, 130, 0.15), rgba(44, 82, 130, 0.25));
     color: var(--primary-color);
-    border: 1px solid rgba(44, 82, 130, 0.2);
+    border: 1px solid rgba(44, 82, 130, 0.3);
 }
 
 .badge-success {
-    background-color: rgba(56, 161, 105, 0.15);
+    background: linear-gradient(135deg, rgba(56, 161, 105, 0.15), rgba(56, 161, 105, 0.25));
     color: var(--success-color);
-    border: 1px solid rgba(56, 161, 105, 0.2);
+    border: 1px solid rgba(56, 161, 105, 0.3);
 }
 
 .badge-warning {
-    background-color: rgba(196, 86, 33, 0.15);
+    background: linear-gradient(135deg, rgba(196, 86, 33, 0.15), rgba(196, 86, 33, 0.25));
     color: var(--accent-color);
-    border: 1px solid rgba(196, 86, 33, 0.2);
+    border: 1px solid rgba(196, 86, 33, 0.3);
 }
 
 .badge-error {
-    background-color: rgba(229, 62, 62, 0.15);
+    background: linear-gradient(135deg, rgba(229, 62, 62, 0.15), rgba(229, 62, 62, 0.25));
     color: var(--error-color);
-    border: 1px solid rgba(229, 62, 62, 0.2);
+    border: 1px solid rgba(229, 62, 62, 0.3);
+}
+
+/* Loading States */
+.btn.loading,
+.btn-add-cart.loading,
+.btn-buy-now.loading,
+.btn-wishlist.loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.btn.loading::after,
+.btn-add-cart.loading::after,
+.btn-buy-now.loading::after,
+.btn-wishlist.loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 16px;
+    height: 16px;
+    margin: auto;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Enhanced Interactive Elements */
+.interactive {
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.interactive:hover {
+    transform: translateY(-2px);
+}
+
+.interactive:active {
+    transform: translateY(0);
+}
+
+/* Pulse Animation */
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(44, 82, 130, 0.7);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(44, 82, 130, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(44, 82, 130, 0);
+    }
+}
+
+/* Enhanced Add to Cart and Buy Now Sections */
+.action-buttons {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+    position: relative;
+}
+
+.btn-add-cart {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-add-cart::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.6s;
+}
+
+.btn-add-cart:hover {
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(44, 82, 130, 0.3);
+}
+
+.btn-add-cart:hover::before {
+    left: 100%;
+}
+
+.btn-add-cart:active {
+    transform: translateY(0);
+}
+
+.btn-add-cart.added {
+    background: linear-gradient(135deg, var(--success-color), #2F855A);
+    animation: cartSuccess 0.6s ease-out;
+}
+
+@keyframes cartSuccess {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.btn-buy-now {
+    background: linear-gradient(135deg, var(--accent-color), var(--accent-light));
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-buy-now::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.6s;
+}
+
+.btn-buy-now:hover {
+    background: linear-gradient(135deg, var(--accent-light), var(--accent-color));
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 8px 25px rgba(196, 86, 33, 0.4);
+}
+
+.btn-buy-now:hover::before {
+    left: 100%;
+}
+
+.btn-buy-now:active {
+    transform: translateY(0) scale(1.02);
+}
+
+/* Enhanced Book Card Actions */
+.book-card-actions {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.35), transparent);
+    padding: var(--spacing-md);
+    transform: translateY(100%);
+    transition: transform var(--transition-base), opacity var(--transition-base);
+    opacity: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-sm);
+    z-index: 2;
+    pointer-events: none;
+}
+
+.card:hover .book-card-actions,
+.card:focus-within .book-card-actions {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.book-card-actions .btn,
+.book-card-actions .btn-add-cart,
+.book-card-actions .btn-buy-now {
+    padding: 0.6rem 0.75rem;
+    font-size: 0.875rem;
+    border-radius: var(--radius-md);
+    width: 100%;
+    margin-bottom: 0;
+    white-space: nowrap;
+}
+
+.book-card-actions .btn-add-cart {
+    background: rgba(44, 82, 130, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-sm);
+    gap: var(--spacing-xs);
+}
+
+.book-card-actions .btn-buy-now {
+    background: rgba(196, 86, 33, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-sm);
+    gap: var(--spacing-xs);
+}
+
+.book-card-actions .btn-add-cart:hover,
+.book-card-actions .btn-buy-now:hover {
+    transform: translateY(-1px);
+}
+
+@media (max-width: 480px) {
+    .book-card-actions {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (hover: none) {
+    .book-card-actions {
+        position: static;
+        transform: none;
+        opacity: 1;
+        background: transparent;
+        border-top: 1px solid var(--border-color);
+        pointer-events: auto;
+    }
+
+    .card:hover .book-card-actions,
+    .card:focus-within .book-card-actions {
+        transform: none;
+        opacity: 1;
+    }
+
+    .book-card-actions .btn-add-cart {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        backdrop-filter: none;
+    }
+
+    .book-card-actions .btn-buy-now {
+        background: linear-gradient(135deg, var(--accent-color), var(--accent-light));
+        backdrop-filter: none;
+    }
+}
+
+/* Quantity Selector */
+.quantity-selector {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    background: var(--surface-color);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-xs);
+    margin-bottom: var(--spacing-md);
+}
+
+.quantity-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: var(--primary-color);
+    color: white;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+}
+
+.quantity-btn:hover {
+    background: var(--primary-dark);
+    transform: scale(1.1);
+}
+
+.quantity-btn:active {
+    transform: scale(0.95);
+}
+
+.quantity-input {
+    width: 50px;
+    text-align: center;
+    border: none;
+    background: transparent;
+    font-weight: 600;
+    color: var(--text-color);
+    font-size: 1rem;
+}
+
+.quantity-input:focus {
+    outline: none;
+}
+
+/* Cart Notification */
+.cart-notification {
+    position: fixed;
+    top: 100px;
+    right: -400px;
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    padding: var(--spacing-lg);
+    min-width: 300px;
+    z-index: 1000;
+    transition: right var(--transition-base);
+    border-left: 4px solid var(--success-color);
+}
+
+.cart-notification.show {
+    right: var(--spacing-xl);
+}
+
+.cart-notification-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+}
+
+.cart-notification-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--success-color), #2F855A);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+}
+
+.cart-notification-title {
+    font-weight: 600;
+    color: var(--secondary-color);
+}
+
+.cart-notification-message {
+    color: var(--text-light);
+    font-size: var(--small-size);
+    margin-bottom: var(--spacing-md);
+}
+
+.cart-notification-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.cart-notification-actions .btn {
+    flex: 1;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+/* Enhanced Product Options */
+.product-options {
+    margin-bottom: var(--spacing-lg);
+}
+
+.option-group {
+    margin-bottom: var(--spacing-md);
+}
+
+.option-label {
+    font-weight: 600;
+    color: var(--secondary-color);
+    margin-bottom: var(--spacing-sm);
+    display: block;
+    font-size: 0.9375rem;
+}
+
+.option-buttons {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+}
+
+.option-btn {
+    padding: 0.5rem 1rem;
+    border: 2px solid var(--border-color);
+    background: var(--surface-color);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.option-btn:hover {
+    border-color: var(--primary-light);
+    background: rgba(44, 82, 130, 0.05);
+}
+
+.option-btn.selected {
+    border-color: var(--primary-color);
+    background: var(--primary-color);
+    color: white;
+}
+
+/* Wishlist Button */
+.btn-wishlist {
+    background: transparent;
+    border: 2px solid var(--error-color);
+    color: var(--error-color);
+    padding: 0.875rem 1.5rem;
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.btn-wishlist::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(229, 62, 62, 0.1), transparent);
+    transition: left 0.6s;
+}
+
+.btn-wishlist::after {
+    content: '♡';
+    font-size: 1.2rem;
+    transition: transform var(--transition-base);
+}
+
+.btn-wishlist:hover {
+    background: var(--error-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(229, 62, 62, 0.3);
+}
+
+.btn-wishlist:hover::before {
+    left: 100%;
+}
+
+.btn-wishlist:hover::after {
+    transform: scale(1.2);
+}
+
+.btn-wishlist.wishlisted {
+    background: var(--error-color);
+    color: white;
+}
+
+.btn-wishlist.wishlisted::after {
+    content: '♥';
+}
+
+/* Pulse Animation */
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(44, 82, 130, 0.7);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(44, 82, 130, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(44, 82, 130, 0);
+    }
 }

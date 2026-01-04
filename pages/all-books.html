@@ -5,24 +5,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Browse Books | ShelfSync</title>
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/shelf-sync-all.css">
     <link rel="stylesheet" href="../css/layout.css">
     <link rel="stylesheet" href="../css/components.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="../books-data.js"></script>
     <style>
         .browse-container {
             display: grid;
-            grid-template-columns: 250px 1fr;
+            grid-template-columns: 280px 1fr;
             gap: var(--spacing-xl);
             padding: var(--spacing-xl) 0;
         }
 
         .sidebar {
-            background-color: var(--surface-color);
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
             padding: var(--spacing-lg);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             height: fit-content;
+            position: sticky;
+            top: 100px;
+            box-shadow: var(--shadow-md);
         }
 
         .filter-section {
@@ -36,9 +41,11 @@
         }
 
         .filter-title {
-            font-weight: 600;
+            font-weight: 700;
             margin-bottom: var(--spacing-md);
-            color: var(--secondary-color);
+            color: var(--primary-color);
+            font-size: 1rem;
+            letter-spacing: -0.01em;
         }
 
         .filter-option {
@@ -48,28 +55,49 @@
             margin-bottom: var(--spacing-sm);
             color: var(--text-color);
             cursor: pointer;
+            font-size: 0.9375rem;
+            transition: color var(--transition-base);
         }
 
-        .book-cover {
-            width: 100%;
-            height: 280px;
-            object-fit: cover;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: block;
-            transition: transform var(--transition-base);
-            border-radius: var(--radius-md) var(--radius-md) 0 0;
+        .filter-option:hover {
+            color: var(--accent-color);
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-color: var(--accent-color);
         }
 
         .book-cover-container {
             position: relative;
             overflow: hidden;
+            height: 320px;
             background-color: var(--border-light);
-            border-radius: var(--radius-md) var(--radius-md) 0 0;
-            height: 280px;
+        }
+
+        .book-cover {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .card:hover .book-cover {
-            transform: scale(1.05);
+            transform: scale(1.1);
         }
 
         .book-cover-overlay {
@@ -78,8 +106,163 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.1) 100%);
-            pointer-events: none;
+            background: linear-gradient(to bottom, transparent 40%, rgba(0, 0, 0, 0.4) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding: var(--spacing-lg);
+        }
+
+        .card:hover .book-cover-overlay {
+            opacity: 1;
+        }
+
+        .quick-view-btn {
+            background: white;
+            color: var(--primary-color);
+            border: none;
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border-radius: var(--radius-full);
+            font-weight: 600;
+            font-size: 0.875rem;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card:hover .quick-view-btn {
+            transform: translateY(0);
+        }
+
+        .card-content {
+            padding: var(--spacing-lg);
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin-bottom: var(--spacing-xs);
+            color: var(--primary-color);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.4;
+        }
+
+        .card-subtitle {
+            font-size: 0.875rem;
+            color: var(--text-light);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .book-meta {
+            display: flex;
+            gap: var(--spacing-xs);
+            margin-bottom: var(--spacing-md);
+            flex-wrap: wrap;
+        }
+
+        .book-tag {
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: var(--radius-full);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        .tag-category {
+            background: #e0e7ff;
+            color: #4338ca;
+        }
+
+        .tag-condition {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .book-stock {
+            font-size: 0.8125rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .stock-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .in-stock .stock-dot {
+            background-color: #10b981;
+            box-shadow: 0 0 8px #10b981;
+        }
+
+        .limited-stock .stock-dot {
+            background-color: #f59e0b;
+            box-shadow: 0 0 8px #f59e0b;
+        }
+
+        .low-stock .stock-dot {
+            background-color: #ef4444;
+            box-shadow: 0 0 8px #ef4444;
+        }
+
+        .card-footer {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: var(--spacing-md);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .book-price {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--accent-color);
+        }
+
+        .card-actions {
+            display: flex;
+            gap: var(--spacing-xs);
+        }
+
+        /* Mesh Gradients for Placeholders */
+        .book-cover.gatsby {
+            background: radial-gradient(at 0% 0%, #f093fb 0%, transparent 50%), radial-gradient(at 100% 100%, #f5576c 0%, transparent 50%), #f093fb;
+        }
+
+        .book-cover.orwell {
+            background: radial-gradient(at 0% 0%, #4facfe 0%, transparent 50%), radial-gradient(at 100% 100%, #00f2fe 0%, transparent 50%), #4facfe;
+        }
+
+        .book-cover.code {
+            background: radial-gradient(at 0% 0%, #43e97b 0%, transparent 50%), radial-gradient(at 100% 100%, #38f9d7 0%, transparent 50%), #43e97b;
+        }
+
+        .book-cover.patterns {
+            background: radial-gradient(at 0% 0%, #fa709a 0%, transparent 50%), radial-gradient(at 100% 100%, #fee140 0%, transparent 50%), #fa709a;
+        }
+
+        .book-cover.alchemist {
+            background: radial-gradient(at 0% 0%, #30cfd0 0%, transparent 50%), radial-gradient(at 100% 100%, #330867 0%, transparent 50%), #30cfd0;
+        }
+
+        .book-cover.sapiens {
+            background: radial-gradient(at 0% 0%, #a8edea 0%, transparent 50%), radial-gradient(at 100% 100%, #fed6e3 0%, transparent 50%), #a8edea;
         }
 
         .book-cover-placeholder {
@@ -89,36 +272,19 @@
             align-items: center;
             justify-content: center;
             color: white;
-            font-weight: 700;
-            font-size: 1.125rem;
+            font-weight: 800;
+            font-size: 1.5rem;
             text-align: center;
-            padding: var(--spacing-md);
+            padding: var(--spacing-xl);
             font-family: var(--font-display);
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            line-height: 1.2;
         }
 
-        .book-cover.gatsby {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        }
-
-        .book-cover.orwell {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        }
-
-        .book-cover.code {
-            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-        }
-
-        .book-cover.patterns {
-            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-        }
-
-        .book-cover.alchemist {
-            background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
-        }
-
-        .book-cover.sapiens {
-            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        @media (max-width: 1024px) {
+            .browse-container {
+                grid-template-columns: 220px 1fr;
+            }
         }
 
         @media (max-width: 768px) {
@@ -128,25 +294,19 @@
 
             .sidebar {
                 display: none;
-                /* Hide filters on mobile for now */
             }
 
-            .book-cover,
             .book-cover-container {
-                height: 240px;
+                height: 280px;
             }
         }
     </style>
 </head>
 
 <body>
-
-    <!-- Navbar -->
     <nav class="navbar">
         <div class="container">
-            <a href="../index.html" class="logo">
-                <span>📚 ShelfSync</span>
-            </a>
+            <a href="../index.html" class="logo"><span>📚 ShelfSync</span></a>
             <ul class="nav-links">
                 <li><a href="../index.html" class="nav-link">Home</a></li>
                 <li><a href="all-books.html" class="nav-link active">Browse Books</a></li>
@@ -155,235 +315,405 @@
             </ul>
         </div>
     </nav>
-
-    <!-- Main Content -->
     <div class="container">
         <div class="browse-container">
-            <!-- Sidebar Filters -->
             <aside class="sidebar">
                 <div class="filter-section">
                     <h4 class="filter-title">Categories</h4>
-                    <label class="filter-option"><input type="checkbox"> Fiction</label>
-                    <label class="filter-option"><input type="checkbox"> Non-Fiction</label>
-                    <label class="filter-option"><input type="checkbox"> Science & Tech</label>
-                    <label class="filter-option"><input type="checkbox"> Business</label>
-                    <label class="filter-option"><input type="checkbox"> History</label>
+                    <label class="filter-option"><input type="checkbox" class="category-filter" value="Fiction">
+                        Fiction</label>
+                    <label class="filter-option"><input type="checkbox" class="category-filter" value="Non-Fiction">
+                        Non-Fiction</label>
+                    <label class="filter-option"><input type="checkbox" class="category-filter" value="Science & Tech">
+                        Science & Tech</label>
+                    <label class="filter-option"><input type="checkbox" class="category-filter" value="Business">
+                        Business</label>
+                    <label class="filter-option"><input type="checkbox" class="category-filter" value="History">
+                        History</label>
                 </div>
-
                 <div class="filter-section">
                     <h4 class="filter-title">Price Range</h4>
-                    <label class="filter-option"><input type="radio" name="price"> Under $10</label>
-                    <label class="filter-option"><input type="radio" name="price"> $10 - $25</label>
-                    <label class="filter-option"><input type="radio" name="price"> $25 - $50</label>
-                    <label class="filter-option"><input type="radio" name="price"> Over $50</label>
+                    <label class="filter-option"><input type="radio" name="price" class="price-filter" value="all"
+                            checked> All Prices</label>
+                    <label class="filter-option"><input type="radio" name="price" class="price-filter" value="under-10">
+                        Under $10</label>
+                    <label class="filter-option"><input type="radio" name="price" class="price-filter" value="10-25">
+                        $10 - $25</label>
+                    <label class="filter-option"><input type="radio" name="price" class="price-filter" value="25-50">
+                        $25 - $50</label>
+                    <label class="filter-option"><input type="radio" name="price" class="price-filter" value="over-50">
+                        Over $50</label>
                 </div>
-
                 <div class="filter-section">
                     <h4 class="filter-title">Condition</h4>
-                    <label class="filter-option"><input type="checkbox"> New</label>
-                    <label class="filter-option"><input type="checkbox"> Like New</label>
-                    <label class="filter-option"><input type="checkbox"> Used</label>
+                    <label class="filter-option"><input type="checkbox" class="condition-filter" value="New">
+                        New</label>
+                    <label class="filter-option"><input type="checkbox" class="condition-filter" value="Like New"> Like
+                        New</label>
+                    <label class="filter-option"><input type="checkbox" class="condition-filter" value="Used">
+                        Used</label>
                 </div>
-
-                <button class="btn btn-primary btn-block">Apply Filters</button>
+                <div class="filter-actions" style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button id="applyFiltersBtn" class="btn btn-primary" style="flex: 1;" onclick="applyFilters()">Apply
+                        Filters</button>
+                    <button id="resetFiltersBtn" class="btn btn-outline" style="flex: 1;"
+                        onclick="resetFilters()">Reset</button>
+                </div>
             </aside>
-
-            <!-- Book Grid -->
             <main>
                 <div
                     style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg);">
-                    <h2>All Books</h2>
-                    <select class="form-control" style="width: auto;">
-                        <option>Sort by: Popularity</option>
-                        <option>Price: Low to High</option>
-                        <option>Price: High to Low</option>
-                        <option>Newest Arrivals</option>
+                    <div>
+                        <h2>All Books</h2>
+                        <p id="pageInfo" style="color: var(--text-light); font-size: 0.875rem; margin-top: 0.25rem;">
+                            Loading books...</p>
+                    </div>
+                    <select class="form-control" style="width: auto;" id="sortSelect" onchange="handleSort()">
+                        <option value="popularity">Sort by: Popularity</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="title">Title: A-Z</option>
                     </select>
                 </div>
-
-                <div class="grid-3">
-                    <!-- Book 1 -->
-                    <div class="card">
-                        <a href="book-details.html" style="text-decoration: none; color: inherit;">
-                            <div class="book-cover-container">
-                                <img src="https://covers.openlibrary.org/b/isbn/9780743273565-L.jpg" 
-                                     alt="The Great Gatsby" 
-                                     class="book-cover gatsby"
-                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                <div class="book-cover-placeholder gatsby" style="display: none;">
-                                    The Great Gatsby
-                                </div>
-                                <div class="book-cover-overlay"></div>
-                            </div>
-                            <div class="card-body">
-                                <h3 class="card-title" style="font-size: 1.1rem;">The Great Gatsby</h3>
-                                <p class="card-subtitle">F. Scott Fitzgerald</p>
-                                <div style="display: flex; justify-content: space-between; align-items: center;">
-                                    <span style="font-weight: 700; color: var(--primary-color);">$12.99</span>
-                                    <span class="badge badge-success">In Stock</span>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-
-                    <!-- Book 2 -->
-                    <div class="card">
-                        <a href="book-details.html" style="text-decoration: none; color: inherit;">
-                            <div class="book-cover-container">
-                                <img src="https://covers.openlibrary.org/b/isbn/9780451524935-L.jpg" 
-                                     alt="1984" 
-                                     class="book-cover orwell"
-                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                <div class="book-cover-placeholder orwell" style="display: none;">
-                                    1984
-                                </div>
-                                <div class="book-cover-overlay"></div>
-                            </div>
-                            <div class="card-body">
-                                <h3 class="card-title" style="font-size: 1.1rem;">1984</h3>
-                                <p class="card-subtitle">George Orwell</p>
-                                <div style="display: flex; justify-content: space-between; align-items: center;">
-                                    <span style="font-weight: 700; color: var(--primary-color);">$10.50</span>
-                                    <span class="badge badge-warning">Low Stock</span>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-
-                    <!-- Book 3 -->
-                    <div class="card">
-                        <a href="book-details.html" style="text-decoration: none; color: inherit;">
-                            <div class="book-cover-container">
-                                <img src="https://covers.openlibrary.org/b/isbn/9780132350884-L.jpg" 
-                                     alt="Clean Code" 
-                                     class="book-cover code"
-                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                <div class="book-cover-placeholder code" style="display: none;">
-                                    Clean Code
-                                </div>
-                                <div class="book-cover-overlay"></div>
-                            </div>
-                            <div class="card-body">
-                                <h3 class="card-title" style="font-size: 1.1rem;">Clean Code</h3>
-                                <p class="card-subtitle">Robert C. Martin</p>
-                                <div style="display: flex; justify-content: space-between; align-items: center;">
-                                    <span style="font-weight: 700; color: var(--primary-color);">$35.00</span>
-                                    <span class="badge badge-success">In Stock</span>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-
-                    <!-- Book 4 -->
-                    <div class="card">
-                        <a href="book-details.html" style="text-decoration: none; color: inherit;">
-                            <div class="book-cover-container">
-                                <img src="https://covers.openlibrary.org/b/isbn/9780201633610-L.jpg" 
-                                     alt="Design Patterns" 
-                                     class="book-cover patterns"
-                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                <div class="book-cover-placeholder patterns" style="display: none;">
-                                    Design Patterns
-                                </div>
-                                <div class="book-cover-overlay"></div>
-                            </div>
-                            <div class="card-body">
-                                <h3 class="card-title" style="font-size: 1.1rem;">Design Patterns</h3>
-                                <p class="card-subtitle">Gang of Four</p>
-                                <div style="display: flex; justify-content: space-between; align-items: center;">
-                                    <span style="font-weight: 700; color: var(--primary-color);">$42.00</span>
-                                    <span class="badge badge-success">In Stock</span>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-
-                    <!-- Book 5 -->
-                    <div class="card">
-                        <a href="book-details.html" style="text-decoration: none; color: inherit;">
-                            <div class="book-cover-container">
-                                <img src="https://covers.openlibrary.org/b/isbn/9780062315007-L.jpg" 
-                                     alt="The Alchemist" 
-                                     class="book-cover alchemist"
-                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                <div class="book-cover-placeholder alchemist" style="display: none;">
-                                    The Alchemist
-                                </div>
-                                <div class="book-cover-overlay"></div>
-                            </div>
-                            <div class="card-body">
-                                <h3 class="card-title" style="font-size: 1.1rem;">The Alchemist</h3>
-                                <p class="card-subtitle">Paulo Coelho</p>
-                                <div style="display: flex; justify-content: space-between; align-items: center;">
-                                    <span style="font-weight: 700; color: var(--primary-color);">$14.99</span>
-                                    <span class="badge badge-success">In Stock</span>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-
-                    <!-- Book 6 -->
-                    <div class="card">
-                        <a href="book-details.html" style="text-decoration: none; color: inherit;">
-                            <div class="book-cover-container">
-                                <img src="https://covers.openlibrary.org/b/isbn/9780062316097-L.jpg" 
-                                     alt="Sapiens" 
-                                     class="book-cover sapiens"
-                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                <div class="book-cover-placeholder sapiens" style="display: none;">
-                                    Sapiens
-                                </div>
-                                <div class="book-cover-overlay"></div>
-                            </div>
-                            <div class="card-body">
-                                <h3 class="card-title" style="font-size: 1.1rem;">Sapiens</h3>
-                                <p class="card-subtitle">Yuval Noah Harari</p>
-                                <div style="display: flex; justify-content: space-between; align-items: center;">
-                                    <span style="font-weight: 700; color: var(--primary-color);">$18.50</span>
-                                    <span class="badge badge-success">In Stock</span>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
+                <div class="grid-3" id="booksGrid">
+                    <div class="loading-spinner">📚 Loading books...</div>
                 </div>
-
-                <!-- Pagination -->
-                <div
-                    style="display: flex; justify-content: center; gap: var(--spacing-sm); margin-top: var(--spacing-2xl);">
-                    <button class="btn btn-outline" disabled>&laquo; Prev</button>
-                    <button class="btn btn-primary">1</button>
-                    <button class="btn btn-outline">2</button>
-                    <button class="btn btn-outline">3</button>
-                    <button class="btn btn-outline">Next &raquo;</button>
+                <div id="paginationContainer"
+                    style="display: flex; justify-content: center; gap: var(--spacing-sm); margin-top: var(--spacing-2xl); flex-wrap: wrap;">
                 </div>
             </main>
         </div>
     </div>
-
-    <!-- Footer -->
+    <div class="cart-notification" id="quickCartNotification">
+        <div class="cart-notification-header">
+            <div class="cart-notification-icon">🛒</div>
+            <div>
+                <div class="cart-notification-title">Added to Cart!</div>
+                <div class="cart-notification-message" id="quickCartMessage">Book has been added to your cart.</div>
+            </div>
+        </div>
+        <div class="cart-notification-actions">
+            <button class="btn btn-outline" onclick="hideNotification()">Continue Shopping</button>
+            <button class="btn btn-primary" onclick="goToCart()">View Cart</button>
+        </div>
+    </div>
     <footer class="footer">
         <div class="container">
-            <div class="footer-grid">
-                <div class="footer-col">
+            <div class="footer-content">
+                <div class="footer-section">
                     <h4>ShelfSync</h4>
-                    <p style="color: var(--text-light);">Connecting readers with their next favorite story.</p>
+                    <p>Your trusted online bookstore for new and used books.</p>
                 </div>
-                <div class="footer-col">
+                <div class="footer-section">
                     <h4>Quick Links</h4>
-                    <ul class="footer-links">
+                    <ul>
                         <li><a href="../index.html">Home</a></li>
                         <li><a href="all-books.html">Browse Books</a></li>
                         <li><a href="login-customer.html">Login</a></li>
                         <li><a href="signup.html">Sign Up</a></li>
                     </ul>
                 </div>
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <p>Email: support@shelfsync.com</p>
+                    <p>Phone: (555) 123-4567</p>
+                </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2025 ShelfSync. All rights reserved.</p>
+                <p>&copy; 2024 ShelfSync. All rights reserved.</p>
             </div>
         </div>
     </footer>
+    <script>
+        // Load books data from JSON file
+        let allBooks = [];
+        let displayBooks = [];
+        let currentPage = 1;
+        const booksPerPage = 50;
 
+        // Load books data
+        async function loadBooksData() {
+            try {
+                if (typeof booksData !== 'undefined') {
+                    allBooks = booksData;
+                    console.log('Loaded ' + allBooks.length + ' books from JS file');
+                    displayBooks = [...allBooks];
+                    showPage(1);
+                } else {
+                    const response = await fetch('../books-database.json');
+                    const data = await response.json();
+                    allBooks = data.books;
+                    console.log('Loaded ' + allBooks.length + ' books from JSON file');
+                    displayBooks = [...allBooks];
+                    showPage(1);
+                }
+            } catch (error) {
+                console.error('Error loading books:', error);
+                // Fallback: use embedded books data
+                loadEmbeddedBooks();
+            }
+        }
+
+        // Fallback embedded books data
+        function loadEmbeddedBooks() {
+            console.log('Using embedded fallback books');
+            allBooks = [
+                { "title": "The Great Gatsby", "author": "F. Scott Fitzgerald", "price": 65.51, "category": "Fiction", "condition": "Used", "stock": "Limited Stock", "gradient": "sapiens", "isbn": "9780743273565", "cover": "https://covers.openlibrary.org/b/isbn/9780743273565-L.jpg" },
+                { "title": "1984", "author": "George Orwell", "price": 22.18, "category": "Fiction", "condition": "New", "stock": "Limited Stock", "gradient": "orwell", "isbn": "9780451524935", "cover": "https://covers.openlibrary.org/b/isbn/9780451524935-L.jpg" },
+                { "title": "To Kill a Mockingbird", "author": "Harper Lee", "price": 58.48, "category": "Fiction", "condition": "Like New", "stock": "In Stock", "gradient": "orwell", "isbn": "9780061120084", "cover": "https://covers.openlibrary.org/b/isbn/9780061120084-L.jpg" },
+                { "title": "Pride and Prejudice", "author": "Jane Austen", "price": 23.79, "category": "Fiction", "condition": "Like New", "stock": "In Stock", "gradient": "code", "isbn": "9780141439518", "cover": "https://covers.openlibrary.org/b/isbn/9780141439518-L.jpg" },
+                { "title": "The Catcher in the Rye", "author": "J.D. Salinger", "price": 21.13, "category": "Fiction", "condition": "Like New", "stock": "In Stock", "gradient": "code", "isbn": "9780316769174", "cover": "https://covers.openlibrary.org/b/isbn/9780316769174-L.jpg" },
+                { "title": "The Hobbit", "author": "J.R.R. Tolkien", "price": 29.23, "category": "Fiction", "condition": "Used", "stock": "Low Stock", "gradient": "gatsby", "isbn": "9780547928227", "cover": "https://covers.openlibrary.org/b/isbn/9780547928227-L.jpg" },
+                { "title": "The Alchemist", "author": "Paulo Coelho", "price": 71.78, "category": "Fiction", "condition": "Like New", "stock": "In Stock", "gradient": "code", "isbn": "9780062315007", "cover": "https://covers.openlibrary.org/b/isbn/9780062315007-L.jpg" },
+                { "title": "Animal Farm", "author": "George Orwell", "price": 63.0, "category": "Fiction", "condition": "Used", "stock": "In Stock", "gradient": "orwell", "isbn": "9780451526342", "cover": "https://covers.openlibrary.org/b/isbn/9780451526342-L.jpg" },
+                { "title": "Brave New World", "author": "Aldous Huxley", "price": 79.61, "category": "Fiction", "condition": "Used", "stock": "Limited Stock", "gradient": "orwell", "isbn": "9780060850524", "cover": "https://covers.openlibrary.org/b/isbn/9780060850524-L.jpg" },
+                { "title": "The Handmaid's Tale", "author": "Margaret Atwood", "price": 44.52, "category": "Fiction", "condition": "Like New", "stock": "In Stock", "gradient": "gatsby", "isbn": "9780385490818", "cover": "https://covers.openlibrary.org/b/isbn/9780385490818-L.jpg" }
+            ];
+            displayBooks = [...allBooks];
+            showPage(1);
+        }
+
+        function renderBooks(books) {
+            const grid = document.getElementById('booksGrid');
+            if (!books || books.length === 0) {
+                grid.innerHTML = '<div class="loading-spinner">No books found matching your criteria</div>';
+                return;
+            }
+
+            const html = books.map(book => {
+                const stockClass = book.stock.toLowerCase().replace(' ', '-');
+                return `
+                <div class="card">
+                    <div class="book-cover-container">
+                        <img class="book-cover" 
+                             src="${book.cover}" 
+                             alt="${book.title}"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="book-cover ${book.gradient}" style="display: none;">
+                            <div class="book-cover-placeholder">${book.title}</div>
+                        </div>
+                        <div class="book-cover-overlay">
+                            <button class="quick-view-btn">Quick View</button>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title" title="${book.title}">${book.title}</h3>
+                        <p class="card-subtitle">by ${book.author}</p>
+                        <div class="book-meta">
+                            <span class="book-tag tag-category">${book.category}</span>
+                            <span class="book-tag tag-condition">${book.condition}</span>
+                        </div>
+                        <div class="book-stock ${stockClass}">
+                            <span class="stock-dot"></span>
+                            ${book.stock}
+                        </div>
+                        <div class="card-footer">
+                            <div class="book-price">$${book.price.toFixed(2)}</div>
+                            <div class="card-actions">
+                                <button class="btn btn-outline btn-sm" onclick="addToCart('${book.title.replace(/'/g, "\\'")}', ${book.price})">
+                                    <span style="font-size: 1.1rem;">🛒</span>
+                                </button>
+                                <button class="btn btn-primary btn-sm" onclick="buyNow('${book.title.replace(/'/g, "\\'")}', ${book.price})">Buy Now</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `}).join('');
+
+            grid.innerHTML = html;
+        }
+
+        function showPage(page) {
+            currentPage = page;
+            const startIndex = (page - 1) * booksPerPage;
+            const endIndex = startIndex + booksPerPage;
+            const pageBooks = displayBooks.slice(startIndex, endIndex);
+
+            renderBooks(pageBooks);
+            updatePageInfo();
+            updatePagination();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function updatePageInfo() {
+            const totalPages = Math.ceil(displayBooks.length / booksPerPage);
+            const startIndex = displayBooks.length === 0 ? 0 : (currentPage - 1) * booksPerPage + 1;
+            const endIndex = Math.min(currentPage * booksPerPage, displayBooks.length);
+
+            document.getElementById('pageInfo').textContent =
+                `Showing ${startIndex}-${endIndex} of ${displayBooks.length} books (Page ${currentPage} of ${totalPages || 1})`;
+        }
+
+        function updatePagination() {
+            const totalPages = Math.ceil(displayBooks.length / booksPerPage);
+            const container = document.getElementById('paginationContainer');
+
+            if (totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+
+            let html = '';
+
+            if (currentPage > 1) {
+                html += `<button class="btn btn-outline" onclick="showPage(${currentPage - 1})">&laquo; Previous</button>`;
+            }
+
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(totalPages, currentPage + 2);
+
+            if (startPage > 1) {
+                html += `<button class="btn btn-outline" onclick="showPage(1)">1</button>`;
+                if (startPage > 2) {
+                    html += `<span style="padding: 0 10px;">...</span>`;
+                }
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                const isActive = i === currentPage ? 'btn-primary' : 'btn-outline';
+                html += `<button class="btn ${isActive}" onclick="showPage(${i})">${i}</button>`;
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    html += `<span style="padding: 0 10px;">...</span>`;
+                }
+                html += `<button class="btn btn-outline" onclick="showPage(${totalPages})">${totalPages}</button>`;
+            }
+
+            if (currentPage < totalPages) {
+                html += `<button class="btn btn-outline" onclick="showPage(${currentPage + 1})">Next &raquo;</button>`;
+            }
+
+            container.innerHTML = html;
+        }
+
+        function applyFilters() {
+            const selectedCategories = Array.from(document.querySelectorAll('.category-filter:checked')).map(cb => cb.value);
+            const selectedConditions = Array.from(document.querySelectorAll('.condition-filter:checked')).map(cb => cb.value);
+
+            // More robust price range selection
+            const priceRadios = document.getElementsByName('price');
+            let selectedPriceRange = 'all';
+            for (const radio of priceRadios) {
+                if (radio.checked) {
+                    selectedPriceRange = radio.value;
+                    break;
+                }
+            }
+
+            console.log('Applying Filters:', { selectedCategories, selectedConditions, selectedPriceRange });
+            console.log('Total books before filter:', allBooks.length);
+
+            displayBooks = allBooks.filter(book => {
+                // Category Filter
+                const categoryMatch = selectedCategories.length === 0 || selectedCategories.includes(book.category);
+
+                // Condition Filter
+                const conditionMatch = selectedConditions.length === 0 || selectedConditions.includes(book.condition);
+
+                // Price Filter
+                let priceMatch = true;
+                const price = parseFloat(book.price);
+
+                if (selectedPriceRange === 'under-10') {
+                    priceMatch = price < 10;
+                } else if (selectedPriceRange === '10-25') {
+                    priceMatch = price >= 10 && price <= 25;
+                } else if (selectedPriceRange === '25-50') {
+                    priceMatch = price >= 25 && price <= 50;
+                } else if (selectedPriceRange === 'over-50') {
+                    priceMatch = price > 50;
+                }
+
+                return categoryMatch && conditionMatch && priceMatch;
+            });
+
+            console.log('Filtered Results Count:', displayBooks.length);
+            if (displayBooks.length > 0) {
+                console.log('First filtered book:', displayBooks[0].title, '$' + displayBooks[0].price);
+            }
+
+            // Re-apply current sort
+            handleSort(false);
+            showPage(1);
+        }
+
+        function resetFilters() {
+            document.querySelectorAll('.category-filter, .condition-filter').forEach(cb => cb.checked = false);
+            const priceRadios = document.getElementsByName('price');
+            for (const radio of priceRadios) {
+                if (radio.value === 'all') radio.checked = true;
+                else radio.checked = false;
+            }
+            displayBooks = [...allBooks];
+            handleSort(false);
+            showPage(1);
+        }
+
+        function handleSort(shouldShowPage = true) {
+            const sortValue = document.getElementById('sortSelect').value;
+
+            switch (sortValue) {
+                case 'price-low':
+                    displayBooks.sort((a, b) => a.price - b.price);
+                    break;
+                case 'price-high':
+                    displayBooks.sort((a, b) => b.price - a.price);
+                    break;
+                case 'title':
+                    displayBooks.sort((a, b) => a.title.localeCompare(b.title));
+                    break;
+                default:
+                    // Default popularity (or original order)
+                    break;
+            }
+
+            if (shouldShowPage) {
+                showPage(1);
+            }
+        }
+
+        function addToCart(title, price) {
+            const cart = JSON.parse(localStorage.getItem('shelfsync_cart_v1') || '[]');
+            const id = title + '__default__default';
+            const existing = cart.find(i => i.id === id);
+
+            if (existing) {
+                existing.qty = (existing.qty || 1) + 1;
+            } else {
+                cart.push({ id, title, price, qty: 1, meta: {} });
+            }
+
+            localStorage.setItem('shelfsync_cart_v1', JSON.stringify(cart));
+            showNotification(title);
+        }
+
+        function buyNow(title, price) {
+            alert('Proceeding to checkout for ' + title + ' - $' + price.toFixed(2));
+        }
+
+        function showNotification(title) {
+            const notif = document.getElementById('quickCartNotification');
+            document.getElementById('quickCartMessage').textContent = title + ' has been added to your cart.';
+            notif.classList.add('show');
+            setTimeout(() => notif.classList.remove('show'), 4000);
+        }
+
+        function hideNotification() {
+            document.getElementById('quickCartNotification').classList.remove('show');
+        }
+
+        function goToCart() {
+            hideNotification();
+            window.location.href = 'view-cart.html';
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function () {
+            loadBooksData();
+        });
+    </script>
 </body>
 
 </html>

@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ship & Track Details | Seller Portal</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .dashboard-sidebar {
+            background-color: #0f172a;
+        }
+
+        .stat-card h3 {
+            color: var(--accent-color);
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: var(--spacing-md);
+            flex-wrap: wrap;
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .page-title {
+            margin: 0;
+        }
+
+        .order-shell {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: var(--spacing-xl);
+        }
+
+        .panel {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid var(--border-light);
+            background: linear-gradient(135deg, rgba(44, 82, 130, 0.05), rgba(196, 86, 33, 0.03));
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: var(--spacing-md);
+            flex-wrap: wrap;
+        }
+
+        .panel-title {
+            margin: 0;
+            font-family: var(--font-display);
+            color: var(--secondary-color);
+        }
+
+        .panel-body {
+            padding: var(--spacing-lg);
+        }
+
+        .kv {
+            display: grid;
+            grid-template-columns: 160px 1fr;
+            gap: var(--spacing-sm) var(--spacing-lg);
+            margin: 0;
+        }
+
+        .kv dt {
+            color: var(--text-light);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.8rem;
+        }
+
+        .kv dd {
+            margin: 0;
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .items-table th,
+        .items-table td {
+            text-align: left;
+            padding: 0.75rem 0.75rem;
+            border-bottom: 1px solid var(--border-light);
+            vertical-align: top;
+        }
+
+        .items-table th {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .ship-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+            flex-wrap: wrap;
+        }
+
+        .sticky {
+            position: sticky;
+            top: calc(var(--spacing-xl) + 24px);
+            align-self: start;
+        }
+
+        .help {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-top: var(--spacing-xs);
+        }
+
+        .toast {
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--success-color);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-xl);
+            padding: 0.9rem 1rem;
+            width: min(420px, calc(100vw - 48px));
+            transform: translateY(12px);
+            opacity: 0;
+            pointer-events: none;
+            transition: all var(--transition-base);
+            z-index: 50;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .toast-title {
+            margin: 0;
+            font-weight: 800;
+            color: var(--secondary-color);
+        }
+
+        .toast-msg {
+            margin: 0.25rem 0 0;
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        @media (max-width: 1024px) {
+            .order-shell {
+                grid-template-columns: 1fr;
+            }
+
+            .sticky {
+                position: static;
+                top: auto;
+            }
+
+            .kv {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="dashboard-sidebar">
+            <a href="../index.html" class="logo">
+                <span>📚 Seller Portal</span>
+            </a>
+            <nav class="sidebar-nav">
+                <a href="seller-dashboard.html" class="sidebar-link">Overview</a>
+                <a href="inventory.html" class="sidebar-link">My Inventory</a>
+                <a href="seller-add-book.html" class="sidebar-link">Add New Book</a>
+                <a href="seller-orders.html" class="sidebar-link active">Orders</a>
+                <a href="seller-earnings.html" class="sidebar-link">Earnings</a>
+                <a href="seller-settings.html" class="sidebar-link">Settings</a>
+                <a href="../index.html" class="sidebar-link"
+                    style="margin-top: auto; color: var(--error-color);">Logout</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <header class="page-header">
+                <div>
+                    <h2 class="page-title">Ship & Track Details</h2>
+                    <p class="text-light" style="margin: 0;">Update shipment details, tracking number, and order status
+                    </p>
+                </div>
+                <div style="display:flex; align-items:center; gap: var(--spacing-md); flex-wrap: wrap;">
+                    <a class="btn btn-outline" href="seller-orders.html">Back to Orders</a>
+                    <span class="badge badge-primary" id="orderIdPill">Order: —</span>
+                </div>
+            </header>
+
+            <div class="order-shell">
+                <section class="panel" aria-label="Order details">
+                    <div class="panel-header">
+                        <div>
+                            <h3 class="panel-title">Order</h3>
+                            <div class="help" id="orderMeta">—</div>
+                        </div>
+                        <span class="badge badge-warning" id="statusBadge">Pending</span>
+                    </div>
+                    <div class="panel-body">
+                        <div id="notFound" class="text-light" style="display:none;">
+                            Order not found. Go back and select an order.
+                        </div>
+
+                        <div id="orderContent" style="display:none;">
+                            <dl class="kv" style="margin-bottom: var(--spacing-lg);">
+                                <dt>Customer</dt>
+                                <dd id="customerName">—</dd>
+
+                                <dt>Phone</dt>
+                                <dd id="customerPhone">—</dd>
+
+                                <dt>Address</dt>
+                                <dd id="customerAddress">—</dd>
+
+                                <dt>Payment</dt>
+                                <dd id="paymentMethod">—</dd>
+
+                                <dt>Total</dt>
+                                <dd id="orderTotal">—</dd>
+                            </dl>
+
+                            <h4 style="margin: 0 0 var(--spacing-md);">Items</h4>
+                            <div
+                                style="border: 1px solid var(--border-light); border-radius: var(--radius-md); overflow:hidden;">
+                                <table class="items-table" aria-label="Ordered items">
+                                    <thead>
+                                        <tr>
+                                            <th>Title</th>
+                                            <th>Qty</th>
+                                            <th>Price</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="itemsBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <aside class="panel sticky" aria-label="Shipment">
+                    <div class="panel-header">
+                        <div>
+                            <h3 class="panel-title">Shipment</h3>
+                            <div class="help">Add carrier + tracking to enable tracking view.</div>
+                        </div>
+                        <span class="badge badge-primary" id="shipmentPill">Not shipped</span>
+                    </div>
+                    <div class="panel-body">
+                        <form id="shipmentForm">
+                            <div class="form-group">
+                                <label class="form-label" for="carrier">Carrier</label>
+                                <input class="form-control" id="carrier" type="text"
+                                    placeholder="e.g., DTDC / BlueDart / FedEx">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="trackingNumber">Tracking Number</label>
+                                <input class="form-control" id="trackingNumber" type="text"
+                                    placeholder="e.g., 1Z999AA10123456784">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="status">Status</label>
+                                <select class="form-control" id="status">
+                                    <option value="Pending">Pending</option>
+                                    <option value="Processing">Processing</option>
+                                    <option value="Shipped">Shipped</option>
+                                    <option value="Delivered">Delivered</option>
+                                    <option value="Cancelled">Cancelled</option>
+                                </select>
+                                <div class="help">Changing to Shipped/Delivered will auto-set timestamps when you use
+                                    the quick buttons below.</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="notes">Notes</label>
+                                <textarea class="form-control" id="notes" rows="3"
+                                    placeholder="Internal notes (optional)"></textarea>
+                            </div>
+
+                            <div class="ship-actions" style="margin-top: var(--spacing-md);">
+                                <button class="btn btn-primary" type="submit">Save Shipment</button>
+                                <button class="btn btn-outline" type="button" id="markShippedBtn">Mark Shipped</button>
+                                <button class="btn btn-outline" type="button" id="markDeliveredBtn">Mark
+                                    Delivered</button>
+                            </div>
+
+                            <div class="ship-actions" style="margin-top: var(--spacing-md);">
+                                <button class="btn btn-outline" type="button" id="copyTrackBtn">Copy Tracking</button>
+                                <a class="btn btn-outline" id="trackLink" href="#" target="_blank"
+                                    rel="noopener noreferrer">Open Carrier Site</a>
+                            </div>
+                        </form>
+                    </div>
+                </aside>
+            </div>
+        </main>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite">
+        <p class="toast-title" id="toastTitle">Done</p>
+        <p class="toast-msg" id="toastMsg">Action completed.</p>
+    </div>
+
+    <script>
+        const ORDERS_KEY = 'shelfsync_orders_v1';
+
+        const toast = document.getElementById('toast');
+        const toastTitle = document.getElementById('toastTitle');
+        const toastMsg = document.getElementById('toastMsg');
+        let toastTimer = null;
+
+        const orderIdPill = document.getElementById('orderIdPill');
+        const statusBadge = document.getElementById('statusBadge');
+        const shipmentPill = document.getElementById('shipmentPill');
+        const trackLink = document.getElementById('trackLink');
+
+        const notFound = document.getElementById('notFound');
+        const orderContent = document.getElementById('orderContent');
+
+        const orderMeta = document.getElementById('orderMeta');
+        const customerNameEl = document.getElementById('customerName');
+        const customerPhoneEl = document.getElementById('customerPhone');
+        const customerAddressEl = document.getElementById('customerAddress');
+        const paymentMethodEl = document.getElementById('paymentMethod');
+        const orderTotalEl = document.getElementById('orderTotal');
+        const itemsBody = document.getElementById('itemsBody');
+
+        const shipmentForm = document.getElementById('shipmentForm');
+        const carrierEl = document.getElementById('carrier');
+        const trackingNumberEl = document.getElementById('trackingNumber');
+        const statusEl = document.getElementById('status');
+        const notesEl = document.getElementById('notes');
+
+        const markShippedBtn = document.getElementById('markShippedBtn');
+        const markDeliveredBtn = document.getElementById('markDeliveredBtn');
+        const copyTrackBtn = document.getElementById('copyTrackBtn');
+
+        function showToast(title, message, tone = 'success') {
+            toastTitle.textContent = title;
+            toastMsg.textContent = message;
+            toast.style.borderLeftColor = tone === 'error' ? 'var(--error-color)' : 'var(--success-color)';
+            toast.classList.add('show');
+
+            if (toastTimer) clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => toast.classList.remove('show'), 2600);
+        }
+
+        function loadOrders() {
+            try {
+                const raw = localStorage.getItem(ORDERS_KEY);
+                const parsed = raw ? JSON.parse(raw) : [];
+                return Array.isArray(parsed) ? parsed : [];
+            } catch {
+                return [];
+            }
+        }
+
+        function saveOrders(orders) {
+            localStorage.setItem(ORDERS_KEY, JSON.stringify(Array.isArray(orders) ? orders : []));
+        }
+
+        function money(n) {
+            return `$${Number(n || 0).toFixed(2)}`;
+        }
+
+        function formatDate(iso) {
+            try {
+                const d = new Date(iso);
+                return d.toLocaleString();
+            } catch {
+                return '';
+            }
+        }
+
+        function badgeClass(status) {
+            const s = String(status || '').toLowerCase();
+            if (s === 'pending') return 'badge badge-warning';
+            if (s === 'processing') return 'badge badge-primary';
+            if (s === 'shipped') return 'badge badge-success';
+            if (s === 'delivered') return 'badge badge-success';
+            if (s === 'cancelled') return 'badge badge-error';
+            return 'badge badge-primary';
+        }
+
+        function getOrderIdFromUrl() {
+            try {
+                const params = new URLSearchParams(window.location.search);
+                return params.get('orderId') || '';
+            } catch {
+                return '';
+            }
+        }
+
+        function computeAddress(delivery) {
+            const d = delivery || {};
+            const parts = [d.address, d.city, d.pincode].filter(Boolean);
+            return parts.length ? parts.join(', ') : '—';
+        }
+
+        function render(order) {
+            const orderId = String(order?.id || '');
+            orderIdPill.textContent = orderId ? `Order: #${orderId}` : 'Order: —';
+            statusBadge.className = badgeClass(order?.status);
+            statusBadge.textContent = String(order?.status || 'Pending');
+
+            orderMeta.textContent = order?.createdAt ? `Created: ${formatDate(order.createdAt)}` : '—';
+
+            customerNameEl.textContent = String(order?.delivery?.fullName || '—');
+            customerPhoneEl.textContent = String(order?.delivery?.phone || '—');
+            customerAddressEl.textContent = computeAddress(order?.delivery);
+            paymentMethodEl.textContent = String(order?.payment?.method || '—').toUpperCase();
+            orderTotalEl.textContent = money(order?.totals?.total);
+
+            const items = Array.isArray(order?.items) ? order.items : [];
+            itemsBody.innerHTML = '';
+            items.forEach((it) => {
+                const tr = document.createElement('tr');
+                const tdTitle = document.createElement('td');
+                tdTitle.textContent = String(it?.title || 'Book');
+
+                const tdQty = document.createElement('td');
+                tdQty.textContent = String(Number(it?.qty) || 0);
+
+                const tdPrice = document.createElement('td');
+                tdPrice.textContent = money(Number(it?.price) || 0);
+
+                tr.appendChild(tdTitle);
+                tr.appendChild(tdQty);
+                tr.appendChild(tdPrice);
+                itemsBody.appendChild(tr);
+            });
+
+            carrierEl.value = String(order?.shipment?.carrier || '');
+            trackingNumberEl.value = String(order?.shipment?.trackingNumber || '');
+            notesEl.value = String(order?.shipment?.notes || '');
+            statusEl.value = String(order?.status || 'Pending');
+
+            const shippedAt = order?.shipment?.shippedAt;
+            const deliveredAt = order?.shipment?.deliveredAt;
+
+            if (String(order?.status || '').toLowerCase() === 'delivered') {
+                shipmentPill.className = 'badge badge-success';
+                shipmentPill.textContent = deliveredAt ? `Delivered: ${formatDate(deliveredAt)}` : 'Delivered';
+            } else if (String(order?.status || '').toLowerCase() === 'shipped') {
+                shipmentPill.className = 'badge badge-success';
+                shipmentPill.textContent = shippedAt ? `Shipped: ${formatDate(shippedAt)}` : 'Shipped';
+            } else {
+                shipmentPill.className = 'badge badge-primary';
+                shipmentPill.textContent = 'Not shipped';
+            }
+
+            const tracking = String(order?.shipment?.trackingNumber || '').trim();
+            if (tracking) {
+                trackLink.href = `https://www.google.com/search?q=${encodeURIComponent(tracking + ' tracking')}`;
+                trackLink.style.pointerEvents = 'auto';
+                trackLink.style.opacity = '1';
+            } else {
+                trackLink.href = '#';
+                trackLink.style.pointerEvents = 'none';
+                trackLink.style.opacity = '0.6';
+            }
+        }
+
+        const orderId = getOrderIdFromUrl();
+        const orders = loadOrders();
+        const idx = orders.findIndex(o => String(o?.id || '') === String(orderId || ''));
+
+        if (!orderId || idx < 0) {
+            notFound.style.display = 'block';
+            orderContent.style.display = 'none';
+            orderIdPill.textContent = 'Order: —';
+
+            // Add demo seeding option if no orders exist
+            const orders = loadOrders();
+            if (orders.length === 0) {
+                notFound.innerHTML = `
+                    Order not found. No orders exist in the system.<br>
+                    <button class="btn btn-outline btn-sm" style="margin-top: 0.5rem;" onclick="seedDemoOrders()">
+                        Seed Demo Orders
+                    </button>
+                `;
+            }
+        } else {
+            notFound.style.display = 'none';
+            orderContent.style.display = 'block';
+            render(orders[idx]);
+        }
+
+        function persistUpdate(patch) {
+            const orders = loadOrders();
+            const idx = orders.findIndex(o => String(o?.id || '') === String(orderId || ''));
+            if (idx < 0) return;
+
+            const current = orders[idx] || {};
+            const next = { ...current, ...patch };
+            orders[idx] = next;
+            saveOrders(orders);
+            render(next);
+        }
+
+        shipmentForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const carrier = (carrierEl.value || '').trim();
+            const trackingNumber = (trackingNumberEl.value || '').trim();
+            const notes = (notesEl.value || '').trim();
+            const status = statusEl.value;
+
+            persistUpdate({
+                status,
+                shipment: {
+                    ...(loadOrders().find(o => String(o?.id || '') === String(orderId || ''))?.shipment || {}),
+                    carrier,
+                    trackingNumber,
+                    notes,
+                }
+            });
+
+            showToast('Saved', 'Shipment details saved.');
+        });
+
+        markShippedBtn.addEventListener('click', () => {
+            const now = new Date().toISOString();
+            persistUpdate({
+                status: 'Shipped',
+                shipment: {
+                    ...(loadOrders().find(o => String(o?.id || '') === String(orderId || ''))?.shipment || {}),
+                    carrier: (carrierEl.value || '').trim(),
+                    trackingNumber: (trackingNumberEl.value || '').trim(),
+                    notes: (notesEl.value || '').trim(),
+                    shippedAt: now,
+                }
+            });
+            statusEl.value = 'Shipped';
+            showToast('Shipped', 'Order marked as shipped.');
+        });
+
+        markDeliveredBtn.addEventListener('click', () => {
+            const now = new Date().toISOString();
+            persistUpdate({
+                status: 'Delivered',
+                shipment: {
+                    ...(loadOrders().find(o => String(o?.id || '') === String(orderId || ''))?.shipment || {}),
+                    carrier: (carrierEl.value || '').trim(),
+                    trackingNumber: (trackingNumberEl.value || '').trim(),
+                    notes: (notesEl.value || '').trim(),
+                    deliveredAt: now,
+                }
+            });
+            statusEl.value = 'Delivered';
+            showToast('Delivered', 'Order marked as delivered.');
+        });
+
+        copyTrackBtn.addEventListener('click', async () => {
+            const tracking = (trackingNumberEl.value || '').trim();
+            if (!tracking) {
+                showToast('Missing', 'No tracking number to copy.', 'error');
+                return;
+            }
+
+            try {
+                await navigator.clipboard.writeText(tracking);
+                showToast('Copied', 'Tracking number copied to clipboard.');
+            } catch {
+                showToast('Copy failed', 'Copy failed in this browser.', 'error');
+            }
+        });
+
+        function seedDemoOrders() {
+            try {
+                const demoOrders = [
+                    {
+                        id: `ORD-${Date.now() - 86400000}`,
+                        createdAt: new Date(Date.now() - 86400000).toISOString(),
+                        status: 'Pending',
+                        items: [{ title: 'Atomic Habits', price: 16.99, qty: 1 }],
+                        totals: { subtotal: 16.99, delivery: 2.0, tax: 0.85, total: 19.84 },
+                        payment: { method: 'gpay' },
+                        delivery: { fullName: 'Alice Johnson', phone: '+91 98765 43210', address: '123 Main St', city: 'Mumbai', pincode: '400001' },
+                        shipment: { carrier: '', trackingNumber: '', shippedAt: null, deliveredAt: null, notes: '' }
+                    },
+                    {
+                        id: `ORD-${Date.now() - 172800000}`,
+                        createdAt: new Date(Date.now() - 172800000).toISOString(),
+                        status: 'Shipped',
+                        items: [{ title: 'Deep Work', price: 14.50, qty: 2 }],
+                        totals: { subtotal: 29.00, delivery: 2.0, tax: 1.45, total: 32.45 },
+                        payment: { method: 'upi' },
+                        delivery: { fullName: 'Bob Smith', phone: '+91 87654 32109', address: '456 Oak Ave', city: 'Delhi', pincode: '110001' },
+                        shipment: { carrier: 'DTDC', trackingNumber: 'DT123456789', shippedAt: new Date(Date.now() - 86400000).toISOString(), deliveredAt: null, notes: '' }
+                    },
+                    {
+                        id: `ORD-${Date.now() - 259200000}`,
+                        createdAt: new Date(Date.now() - 259200000).toISOString(),
+                        status: 'Delivered',
+                        items: [{ title: 'The Alchemist', price: 12.99, qty: 1 }],
+                        totals: { subtotal: 12.99, delivery: 2.0, tax: 0.65, total: 15.64 },
+                        payment: { method: 'card' },
+                        delivery: { fullName: 'Charlie Brown', phone: '+91 76543 21098', address: '789 Pine Rd', city: 'Bangalore', pincode: '560001' },
+                        shipment: { carrier: 'BlueDart', trackingNumber: 'BD987654321', shippedAt: new Date(Date.now() - 172800000).toISOString(), deliveredAt: new Date(Date.now() - 86400000).toISOString(), notes: '' }
+                    }
+                ];
+
+                const existingOrders = loadOrders();
+                const combinedOrders = [...demoOrders, ...existingOrders];
+                saveOrders(combinedOrders);
+
+                // Redirect to the first demo order
+                window.location.href = `ship-track-details.html?orderId=${encodeURIComponent(demoOrders[0].id)}`;
+            } catch (error) {
+                console.error('Error seeding demo orders:', error);
+                alert('Failed to seed demo orders. Please try again.');
+            }
+        }
+    </script>
+
+</body>
+
+</html>

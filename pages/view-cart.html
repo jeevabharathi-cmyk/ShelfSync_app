@@ -1,0 +1,1517 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Cart | ShelfSync</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .cart-layout {
+            display: grid;
+            grid-template-columns: 1.6fr 1fr;
+            gap: var(--spacing-xl);
+            padding: var(--spacing-xl) 0;
+            align-items: start;
+        }
+
+        .cart-side {
+            position: sticky;
+            top: calc(var(--spacing-xl) + 70px);
+            align-self: start;
+            display: grid;
+            gap: var(--spacing-xl);
+        }
+
+        .panel {
+            background: var(--surface-color);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: var(--spacing-md);
+        }
+
+        .panel-title {
+            margin: 0;
+            font-size: 1.125rem;
+            color: var(--secondary-color);
+            font-weight: 800;
+        }
+
+        .panel-subtitle {
+            margin: var(--spacing-xs) 0 0;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .panel-body {
+            padding: var(--spacing-lg);
+        }
+
+        .cart-item {
+            display: grid;
+            grid-template-columns: 72px 1fr;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            background: rgba(44, 82, 130, 0.03);
+            margin-bottom: var(--spacing-md);
+            position: relative;
+        }
+
+        .cart-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, var(--primary-color), var(--accent-color));
+            opacity: 0.0;
+            transition: opacity var(--transition-base);
+            border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+        }
+
+        .cart-item:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+        }
+
+        .cart-item:hover::before {
+            opacity: 1;
+        }
+
+        .cart-thumb {
+            width: 72px;
+            height: 96px;
+            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, #2C5282, #C05621);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 800;
+            font-family: var(--font-display);
+            box-shadow: var(--shadow-sm);
+            user-select: none;
+        }
+
+        .cart-item-title {
+            margin: 0;
+            font-weight: 800;
+            color: var(--secondary-color);
+        }
+
+        .cart-item-meta {
+            margin: var(--spacing-xs) 0 0;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .cart-item-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-md);
+            flex-wrap: wrap;
+        }
+
+        .cart-item-actions-left {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            flex-wrap: wrap;
+        }
+
+        .cart-item-actions-right {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .muted {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .add-item {
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-md);
+            background: rgba(15, 23, 42, 0.02);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .add-item-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-md);
+        }
+
+        .add-item-grid .span-2 {
+            grid-column: 1 / -1;
+        }
+
+        .qty-control {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 0.25rem;
+            background: var(--surface-color);
+        }
+
+        .qty-btn {
+            width: 34px;
+            height: 34px;
+            border: none;
+            background: var(--primary-color);
+            color: white;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-weight: 800;
+            transition: transform var(--transition-base), background var(--transition-base);
+        }
+
+        .qty-btn:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
+        }
+
+        .qty-input {
+            width: 48px;
+            border: none;
+            background: transparent;
+            text-align: center;
+            font-weight: 700;
+            color: var(--secondary-color);
+        }
+
+        .qty-input:focus {
+            outline: none;
+        }
+
+        .price {
+            font-weight: 800;
+            color: var(--accent-color);
+            font-family: var(--font-display);
+        }
+
+        .totals {
+            display: grid;
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-md);
+        }
+
+        .totals-row {
+            display: flex;
+            justify-content: space-between;
+            gap: var(--spacing-md);
+            color: var(--text-light);
+        }
+
+        .totals-row strong {
+            color: var(--secondary-color);
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--border-light);
+            margin: var(--spacing-md) 0;
+        }
+
+        .empty {
+            text-align: center;
+            padding: var(--spacing-2xl) var(--spacing-lg);
+            color: var(--text-light);
+        }
+
+        .payment-tabs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-md);
+        }
+
+        .pay-option {
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-md);
+            background: rgba(15, 23, 42, 0.02);
+            cursor: pointer;
+            transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--spacing-md);
+        }
+
+        .pay-option:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-light);
+        }
+
+        .pay-option.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(44, 82, 130, 0.12);
+            background: rgba(44, 82, 130, 0.04);
+        }
+
+        .pay-option-title {
+            font-weight: 800;
+            color: var(--secondary-color);
+            margin: 0;
+        }
+
+        .pay-option-desc {
+            margin: var(--spacing-xs) 0 0;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.6rem;
+            border-radius: var(--radius-full);
+            font-size: 0.8rem;
+            border: 1px solid var(--border-color);
+            background: rgba(44, 82, 130, 0.06);
+            color: var(--secondary-color);
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .payment-details {
+            margin-top: var(--spacing-md);
+            padding: var(--spacing-md);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-light);
+            background: rgba(44, 82, 130, 0.03);
+        }
+
+        .qr-box {
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            text-align: center;
+            background: rgba(15, 23, 42, 0.02);
+        }
+
+        .map {
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            height: 320px;
+            background: #0f172a;
+        }
+
+        .map #mapCanvas {
+            width: 100%;
+            height: 100%;
+            display: none;
+        }
+
+        .map iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        .toast {
+            position: fixed;
+            right: 18px;
+            bottom: 18px;
+            width: min(420px, calc(100vw - 36px));
+            background: var(--surface-color);
+            border: 1px solid var(--border-light);
+            border-left: 6px solid var(--success-color);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            padding: var(--spacing-md);
+            display: none;
+            z-index: 9999;
+        }
+
+        .toast.show {
+            display: block;
+            animation: slideInRight 0.4s ease-out;
+        }
+
+        .toast-title {
+            font-weight: 800;
+            color: var(--secondary-color);
+            margin: 0 0 var(--spacing-xs);
+        }
+
+        .toast-msg {
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        .error-text {
+            color: var(--error-color);
+            font-size: 0.85rem;
+            margin-top: var(--spacing-xs);
+            display: none;
+        }
+
+        .form-control.invalid {
+            border-color: var(--error-color);
+            box-shadow: 0 0 0 4px rgba(229, 62, 62, 0.12);
+        }
+
+        @media (max-width: 1024px) {
+            .cart-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .cart-side {
+                position: static;
+                top: auto;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .payment-tabs {
+                grid-template-columns: 1fr;
+            }
+
+            .add-item-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .cart-item {
+                grid-template-columns: 1fr;
+            }
+
+            .cart-thumb {
+                width: 100%;
+                height: 160px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="container">
+            <a href="../index.html" class="logo">
+                <span>📚 ShelfSync</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="all-books.html" class="nav-link">Browse Books</a></li>
+                <li><a href="view-cart.html" class="btn btn-primary">Cart</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div
+            style="display:flex; justify-content:space-between; align-items:flex-end; gap: var(--spacing-md); margin-top: var(--spacing-lg); flex-wrap: wrap;">
+            <div>
+                <h2 style="margin-bottom: var(--spacing-xs);">Your Cart</h2>
+                <p class="text-light" style="margin: 0;">Review items, choose payment, and confirm delivery.</p>
+            </div>
+            <a class="btn btn-outline" href="all-books.html">Continue Shopping</a>
+        </div>
+
+        <div class="cart-layout">
+            <section class="panel" aria-label="Cart items">
+                <div class="panel-header">
+                    <div>
+                        <h3 class="panel-title">Cart Items</h3>
+                        <p class="panel-subtitle" id="itemsSubtitle">Loading…</p>
+                    </div>
+                    <button class="btn btn-outline" id="clearCartBtn"
+                        style="color: var(--error-color); border-color: var(--error-color);">Clear Cart</button>
+                </div>
+                <div class="panel-body">
+                    <div class="add-item">
+                        <div
+                            style="display:flex; justify-content: space-between; align-items: center; gap: var(--spacing-md); flex-wrap: wrap; margin-bottom: var(--spacing-md);">
+                            <div>
+                                <div style="font-weight: 800; color: var(--secondary-color);">Add Item (CRUD - Create)
+                                </div>
+                                <div class="muted">Use this to quickly add a book into cart for demo/testing.</div>
+                            </div>
+                        </div>
+                        <form id="addItemForm">
+                            <div class="add-item-grid">
+                                <div class="form-group span-2" style="margin-bottom: 0;">
+                                    <label class="form-label" for="newTitle">Book Title *</label>
+                                    <input class="form-control" id="newTitle" type="text" placeholder="e.g., Clean Code"
+                                        required>
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="newPrice">Price *</label>
+                                    <input class="form-control" id="newPrice" type="number" min="0" step="0.01"
+                                        placeholder="e.g., 19.99" required>
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="newQty">Qty *</label>
+                                    <input class="form-control" id="newQty" type="number" min="1" step="1" value="1"
+                                        required>
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="newFormat">Format</label>
+                                    <select class="form-control" id="newFormat">
+                                        <option value="">Default</option>
+                                        <option value="hardcover">Hardcover</option>
+                                        <option value="paperback">Paperback</option>
+                                        <option value="ebook">E-book</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="newCondition">Condition</label>
+                                    <select class="form-control" id="newCondition">
+                                        <option value="">Default</option>
+                                        <option value="new">New</option>
+                                        <option value="like-new">Like New</option>
+                                        <option value="good">Good</option>
+                                        <option value="acceptable">Acceptable</option>
+                                    </select>
+                                </div>
+                                <div class="form-group span-2" style="margin-bottom: 0;">
+                                    <label class="form-label" for="newIsbn">ISBN</label>
+                                    <input class="form-control" id="newIsbn" type="text" placeholder="Optional">
+                                </div>
+                            </div>
+                            <div
+                                style="display:flex; gap: var(--spacing-md); flex-wrap: wrap; margin-top: var(--spacing-md);">
+                                <button class="btn btn-primary" type="submit"
+                                    style="background-color: var(--primary-color);">Add to Cart</button>
+                                <button class="btn btn-outline" type="button" id="seedDemoBtn">Add Demo Items</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div id="cartItems"></div>
+                    <div id="emptyState" class="empty" style="display:none;">
+                        <div style="font-size: 2.4rem; margin-bottom: var(--spacing-sm);">🛒</div>
+                        <h3 style="margin-bottom: var(--spacing-xs);">Your cart is empty</h3>
+                        <p style="margin: 0;">Add some books and come back here to checkout.</p>
+                        <div style="margin-top: var(--spacing-lg);">
+                            <a class="btn btn-primary" href="all-books.html">Browse Books</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <aside class="cart-side">
+                <section class="panel" aria-label="Delivery details">
+                    <div class="panel-header">
+                        <div>
+                            <h3 class="panel-title">Delivery</h3>
+                            <p class="panel-subtitle">Add your address and confirm live location</p>
+                        </div>
+                        <span class="pill" id="locPill">Location: not set</span>
+                    </div>
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label class="form-label" for="fullName">Full Name *</label>
+                            <input class="form-control" id="fullName" type="text" placeholder="Your name" required>
+                            <div class="error-text" data-error-for="fullName">Please enter your name.</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="phone">Phone Number *</label>
+                            <input class="form-control" id="phone" type="tel" placeholder="e.g., +91 98765 43210"
+                                required>
+                            <div class="error-text" data-error-for="phone">Please enter your phone number.</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="address">Address *</label>
+                            <textarea class="form-control" id="address" rows="3" placeholder="House no, street, area"
+                                required></textarea>
+                            <div class="error-text" data-error-for="address">Please enter your address.</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="city">City *</label>
+                            <input class="form-control" id="city" type="text" placeholder="City" required>
+                            <div class="error-text" data-error-for="city">Please enter your city.</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="pincode">Pincode *</label>
+                            <input class="form-control" id="pincode" type="text" placeholder="Pincode" required>
+                            <div class="error-text" data-error-for="pincode">Please enter your pincode.</div>
+                        </div>
+
+                        <div style="display:flex; gap: var(--spacing-md); flex-wrap: wrap;">
+                            <button class="btn btn-primary" id="useLocationBtn" type="button"
+                                style="background-color: var(--primary-color);">Use My Live Location</button>
+                            <button class="btn btn-outline" id="refreshMapBtn" type="button">Refresh Map</button>
+                        </div>
+
+                        <div class="form-group" style="margin-top: var(--spacing-md);">
+                            <label class="form-label" for="gmapsKey">Google Maps API Key</label>
+                            <input class="form-control" id="gmapsKey" type="password"
+                                placeholder="Paste your Google Maps JavaScript API key">
+                            <div class="help-text">Required for interactive map + marker + live tracking. Stored locally
+                                on this device.</div>
+                        </div>
+                        <div style="display:flex; gap: var(--spacing-md); flex-wrap: wrap;">
+                            <button class="btn btn-outline" id="saveKeyBtn" type="button">Save Key</button>
+                            <button class="btn btn-outline" id="clearKeyBtn" type="button"
+                                style="color: var(--error-color); border-color: var(--error-color);">Clear Key</button>
+                        </div>
+
+                        <div style="margin-top: var(--spacing-md);" class="map">
+                            <div id="mapCanvas" aria-label="Google Map" role="application"></div>
+                            <iframe id="mapFrame" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+                                src="https://www.google.com/maps?q=India&z=4&output=embed"></iframe>
+                        </div>
+
+                        <p class="text-light" id="coordsText" style="margin: var(--spacing-sm) 0 0;">Coordinates: —</p>
+                    </div>
+                </section>
+
+                <section class="panel" aria-label="Checkout">
+                    <div class="panel-header">
+                        <div>
+                            <h3 class="panel-title">Checkout</h3>
+                            <p class="panel-subtitle">Choose payment method and place order</p>
+                        </div>
+                        <span class="pill" id="totalPill">Total: $0.00</span>
+                    </div>
+                    <div class="panel-body">
+                        <div class="totals">
+                            <div class="totals-row"><span>Subtotal</span><strong id="subtotalText">$0.00</strong></div>
+                            <div class="totals-row"><span>Delivery</span><strong id="deliveryText">$2.00</strong></div>
+                            <div class="totals-row"><span>Tax</span><strong id="taxText">$0.00</strong></div>
+                            <div class="divider"></div>
+                            <div class="totals-row" style="font-size: 1.05rem;"><span>Total</span><strong
+                                    id="totalText">$0.00</strong></div>
+                        </div>
+
+                        <div class="payment-tabs" id="paymentTabs" aria-label="Payment options">
+                            <div class="pay-option active" data-method="gpay" tabindex="0" role="button"
+                                aria-label="Pay with Google Pay">
+                                <div>
+                                    <p class="pay-option-title">GPay</p>
+                                    <p class="pay-option-desc">Fast UPI via Google Pay</p>
+                                </div>
+                                <span class="pill">Recommended</span>
+                            </div>
+                            <div class="pay-option" data-method="upi" tabindex="0" role="button"
+                                aria-label="Pay with UPI">
+                                <div>
+                                    <p class="pay-option-title">UPI</p>
+                                    <p class="pay-option-desc">Enter UPI ID & pay</p>
+                                </div>
+                                <span class="pill">UPI</span>
+                            </div>
+                            <div class="pay-option" data-method="qr" tabindex="0" role="button"
+                                aria-label="Pay with QR code">
+                                <div>
+                                    <p class="pay-option-title">QR Code</p>
+                                    <p class="pay-option-desc">Scan and pay</p>
+                                </div>
+                                <span class="pill">Scan</span>
+                            </div>
+                            <div class="pay-option" data-method="card" tabindex="0" role="button"
+                                aria-label="Pay with card">
+                                <div>
+                                    <p class="pay-option-title">Card</p>
+                                    <p class="pay-option-desc">Credit / Debit Card</p>
+                                </div>
+                                <span class="pill">Card</span>
+                            </div>
+                        </div>
+
+                        <div class="payment-details" id="paymentDetails">
+                            <div id="payGpay">
+                                <p style="margin: 0; font-weight: 700; color: var(--secondary-color);">Google Pay (GPay)
+                                </p>
+                                <p class="text-light" style="margin: var(--spacing-xs) 0 0;">You will be redirected to
+                                    your UPI app after placing the order (demo).</p>
+                            </div>
+
+                            <div id="payUpi" style="display:none;">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label" for="upiId">UPI ID *</label>
+                                    <input class="form-control" id="upiId" type="text" placeholder="name@bank">
+                                    <div class="error-text" data-error-for="upiId">Please enter a valid UPI ID.</div>
+                                </div>
+                            </div>
+
+                            <div id="payQr" style="display:none;">
+                                <div class="qr-box">
+                                    <div style="font-size: 2rem; margin-bottom: var(--spacing-xs);">📷</div>
+                                    <div style="font-weight: 800; color: var(--secondary-color);">Scan QR to Pay</div>
+                                    <div class="text-light" style="margin-top: var(--spacing-xs);">(Demo) This is a
+                                        placeholder. In a real app, a QR will be generated for the total amount.</div>
+                                </div>
+                            </div>
+
+                            <div id="payCard" style="display:none;">
+                                <div class="form-group">
+                                    <label class="form-label" for="cardName">Name on Card *</label>
+                                    <input class="form-control" id="cardName" type="text"
+                                        placeholder="Card holder name">
+                                    <div class="error-text" data-error-for="cardName">Please enter name on card.</div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="cardNumber">Card Number *</label>
+                                    <input class="form-control" id="cardNumber" type="text"
+                                        placeholder="1234 5678 9012 3456" inputmode="numeric" maxlength="19">
+                                    <div class="error-text" data-error-for="cardNumber">Please enter a valid card
+                                        number.</div>
+                                </div>
+                                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md);">
+                                    <div class="form-group">
+                                        <label class="form-label" for="cardExp">Expiry (MM/YY) *</label>
+                                        <input class="form-control" id="cardExp" type="text" placeholder="MM/YY"
+                                            inputmode="numeric" maxlength="5">
+                                        <div class="error-text" data-error-for="cardExp">Please enter expiry.</div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="cardCvv">CVV *</label>
+                                        <input class="form-control" id="cardCvv" type="password" placeholder="***"
+                                            inputmode="numeric" maxlength="4">
+                                        <div class="error-text" data-error-for="cardCvv">Please enter CVV.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary" id="placeOrderBtn"
+                            style="width: 100%; margin-top: var(--spacing-md); background-color: var(--accent-color);">Place
+                            Order</button>
+                        <p class="text-light" style="margin: var(--spacing-sm) 0 0; font-size: 0.9rem;">By placing the
+                            order, you agree to our terms (demo).</p>
+                    </div>
+                </section>
+            </aside>
+        </div>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite">
+        <p class="toast-title" id="toastTitle">Done</p>
+        <p class="toast-msg" id="toastMsg">Action completed.</p>
+    </div>
+
+    <script>
+        const CART_KEY = 'shelfsync_cart_v1';
+        const ORDERS_KEY = 'shelfsync_orders_v1';
+        const GMAPS_KEY = 'shelfsync_gmaps_js_key_v1';
+
+        const cartItemsEl = document.getElementById('cartItems');
+        const emptyStateEl = document.getElementById('emptyState');
+        const itemsSubtitleEl = document.getElementById('itemsSubtitle');
+
+        const subtotalText = document.getElementById('subtotalText');
+        const deliveryText = document.getElementById('deliveryText');
+        const taxText = document.getElementById('taxText');
+        const totalText = document.getElementById('totalText');
+        const totalPill = document.getElementById('totalPill');
+
+        const toast = document.getElementById('toast');
+        const toastTitle = document.getElementById('toastTitle');
+        const toastMsg = document.getElementById('toastMsg');
+        let toastTimer = null;
+
+        const locPill = document.getElementById('locPill');
+        const coordsText = document.getElementById('coordsText');
+        const mapCanvas = document.getElementById('mapCanvas');
+        const mapFrame = document.getElementById('mapFrame');
+        const gmapsKeyInput = document.getElementById('gmapsKey');
+        const saveKeyBtn = document.getElementById('saveKeyBtn');
+        const clearKeyBtn = document.getElementById('clearKeyBtn');
+
+        const paymentTabs = document.getElementById('paymentTabs');
+        const payGpay = document.getElementById('payGpay');
+        const payUpi = document.getElementById('payUpi');
+        const payQr = document.getElementById('payQr');
+        const payCard = document.getElementById('payCard');
+
+        let currentMethod = 'gpay';
+        let currentCoords = null;
+        let geoWatchId = null;
+
+        let mapsReady = false;
+        let mapInstance = null;
+        let markerInstance = null;
+        let mapsScriptLoading = null;
+
+        let editingId = null;
+
+        function showToast(title, message, tone = 'success') {
+            toastTitle.textContent = title;
+            toastMsg.textContent = message;
+            toast.style.borderLeftColor = tone === 'error' ? 'var(--error-color)' : 'var(--success-color)';
+            toast.classList.add('show');
+
+            if (toastTimer) clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => toast.classList.remove('show'), 2600);
+        }
+
+        function loadSavedMapsKey() {
+            try {
+                const raw = localStorage.getItem(GMAPS_KEY);
+                return raw ? String(raw) : '';
+            } catch {
+                return '';
+            }
+        }
+
+        function saveMapsKey(key) {
+            localStorage.setItem(GMAPS_KEY, key);
+        }
+
+        function clearMapsKey() {
+            localStorage.removeItem(GMAPS_KEY);
+        }
+
+        function setMapMode(mode) {
+            if (mode === 'js') {
+                mapCanvas.style.display = 'block';
+                mapFrame.style.display = 'none';
+            } else {
+                mapCanvas.style.display = 'none';
+                mapFrame.style.display = 'block';
+            }
+        }
+
+        function loadGoogleMapsScript(apiKey) {
+            if (mapsReady) return Promise.resolve();
+            if (mapsScriptLoading) return mapsScriptLoading;
+
+            mapsScriptLoading = new Promise((resolve, reject) => {
+                if (!apiKey) {
+                    reject(new Error('Missing API key'));
+                    return;
+                }
+
+                if (window.google && window.google.maps) {
+                    mapsReady = true;
+                    resolve();
+                    return;
+                }
+
+                const script = document.createElement('script');
+                script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(apiKey)}`;
+                script.async = true;
+                script.defer = true;
+                script.onload = () => {
+                    if (window.google && window.google.maps) {
+                        mapsReady = true;
+                        resolve();
+                    } else {
+                        reject(new Error('Google Maps loaded but API is unavailable'));
+                    }
+                };
+                script.onerror = () => reject(new Error('Failed to load Google Maps JavaScript API'));
+                document.head.appendChild(script);
+            });
+
+            return mapsScriptLoading;
+        }
+
+        function ensureJsMap(lat, lng) {
+            const apiKey = (gmapsKeyInput.value || '').trim() || loadSavedMapsKey();
+
+            return loadGoogleMapsScript(apiKey)
+                .then(() => {
+                    setMapMode('js');
+
+                    const center = { lat: Number(lat) || 20.5937, lng: Number(lng) || 78.9629 };
+
+                    if (!mapInstance) {
+                        mapInstance = new google.maps.Map(mapCanvas, {
+                            center,
+                            zoom: 16,
+                            mapTypeControl: false,
+                            streetViewControl: false,
+                            fullscreenControl: false
+                        });
+                    } else {
+                        mapInstance.setCenter(center);
+                    }
+
+                    if (!markerInstance) {
+                        markerInstance = new google.maps.Marker({
+                            map: mapInstance,
+                            position: center,
+                            title: 'Delivery Location'
+                        });
+                    } else {
+                        markerInstance.setPosition(center);
+                    }
+                })
+                .catch((err) => {
+                    setMapMode('embed');
+                    showToast('Maps fallback', err.message, 'error');
+                });
+        }
+
+        function loadCart() {
+            try {
+                const raw = localStorage.getItem(CART_KEY);
+                if (!raw) return [];
+                const parsed = JSON.parse(raw);
+                return Array.isArray(parsed) ? parsed : [];
+            } catch {
+                return [];
+            }
+        }
+
+        function loadOrders() {
+            try {
+                const raw = localStorage.getItem(ORDERS_KEY);
+                const parsed = raw ? JSON.parse(raw) : [];
+                return Array.isArray(parsed) ? parsed : [];
+            } catch {
+                return [];
+            }
+        }
+
+        function saveOrders(orders) {
+            localStorage.setItem(ORDERS_KEY, JSON.stringify(Array.isArray(orders) ? orders : []));
+        }
+
+        function makeCartId(title, format, condition) {
+            const t = String(title || 'Book').trim();
+            const f = String(format || 'default').trim() || 'default';
+            const c = String(condition || 'default').trim() || 'default';
+            return `${t}__${f}__${c}`;
+        }
+
+        function makeOrderId() {
+            return `ORD-${Date.now()}`;
+        }
+
+        function saveCart(items) {
+            localStorage.setItem(CART_KEY, JSON.stringify(items));
+        }
+
+        function addItemToCart(item) {
+            const items = loadCart();
+            const existing = items.find(i => i.id === item.id);
+            if (existing) {
+                existing.qty = (Number(existing.qty) || 0) + (Number(item.qty) || 1);
+                existing.price = item.price;
+                existing.meta = item.meta;
+                existing.title = item.title;
+            } else {
+                items.push(item);
+            }
+            saveCart(items);
+        }
+
+        function updateItem(id, patch) {
+            const items = loadCart().map((it) => it.id === id ? { ...it, ...patch } : it);
+            saveCart(items);
+        }
+
+        function money(n) {
+            return `$${Number(n || 0).toFixed(2)}`;
+        }
+
+        function calcTotals(items) {
+            const subtotal = items.reduce((sum, i) => sum + (Number(i.price) || 0) * (Number(i.qty) || 0), 0);
+            const delivery = items.length > 0 ? 2.0 : 0;
+            const tax = subtotal * 0.05;
+            const total = subtotal + delivery + tax;
+            return { subtotal, delivery, tax, total };
+        }
+
+        function renderTotals(items) {
+            const { subtotal, delivery, tax, total } = calcTotals(items);
+            subtotalText.textContent = money(subtotal);
+            deliveryText.textContent = money(delivery);
+            taxText.textContent = money(tax);
+            totalText.textContent = money(total);
+            totalPill.textContent = `Total: ${money(total)}`;
+        }
+
+        function itemMetaText(item) {
+            const parts = [];
+            if (item.meta?.format) parts.push(`Format: ${item.meta.format}`);
+            if (item.meta?.condition) parts.push(`Condition: ${item.meta.condition}`);
+            if (item.meta?.isbn) parts.push(`ISBN: ${item.meta.isbn}`);
+            return parts.length ? parts.join(' • ') : '—';
+        }
+
+        function renderCart() {
+            const items = loadCart();
+
+            if (items.length === 0) {
+                cartItemsEl.innerHTML = '';
+                emptyStateEl.style.display = 'block';
+                itemsSubtitleEl.textContent = '0 items';
+                renderTotals(items);
+                return;
+            }
+
+            emptyStateEl.style.display = 'none';
+            itemsSubtitleEl.textContent = `${items.length} item${items.length === 1 ? '' : 's'} in your cart`;
+
+            cartItemsEl.innerHTML = '';
+            items.forEach((item) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'cart-item';
+
+                const thumb = document.createElement('div');
+                thumb.className = 'cart-thumb';
+                thumb.textContent = (item.title || 'Book').slice(0, 1).toUpperCase();
+
+                const body = document.createElement('div');
+
+                const isEditing = editingId === item.id;
+
+                const title = document.createElement('h4');
+                title.className = 'cart-item-title';
+                title.textContent = item.title || 'Untitled';
+
+                const meta = document.createElement('p');
+                meta.className = 'cart-item-meta';
+                meta.textContent = itemMetaText(item);
+
+                const editBlock = document.createElement('div');
+                editBlock.style.display = isEditing ? 'block' : 'none';
+                editBlock.style.marginTop = 'var(--spacing-md)';
+
+                const editGrid = document.createElement('div');
+                editGrid.style.display = 'grid';
+                editGrid.style.gridTemplateColumns = '1fr 1fr';
+                editGrid.style.gap = 'var(--spacing-md)';
+
+                const eTitle = document.createElement('input');
+                eTitle.className = 'form-control';
+                eTitle.type = 'text';
+                eTitle.value = item.title || '';
+                eTitle.placeholder = 'Title';
+                eTitle.style.gridColumn = '1 / -1';
+
+                const ePrice = document.createElement('input');
+                ePrice.className = 'form-control';
+                ePrice.type = 'number';
+                ePrice.min = '0';
+                ePrice.step = '0.01';
+                ePrice.value = String(Number(item.price) || 0);
+                ePrice.placeholder = 'Price';
+
+                const eIsbn = document.createElement('input');
+                eIsbn.className = 'form-control';
+                eIsbn.type = 'text';
+                eIsbn.value = String(item.meta?.isbn || '');
+                eIsbn.placeholder = 'ISBN (optional)';
+
+                const eFormat = document.createElement('select');
+                eFormat.className = 'form-control';
+                eFormat.innerHTML = `
+                    <option value="">Default</option>
+                    <option value="hardcover">Hardcover</option>
+                    <option value="paperback">Paperback</option>
+                    <option value="ebook">E-book</option>
+                `;
+                eFormat.value = String(item.meta?.format || '');
+
+                const eCondition = document.createElement('select');
+                eCondition.className = 'form-control';
+                eCondition.innerHTML = `
+                    <option value="">Default</option>
+                    <option value="new">New</option>
+                    <option value="like-new">Like New</option>
+                    <option value="good">Good</option>
+                    <option value="acceptable">Acceptable</option>
+                `;
+                eCondition.value = String(item.meta?.condition || '');
+
+                editGrid.appendChild(eTitle);
+                editGrid.appendChild(ePrice);
+                editGrid.appendChild(eIsbn);
+                editGrid.appendChild(eFormat);
+                editGrid.appendChild(eCondition);
+
+                const editActions = document.createElement('div');
+                editActions.style.display = 'flex';
+                editActions.style.gap = 'var(--spacing-md)';
+                editActions.style.flexWrap = 'wrap';
+                editActions.style.marginTop = 'var(--spacing-md)';
+
+                const saveBtn = document.createElement('button');
+                saveBtn.type = 'button';
+                saveBtn.className = 'btn btn-primary';
+                saveBtn.style.backgroundColor = 'var(--primary-color)';
+                saveBtn.textContent = 'Save';
+
+                const cancelBtn = document.createElement('button');
+                cancelBtn.type = 'button';
+                cancelBtn.className = 'btn btn-outline';
+                cancelBtn.textContent = 'Cancel';
+
+                saveBtn.addEventListener('click', () => {
+                    const nextTitle = (eTitle.value || '').trim() || 'Book';
+                    const nextPrice = Number(ePrice.value) || 0;
+                    const nextFormat = (eFormat.value || '').trim();
+                    const nextCondition = (eCondition.value || '').trim();
+                    const nextIsbn = (eIsbn.value || '').trim();
+
+                    const nextId = makeCartId(nextTitle, nextFormat, nextCondition);
+                    const items = loadCart();
+                    const existing = items.find(i => i.id === nextId);
+
+                    const updated = {
+                        id: nextId,
+                        title: nextTitle,
+                        price: nextPrice,
+                        qty: Number(item.qty) || 1,
+                        meta: {
+                            ...(item.meta || {}),
+                            format: nextFormat || undefined,
+                            condition: nextCondition || undefined,
+                            isbn: nextIsbn || undefined
+                        }
+                    };
+
+                    const filtered = items.filter(i => i.id !== item.id);
+                    if (existing && existing.id !== item.id) {
+                        existing.qty = (Number(existing.qty) || 0) + (Number(updated.qty) || 0);
+                        existing.title = updated.title;
+                        existing.price = updated.price;
+                        existing.meta = updated.meta;
+                        saveCart(filtered);
+                    } else {
+                        filtered.push(updated);
+                        saveCart(filtered);
+                    }
+
+                    editingId = null;
+                    showToast('Updated', 'Cart item updated.');
+                    renderCart();
+                });
+
+                cancelBtn.addEventListener('click', () => {
+                    editingId = null;
+                    renderCart();
+                });
+
+                editActions.appendChild(saveBtn);
+                editActions.appendChild(cancelBtn);
+
+                editBlock.appendChild(editGrid);
+                editBlock.appendChild(editActions);
+
+                const actions = document.createElement('div');
+                actions.className = 'cart-item-actions';
+
+                const left = document.createElement('div');
+                left.className = 'cart-item-actions-left';
+
+                const right = document.createElement('div');
+                right.className = 'cart-item-actions-right';
+
+                const qty = document.createElement('div');
+                qty.className = 'qty-control';
+
+                const dec = document.createElement('button');
+                dec.className = 'qty-btn';
+                dec.type = 'button';
+                dec.textContent = '−';
+                dec.addEventListener('click', () => updateQty(item.id, (Number(item.qty) || 1) - 1));
+
+                const input = document.createElement('input');
+                input.className = 'qty-input';
+                input.type = 'number';
+                input.min = '1';
+                input.value = String(item.qty || 1);
+                input.addEventListener('change', () => updateQty(item.id, Number(input.value || 1)));
+
+                const inc = document.createElement('button');
+                inc.className = 'qty-btn';
+                inc.type = 'button';
+                inc.textContent = '+';
+                inc.addEventListener('click', () => updateQty(item.id, (Number(item.qty) || 1) + 1));
+
+                qty.appendChild(dec);
+                qty.appendChild(input);
+                qty.appendChild(inc);
+
+                const priceEl = document.createElement('div');
+                priceEl.className = 'price';
+                priceEl.textContent = money((Number(item.price) || 0) * (Number(item.qty) || 0));
+
+                const remove = document.createElement('button');
+                remove.className = 'btn btn-outline';
+                remove.type = 'button';
+                remove.textContent = 'Remove';
+                remove.style.color = 'var(--error-color)';
+                remove.style.borderColor = 'var(--error-color)';
+                remove.addEventListener('click', () => removeItem(item.id));
+
+                const editBtn = document.createElement('button');
+                editBtn.className = 'btn btn-outline';
+                editBtn.type = 'button';
+                editBtn.textContent = isEditing ? 'Editing…' : 'Edit';
+                editBtn.addEventListener('click', () => {
+                    editingId = item.id;
+                    renderCart();
+                });
+
+                left.appendChild(qty);
+                left.appendChild(priceEl);
+
+                right.appendChild(editBtn);
+                right.appendChild(remove);
+
+                actions.appendChild(left);
+                actions.appendChild(right);
+
+                body.appendChild(title);
+                body.appendChild(meta);
+                body.appendChild(editBlock);
+                body.appendChild(actions);
+
+                wrapper.appendChild(thumb);
+                wrapper.appendChild(body);
+                cartItemsEl.appendChild(wrapper);
+            });
+
+            renderTotals(items);
+        }
+
+        function updateQty(id, qty) {
+            const nextQty = Math.max(1, Math.min(99, Number(qty) || 1));
+            const items = loadCart().map((it) => it.id === id ? { ...it, qty: nextQty } : it);
+            saveCart(items);
+            renderCart();
+        }
+
+        function removeItem(id) {
+            const items = loadCart().filter((it) => it.id !== id);
+            saveCart(items);
+            showToast('Removed', 'Item removed from cart.');
+            renderCart();
+        }
+
+        document.getElementById('clearCartBtn').addEventListener('click', () => {
+            saveCart([]);
+            showToast('Cleared', 'Cart cleared.');
+            renderCart();
+        });
+
+        const addItemForm = document.getElementById('addItemForm');
+        const seedDemoBtn = document.getElementById('seedDemoBtn');
+
+        addItemForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const title = (document.getElementById('newTitle')?.value || '').trim();
+            const price = Number(document.getElementById('newPrice')?.value || 0);
+            const qty = Number(document.getElementById('newQty')?.value || 1);
+            const format = (document.getElementById('newFormat')?.value || '').trim();
+            const condition = (document.getElementById('newCondition')?.value || '').trim();
+            const isbn = (document.getElementById('newIsbn')?.value || '').trim();
+
+            if (!title || !(price >= 0) || !(qty >= 1)) {
+                showToast('Invalid input', 'Please enter title, price and qty.', 'error');
+                return;
+            }
+
+            const id = makeCartId(title, format, condition);
+            addItemToCart({
+                id,
+                title,
+                price,
+                qty,
+                meta: {
+                    format: format || undefined,
+                    condition: condition || undefined,
+                    isbn: isbn || undefined
+                }
+            });
+
+            addItemForm.reset();
+            document.getElementById('newQty').value = '1';
+            showToast('Added', 'Item added to cart.');
+            renderCart();
+        });
+
+        seedDemoBtn.addEventListener('click', () => {
+            addItemToCart({ id: makeCartId('Atomic Habits', 'paperback', 'new'), title: 'Atomic Habits', price: 16.99, qty: 1, meta: { format: 'paperback', condition: 'new', isbn: '978-0735211292' } });
+            addItemToCart({ id: makeCartId('Deep Work', 'hardcover', 'good'), title: 'Deep Work', price: 14.5, qty: 2, meta: { format: 'hardcover', condition: 'good', isbn: '978-1455586691' } });
+            addItemToCart({ id: makeCartId('The Alchemist', '', ''), title: 'The Alchemist', price: 12.99, qty: 1, meta: {} });
+            showToast('Demo added', 'Demo items added to cart.');
+            renderCart();
+        });
+
+        function setMethod(method) {
+            currentMethod = method;
+
+            document.querySelectorAll('.pay-option').forEach((el) => {
+                el.classList.toggle('active', el.dataset.method === method);
+            });
+
+            payGpay.style.display = method === 'gpay' ? 'block' : 'none';
+            payUpi.style.display = method === 'upi' ? 'block' : 'none';
+            payQr.style.display = method === 'qr' ? 'block' : 'none';
+            payCard.style.display = method === 'card' ? 'block' : 'none';
+        }
+
+        paymentTabs.addEventListener('click', (e) => {
+            const target = e.target.closest('.pay-option');
+            if (!target) return;
+            setMethod(target.dataset.method);
+        });
+
+        paymentTabs.addEventListener('keydown', (e) => {
+            if (e.key !== 'Enter' && e.key !== ' ') return;
+            const target = e.target.closest('.pay-option');
+            if (!target) return;
+            e.preventDefault();
+            setMethod(target.dataset.method);
+        });
+
+        function setFieldError(id, isError) {
+            const el = document.getElementById(id);
+            const msg = document.querySelector(`[data-error-for="${id}"]`);
+            if (!el) return;
+
+            if (isError) {
+                el.classList.add('invalid');
+                if (msg) msg.style.display = 'block';
+            } else {
+                el.classList.remove('invalid');
+                if (msg) msg.style.display = 'none';
+            }
+        }
+
+        function validateDelivery() {
+            const required = ['fullName', 'phone', 'address', 'city', 'pincode'];
+            let ok = true;
+            required.forEach((id) => {
+                const val = (document.getElementById(id)?.value || '').trim();
+                const bad = !val;
+                setFieldError(id, bad);
+                if (bad) ok = false;
+            });
+            return ok;
+        }
+
+        function validatePayment() {
+            if (currentMethod === 'upi') {
+                const upi = (document.getElementById('upiId')?.value || '').trim();
+                const ok = /^[^@\s]+@[^@\s]+$/.test(upi);
+                setFieldError('upiId', !ok);
+                return ok;
+            }
+
+            if (currentMethod === 'card') {
+                const name = (document.getElementById('cardName')?.value || '').trim();
+                const num = (document.getElementById('cardNumber')?.value || '').replace(/\s+/g, '');
+                const exp = (document.getElementById('cardExp')?.value || '').trim();
+                const cvv = (document.getElementById('cardCvv')?.value || '').trim();
+
+                const okName = name.length >= 2;
+                const okNum = /^\d{13,19}$/.test(num);
+                const okExp = /^(0[1-9]|1[0-2])\/(\d{2})$/.test(exp);
+                const okCvv = /^\d{3,4}$/.test(cvv);
+
+                setFieldError('cardName', !okName);
+                setFieldError('cardNumber', !okNum);
+                setFieldError('cardExp', !okExp);
+                setFieldError('cardCvv', !okCvv);
+
+                return okName && okNum && okExp && okCvv;
+            }
+
+            return true;
+        }
+
+        document.getElementById('cardNumber')?.addEventListener('input', (e) => {
+            const el = e.target;
+            const digits = el.value.replace(/\D/g, '').slice(0, 19);
+            const grouped = digits.replace(/(.{4})/g, '$1 ').trim();
+            el.value = grouped;
+        });
+
+        document.getElementById('cardExp')?.addEventListener('input', (e) => {
+            const el = e.target;
+            const digits = el.value.replace(/\D/g, '').slice(0, 4);
+            const out = digits.length >= 3 ? `${digits.slice(0, 2)}/${digits.slice(2)}` : digits;
+            el.value = out;
+        });
+
+        function updateMap(lat, lng) {
+            mapFrame.src = `https://www.google.com/maps?q=${lat},${lng}&z=16&output=embed`;
+            if (mapsReady) {
+                ensureJsMap(lat, lng);
+            }
+        }
+
+        function setCoords(lat, lng) {
+            currentCoords = { lat, lng };
+            coordsText.textContent = `Coordinates: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+            locPill.textContent = 'Location: set';
+            updateMap(lat, lng);
+        }
+
+        saveKeyBtn.addEventListener('click', () => {
+            const key = (gmapsKeyInput.value || '').trim();
+            if (!key) {
+                showToast('Missing key', 'Paste your Google Maps API key first.', 'error');
+                return;
+            }
+
+            saveMapsKey(key);
+            showToast('Key saved', 'Google Maps API key saved on this device.');
+
+            if (currentCoords) {
+                ensureJsMap(currentCoords.lat, currentCoords.lng);
+            } else {
+                ensureJsMap(20.5937, 78.9629);
+            }
+        });
+
+        clearKeyBtn.addEventListener('click', () => {
+            clearMapsKey();
+            gmapsKeyInput.value = '';
+            mapsReady = false;
+            mapInstance = null;
+            markerInstance = null;
+            mapsScriptLoading = null;
+            setMapMode('embed');
+            showToast('Key cleared', 'Google Maps API key removed.');
+        });
+
+        document.getElementById('useLocationBtn').addEventListener('click', () => {
+            if (!navigator.geolocation) {
+                showToast('Not supported', 'Geolocation is not supported in this browser.', 'error');
+                return;
+            }
+
+            if (geoWatchId !== null) {
+                navigator.geolocation.clearWatch(geoWatchId);
+                geoWatchId = null;
+            }
+
+            locPill.textContent = 'Location: fetching…';
+            geoWatchId = navigator.geolocation.watchPosition(
+                (pos) => {
+                    const lat = pos.coords.latitude;
+                    const lng = pos.coords.longitude;
+                    setCoords(lat, lng);
+                },
+                () => {
+                    locPill.textContent = 'Location: not set';
+                    showToast('Permission denied', 'Allow location permission to use live tracking.', 'error');
+                },
+                { enableHighAccuracy: true, maximumAge: 2000, timeout: 8000 }
+            );
+
+            showToast('Live tracking', 'Tracking started. Location will update in real-time.');
+        });
+
+        document.getElementById('refreshMapBtn').addEventListener('click', () => {
+            if (currentCoords) {
+                updateMap(currentCoords.lat, currentCoords.lng);
+                showToast('Refreshed', 'Map refreshed.');
+            } else {
+                showToast('No location', 'Set live location first.', 'error');
+            }
+        });
+
+        function createOrderRecord(items) {
+            const { subtotal, delivery, tax, total } = calcTotals(items);
+
+            const deliveryDetails = {
+                fullName: (document.getElementById('fullName')?.value || '').trim(),
+                phone: (document.getElementById('phone')?.value || '').trim(),
+                address: (document.getElementById('address')?.value || '').trim(),
+                city: (document.getElementById('city')?.value || '').trim(),
+                pincode: (document.getElementById('pincode')?.value || '').trim(),
+            };
+
+            return {
+                id: makeOrderId(),
+                createdAt: new Date().toISOString(),
+                status: 'Pending',
+                items,
+                totals: { subtotal, delivery, tax, total },
+                payment: { method: currentMethod },
+                delivery: deliveryDetails,
+                location: currentCoords ? { ...currentCoords } : null,
+                shipment: {
+                    carrier: '',
+                    trackingNumber: '',
+                    shippedAt: null,
+                    deliveredAt: null,
+                    notes: '',
+                },
+            };
+        }
+
+        document.getElementById('placeOrderBtn').addEventListener('click', () => {
+            const items = loadCart();
+            if (items.length === 0) {
+                showToast('Cart empty', 'Add items to cart before checkout.', 'error');
+                return;
+            }
+
+            const okDelivery = validateDelivery();
+            const okPay = validatePayment();
+
+            if (!okDelivery) {
+                showToast('Missing delivery details', 'Please fill delivery details.', 'error');
+                return;
+            }
+
+            if (!okPay) {
+                showToast('Payment details required', 'Please complete payment details.', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('placeOrderBtn');
+            const original = btn.innerHTML;
+            btn.classList.add('loading');
+            btn.disabled = true;
+
+            setTimeout(() => {
+                btn.classList.remove('loading');
+                btn.disabled = false;
+                btn.innerHTML = original;
+
+                const orders = loadOrders();
+                const order = createOrderRecord(items);
+                orders.unshift(order);
+                saveOrders(orders);
+
+                saveCart([]);
+                renderCart();
+
+                showToast('Order placed', `Payment method: ${currentMethod.toUpperCase()} (demo).`);
+            }, 900);
+        });
+
+        setMethod('gpay');
+        gmapsKeyInput.value = loadSavedMapsKey();
+        renderCart();
+    </script>
+
+</body>
+
+</html>

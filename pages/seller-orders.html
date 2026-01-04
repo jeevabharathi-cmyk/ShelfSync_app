@@ -223,6 +223,7 @@
             <nav class="sidebar-nav">
                 <a href="seller-dashboard.html" class="sidebar-link">Overview</a>
                 <a href="inventory.html" class="sidebar-link">My Inventory</a>
+                <a href="seller-add-book.html" class="sidebar-link">Add New Book</a>
                 <a href="seller-orders.html" class="sidebar-link active">Orders</a>
                 <a href="seller-earnings.html" class="sidebar-link">Earnings</a>
                 <a href="seller-settings.html" class="sidebar-link">Settings</a>
@@ -267,170 +268,362 @@
 
             <!-- Filter Tabs -->
             <div class="filter-tabs">
-                <button class="filter-tab active">All Orders</button>
-                <button class="filter-tab">Pending</button>
-                <button class="filter-tab">Processing</button>
-                <button class="filter-tab">Shipped</button>
-                <button class="filter-tab">Delivered</button>
-                <button class="filter-tab">Cancelled</button>
+                <button class="filter-tab active" data-filter="all">All Orders</button>
+                <button class="filter-tab" data-filter="pending">Pending</button>
+                <button class="filter-tab" data-filter="processing">Processing</button>
+                <button class="filter-tab" data-filter="shipped">Shipped</button>
+                <button class="filter-tab" data-filter="delivered">Delivered</button>
+                <button class="filter-tab" data-filter="cancelled">Cancelled</button>
             </div>
 
             <!-- Search Bar -->
             <div class="search-bar">
-                <input type="text" class="form-control" placeholder="Search by Order ID, Customer name, or Book title...">
-                <button class="btn btn-primary">Search</button>
-                <button class="btn btn-outline">Export</button>
+                <input id="orderSearch" type="text" class="form-control"
+                    placeholder="Search by Order ID, Customer name, or Book title...">
+                <button class="btn btn-primary" id="searchBtn">Search</button>
+                <button class="btn btn-outline" id="exportBtn">Export</button>
             </div>
 
             <!-- Orders List -->
-            <div>
-                <!-- Order Card 1 -->
-                <div class="order-card">
-                    <div class="order-card-header">
-                        <div class="order-info">
-                            <div class="order-id">#ORD-2024-001</div>
-                            <div class="order-date">Ordered on Jan 15, 2024 at 2:30 PM</div>
-                        </div>
-                        <div>
-                            <span class="badge badge-warning order-status-badge">Pending</span>
-                        </div>
-                    </div>
-                    <div class="order-details">
-                        <div class="detail-item">
-                            <span class="detail-label">Customer</span>
-                            <span class="detail-value">Alice Johnson</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Book</span>
-                            <span class="detail-value">The Great Gatsby</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Quantity</span>
-                            <span class="detail-value">1</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Total Amount</span>
-                            <span class="order-total">$12.99</span>
-                        </div>
-                    </div>
-                    <div class="order-actions">
-                        <button class="btn btn-primary btn-sm">Process Order</button>
-                        <button class="btn btn-outline btn-sm">View Details</button>
-                        <button class="btn btn-outline btn-sm" style="color: var(--error-color); border-color: var(--error-color);">Cancel</button>
-                    </div>
-                </div>
-
-                <!-- Order Card 2 -->
-                <div class="order-card">
-                    <div class="order-card-header">
-                        <div class="order-info">
-                            <div class="order-id">#ORD-2024-002</div>
-                            <div class="order-date">Ordered on Jan 14, 2024 at 10:15 AM</div>
-                        </div>
-                        <div>
-                            <span class="badge badge-primary order-status-badge">Processing</span>
-                        </div>
-                    </div>
-                    <div class="order-details">
-                        <div class="detail-item">
-                            <span class="detail-label">Customer</span>
-                            <span class="detail-value">Bob Smith</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Book</span>
-                            <span class="detail-value">1984 by George Orwell</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Quantity</span>
-                            <span class="detail-value">2</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Total Amount</span>
-                            <span class="order-total">$21.00</span>
-                        </div>
-                    </div>
-                    <div class="order-actions">
-                        <button class="btn btn-primary btn-sm">Mark as Shipped</button>
-                        <button class="btn btn-outline btn-sm">Print Label</button>
-                        <button class="btn btn-outline btn-sm">View Details</button>
-                    </div>
-                </div>
-
-                <!-- Order Card 3 -->
-                <div class="order-card">
-                    <div class="order-card-header">
-                        <div class="order-info">
-                            <div class="order-id">#ORD-2024-003</div>
-                            <div class="order-date">Ordered on Jan 13, 2024 at 4:45 PM</div>
-                        </div>
-                        <div>
-                            <span class="badge badge-success order-status-badge">Shipped</span>
-                        </div>
-                    </div>
-                    <div class="order-details">
-                        <div class="detail-item">
-                            <span class="detail-label">Customer</span>
-                            <span class="detail-value">Charlie Brown</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Book</span>
-                            <span class="detail-value">Clean Code</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Tracking</span>
-                            <span class="detail-value">1Z999AA10123456784</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Total Amount</span>
-                            <span class="order-total">$35.00</span>
-                        </div>
-                    </div>
-                    <div class="order-actions">
-                        <button class="btn btn-outline btn-sm">Track Package</button>
-                        <button class="btn btn-outline btn-sm">View Details</button>
-                    </div>
-                </div>
-
-                <!-- Order Card 4 -->
-                <div class="order-card">
-                    <div class="order-card-header">
-                        <div class="order-info">
-                            <div class="order-id">#ORD-2024-004</div>
-                            <div class="order-date">Ordered on Jan 12, 2024 at 11:20 AM</div>
-                        </div>
-                        <div>
-                            <span class="badge badge-success order-status-badge">Delivered</span>
-                        </div>
-                    </div>
-                    <div class="order-details">
-                        <div class="detail-item">
-                            <span class="detail-label">Customer</span>
-                            <span class="detail-value">Diana Prince</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Book</span>
-                            <span class="detail-value">Design Patterns</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Delivered On</span>
-                            <span class="detail-value">Jan 15, 2024</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Total Amount</span>
-                            <span class="order-total">$42.00</span>
-                        </div>
-                    </div>
-                    <div class="order-actions">
-                        <button class="btn btn-outline btn-sm">View Details</button>
-                        <button class="btn btn-outline btn-sm">Contact Customer</button>
-                    </div>
-                </div>
-            </div>
+            <div id="ordersList"></div>
 
         </main>
     </div>
 
+    <script>
+        const ORDERS_KEY = 'shelfsync_orders_v1';
+
+        const ordersListEl = document.getElementById('ordersList');
+        const orderSearchEl = document.getElementById('orderSearch');
+        const searchBtn = document.getElementById('searchBtn');
+        const exportBtn = document.getElementById('exportBtn');
+
+        const statPending = document.querySelector('.stats-grid .stat-card:nth-child(1) h3');
+        const statTotal = document.querySelector('.stats-grid .stat-card:nth-child(2) h3');
+        const statShippedToday = document.querySelector('.stats-grid .stat-card:nth-child(3) h3');
+        const statThisMonth = document.querySelector('.stats-grid .stat-card:nth-child(4) h3');
+
+        let activeFilter = 'all';
+        let activeQuery = '';
+
+        function loadOrders() {
+            try {
+                const raw = localStorage.getItem(ORDERS_KEY);
+                const parsed = raw ? JSON.parse(raw) : [];
+                return Array.isArray(parsed) ? parsed : [];
+            } catch {
+                return [];
+            }
+        }
+
+        function saveOrders(orders) {
+            localStorage.setItem(ORDERS_KEY, JSON.stringify(Array.isArray(orders) ? orders : []));
+        }
+
+        function money(n) {
+            return `$${Number(n || 0).toFixed(2)}`;
+        }
+
+        function formatDate(iso) {
+            try {
+                const d = new Date(iso);
+                return d.toLocaleString();
+            } catch {
+                return '';
+            }
+        }
+
+        function statusBadgeClass(status) {
+            const s = String(status || '').toLowerCase();
+            if (s === 'pending') return 'badge badge-warning order-status-badge';
+            if (s === 'processing') return 'badge badge-primary order-status-badge';
+            if (s === 'shipped') return 'badge badge-success order-status-badge';
+            if (s === 'delivered') return 'badge badge-success order-status-badge';
+            if (s === 'cancelled') return 'badge badge-error order-status-badge';
+            return 'badge badge-primary order-status-badge';
+        }
+
+        function firstItemSummary(order) {
+            const items = Array.isArray(order?.items) ? order.items : [];
+            if (items.length === 0) return { title: '—', qty: 0 };
+            const qty = items.reduce((s, i) => s + (Number(i.qty) || 0), 0);
+            const title = String(items[0]?.title || 'Book');
+            return { title, qty };
+        }
+
+        function matchesQuery(order, query) {
+            const q = String(query || '').trim().toLowerCase();
+            if (!q) return true;
+
+            const id = String(order?.id || '').toLowerCase();
+            const customer = String(order?.delivery?.fullName || '').toLowerCase();
+            const items = Array.isArray(order?.items) ? order.items : [];
+            const titles = items.map(i => String(i?.title || '').toLowerCase()).join(' ');
+            return id.includes(q) || customer.includes(q) || titles.includes(q);
+        }
+
+        function filterOrders(orders) {
+            const filtered = orders
+                .filter((o) => {
+                    if (activeFilter === 'all') return true;
+                    return String(o?.status || '').toLowerCase() === activeFilter;
+                })
+                .filter((o) => matchesQuery(o, activeQuery));
+            return filtered;
+        }
+
+        function updateStats(allOrders) {
+            const orders = Array.isArray(allOrders) ? allOrders : [];
+            const pending = orders.filter(o => String(o?.status || '').toLowerCase() === 'pending').length;
+            const total = orders.length;
+
+            const today = new Date();
+            const isToday = (iso) => {
+                try {
+                    const d = new Date(iso);
+                    return d.getFullYear() === today.getFullYear() && d.getMonth() === today.getMonth() && d.getDate() === today.getDate();
+                } catch {
+                    return false;
+                }
+            };
+
+            const shippedToday = orders.filter(o => String(o?.status || '').toLowerCase() === 'shipped' && isToday(o?.shipment?.shippedAt)).length;
+
+            const monthTotal = orders
+                .filter((o) => {
+                    try {
+                        const d = new Date(o?.createdAt);
+                        return d.getFullYear() === today.getFullYear() && d.getMonth() === today.getMonth();
+                    } catch {
+                        return false;
+                    }
+                })
+                .reduce((s, o) => s + (Number(o?.totals?.total) || 0), 0);
+
+            if (statPending) statPending.textContent = String(pending);
+            if (statTotal) statTotal.textContent = String(total);
+            if (statShippedToday) statShippedToday.textContent = String(shippedToday);
+            if (statThisMonth) statThisMonth.textContent = money(monthTotal);
+        }
+
+        function setFilter(next) {
+            activeFilter = next;
+            document.querySelectorAll('.filter-tab').forEach((btn) => {
+                btn.classList.toggle('active', btn.dataset.filter === next);
+            });
+            render();
+        }
+
+        function render() {
+            const allOrders = loadOrders();
+            updateStats(allOrders);
+
+            const orders = filterOrders(allOrders);
+            ordersListEl.innerHTML = '';
+
+            if (orders.length === 0) {
+                const empty = document.createElement('div');
+                empty.className = 'order-card';
+                empty.innerHTML = `
+                    <div class="order-card-header">
+                        <div class="order-info">
+                            <div class="order-id">No orders found</div>
+                            <div class="order-date">Try changing filters or place a new order from the cart.</div>
+                        </div>
+                        <div><span class="badge badge-primary order-status-badge">Empty</span></div>
+                    </div>
+                    <div class="order-actions">
+                        <button class="btn btn-outline btn-sm" onclick="seedDemoOrders()">Seed Demo Orders</button>
+                    </div>
+                `;
+                ordersListEl.appendChild(empty);
+                return;
+            }
+
+            orders.forEach((order) => {
+                const card = document.createElement('div');
+                card.className = 'order-card';
+
+                const summary = firstItemSummary(order);
+                const total = Number(order?.totals?.total) || 0;
+
+                const tracking = String(order?.shipment?.trackingNumber || '').trim();
+                const trackingText = tracking ? tracking : '—';
+
+                card.innerHTML = `
+                    <div class="order-card-header">
+                        <div class="order-info">
+                            <div class="order-id">#${order.id || ''}</div>
+                            <div class="order-date">Ordered on ${formatDate(order.createdAt)}</div>
+                        </div>
+                        <div>
+                            <span class="${statusBadgeClass(order.status)}">${String(order.status || 'Pending')}</span>
+                        </div>
+                    </div>
+                    <div class="order-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Customer</span>
+                            <span class="detail-value">${String(order?.delivery?.fullName || '—')}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Book</span>
+                            <span class="detail-value">${summary.title}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Quantity</span>
+                            <span class="detail-value">${String(summary.qty || 0)}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Tracking</span>
+                            <span class="detail-value">${trackingText}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Total Amount</span>
+                            <span class="order-total">${money(total)}</span>
+                        </div>
+                    </div>
+                    <div class="order-actions"></div>
+                `;
+
+                const actions = card.querySelector('.order-actions');
+                const shipTrack = document.createElement('a');
+                shipTrack.className = 'btn btn-primary btn-sm';
+                shipTrack.href = `ship-track-details.html?orderId=${encodeURIComponent(order.id || '')}`;
+                shipTrack.textContent = 'Ship & Track';
+
+                const markProcessing = document.createElement('button');
+                markProcessing.className = 'btn btn-outline btn-sm';
+                markProcessing.type = 'button';
+                markProcessing.textContent = 'Processing';
+                markProcessing.addEventListener('click', () => {
+                    const orders = loadOrders();
+                    const idx = orders.findIndex(o => o.id === order.id);
+                    if (idx >= 0) {
+                        orders[idx].status = 'Processing';
+                        saveOrders(orders);
+                        render();
+                    }
+                });
+
+                const cancel = document.createElement('button');
+                cancel.className = 'btn btn-outline btn-sm';
+                cancel.type = 'button';
+                cancel.textContent = 'Cancel';
+                cancel.style.color = 'var(--error-color)';
+                cancel.style.borderColor = 'var(--error-color)';
+                cancel.addEventListener('click', () => {
+                    const orders = loadOrders();
+                    const idx = orders.findIndex(o => o.id === order.id);
+                    if (idx >= 0) {
+                        orders[idx].status = 'Cancelled';
+                        saveOrders(orders);
+                        render();
+                    }
+                });
+
+                actions.appendChild(shipTrack);
+                actions.appendChild(markProcessing);
+                actions.appendChild(cancel);
+                ordersListEl.appendChild(card);
+            });
+        }
+
+        document.querySelectorAll('.filter-tab').forEach((btn) => {
+            btn.addEventListener('click', () => setFilter(btn.dataset.filter));
+        });
+
+        searchBtn.addEventListener('click', () => {
+            activeQuery = (orderSearchEl.value || '').trim();
+            render();
+        });
+
+        orderSearchEl.addEventListener('keydown', (e) => {
+            if (e.key !== 'Enter') return;
+            activeQuery = (orderSearchEl.value || '').trim();
+            render();
+        });
+
+        exportBtn.addEventListener('click', () => {
+            const data = filterOrders(loadOrders());
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'orders-export.json';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 500);
+        });
+
+        function seedDemoOrders() {
+            try {
+                const demoOrders = [
+                    {
+                        id: `ORD-${Date.now() - 86400000}`,
+                        createdAt: new Date(Date.now() - 86400000).toISOString(),
+                        status: 'Pending',
+                        items: [{ title: 'Atomic Habits', price: 16.99, qty: 1 }],
+                        totals: { subtotal: 16.99, delivery: 2.0, tax: 0.85, total: 19.84 },
+                        payment: { method: 'gpay' },
+                        delivery: { fullName: 'Alice Johnson', phone: '+91 98765 43210', address: '123 Main St', city: 'Mumbai', pincode: '400001' },
+                        shipment: { carrier: '', trackingNumber: '', shippedAt: null, deliveredAt: null, notes: '' }
+                    },
+                    {
+                        id: `ORD-${Date.now() - 172800000}`,
+                        createdAt: new Date(Date.now() - 172800000).toISOString(),
+                        status: 'Processing',
+                        items: [{ title: 'Deep Work', price: 14.50, qty: 2 }],
+                        totals: { subtotal: 29.00, delivery: 2.0, tax: 1.45, total: 32.45 },
+                        payment: { method: 'upi' },
+                        delivery: { fullName: 'Bob Smith', phone: '+91 87654 32109', address: '456 Oak Ave', city: 'Delhi', pincode: '110001' },
+                        shipment: { carrier: '', trackingNumber: '', shippedAt: null, deliveredAt: null, notes: '' }
+                    },
+                    {
+                        id: `ORD-${Date.now() - 259200000}`,
+                        createdAt: new Date(Date.now() - 259200000).toISOString(),
+                        status: 'Shipped',
+                        items: [{ title: 'The Alchemist', price: 12.99, qty: 1 }],
+                        totals: { subtotal: 12.99, delivery: 2.0, tax: 0.65, total: 15.64 },
+                        payment: { method: 'card' },
+                        delivery: { fullName: 'Charlie Brown', phone: '+91 76543 21098', address: '789 Pine Rd', city: 'Bangalore', pincode: '560001' },
+                        shipment: { carrier: 'DTDC', trackingNumber: 'DT123456789', shippedAt: new Date(Date.now() - 86400000).toISOString(), deliveredAt: null, notes: '' }
+                    },
+                    {
+                        id: `ORD-${Date.now() - 345600000}`,
+                        createdAt: new Date(Date.now() - 345600000).toISOString(),
+                        status: 'Delivered',
+                        items: [{ title: 'Clean Code', price: 35.00, qty: 1 }],
+                        totals: { subtotal: 35.00, delivery: 2.0, tax: 1.75, total: 38.75 },
+                        payment: { method: 'gpay' },
+                        delivery: { fullName: 'Diana Prince', phone: '+91 65432 10987', address: '321 Elm St', city: 'Chennai', pincode: '600001' },
+                        shipment: { carrier: 'BlueDart', trackingNumber: 'BD987654321', shippedAt: new Date(Date.now() - 259200000).toISOString(), deliveredAt: new Date(Date.now() - 172800000).toISOString(), notes: '' }
+                    },
+                    {
+                        id: `ORD-${Date.now() - 432000000}`,
+                        createdAt: new Date(Date.now() - 432000000).toISOString(),
+                        status: 'Cancelled',
+                        items: [{ title: 'Design Patterns', price: 42.00, qty: 1 }],
+                        totals: { subtotal: 42.00, delivery: 2.0, tax: 2.10, total: 46.10 },
+                        payment: { method: 'upi' },
+                        delivery: { fullName: 'Eve Wilson', phone: '+91 54321 09876', address: '654 Maple Dr', city: 'Kolkata', pincode: '700001' },
+                        shipment: { carrier: '', trackingNumber: '', shippedAt: null, deliveredAt: null, notes: 'Customer requested cancellation' }
+                    }
+                ];
+
+                const existingOrders = loadOrders();
+                const combinedOrders = [...demoOrders, ...existingOrders];
+                saveOrders(combinedOrders);
+                render();
+            } catch (error) {
+                console.error('Error seeding demo orders:', error);
+                alert('Failed to seed demo orders. Please try again.');
+            }
+        }
+
+        render();
+    </script>
+
 </body>
 
 </html>
-

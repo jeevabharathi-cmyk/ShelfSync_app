@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -31,7 +32,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: 
+            background:
                 radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
                 radial-gradient(circle at 80% 70%, rgba(196, 86, 33, 0.15) 0%, transparent 50%);
             pointer-events: none;
@@ -43,10 +44,17 @@
         }
 
         @keyframes gradientShift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
         }
-        
+
         .hero h1 {
             color: white;
             font-size: 3.75rem;
@@ -54,7 +62,7 @@
             text-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
             letter-spacing: -0.03em;
         }
-        
+
         .hero p {
             font-size: 1.375rem;
             opacity: 0.95;
@@ -86,13 +94,14 @@
         }
     </style>
 </head>
+
 <body>
 
     <!-- Navbar -->
     <nav class="navbar">
         <div class="container">
             <a href="index.html" class="logo">
-                <span>📚 ShelfSync</span>
+                <span> ShelfSync</span>
             </a>
             <ul class="nav-links">
                 <li><a href="index.html" class="nav-link active">Home</a></li>
@@ -107,10 +116,14 @@
     <header class="hero">
         <div class="container">
             <h1>Your Next Favorite Book Awaits</h1>
-            <p>Discover a world of stories, knowledge, and adventure. ShelfSync connects you with the best books from trusted sellers.</p>
+            <p>Discover a world of stories, knowledge, and adventure. ShelfSync connects you with the best books from
+                trusted sellers.</p>
             <div style="display: flex; gap: 1rem; justify-content: center;">
-                <a href="pages/all-books.html" class="btn" style="background-color: white; color: var(--primary-color);">Browse Collection</a>
-                <a href="pages/signup.html" class="btn" style="background-color: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.4);">Join Now</a>
+                <a href="pages/all-books.html" class="btn"
+                    style="background-color: white; color: var(--primary-color);">Browse Collection</a>
+                <a href="pages/signup.html" class="btn"
+                    style="background-color: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.4);">Join
+                    Now</a>
             </div>
         </div>
     </header>
@@ -118,7 +131,8 @@
     <!-- Featured Books -->
     <section class="section">
         <div class="container">
-            <div style="display: flex; justify-content: space-between; align-items: end; margin-bottom: var(--spacing-xl);">
+            <div
+                style="display: flex; justify-content: space-between; align-items: end; margin-bottom: var(--spacing-xl);">
                 <div>
                     <h2>Trending Now</h2>
                     <p class="text-light">Top picks for this week</p>
@@ -130,15 +144,18 @@
                 <!-- Book Card 1 -->
                 <a href="pages/book-details.html" style="text-decoration: none; color: inherit;">
                     <div class="card">
-                        <div style="height: 280px; overflow: hidden; border-radius: var(--radius-md) var(--radius-md) 0 0; position: relative;">
-                            <img src="https://covers.openlibrary.org/b/isbn/9780743273565-L.jpg" 
-                                 alt="The Great Gatsby" 
-                                 style="width: 100%; height: 100%; object-fit: cover; transition: transform var(--transition-base);"
-                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                            <div style="display: none; width: 100%; height: 100%; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.125rem; font-family: var(--font-display);">
+                        <div
+                            style="height: 280px; overflow: hidden; border-radius: var(--radius-md) var(--radius-md) 0 0; position: relative;">
+                            <img src="https://covers.openlibrary.org/b/isbn/9780743273565-L.jpg" alt="The Great Gatsby"
+                                style="width: 100%; height: 100%; object-fit: cover; transition: transform var(--transition-base);"
+                                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div
+                                style="display: none; width: 100%; height: 100%; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.125rem; font-family: var(--font-display);">
                                 The Great Gatsby
                             </div>
-                            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.1) 100%); pointer-events: none;"></div>
+                            <div
+                                style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.1) 100%); pointer-events: none;">
+                            </div>
                         </div>
                         <div class="card-body">
                             <h3 class="card-title" style="font-size: 1.1rem;">The Great Gatsby</h3>
@@ -154,15 +171,18 @@
                 <!-- Book Card 2 -->
                 <a href="pages/book-details.html" style="text-decoration: none; color: inherit;">
                     <div class="card">
-                        <div style="height: 280px; overflow: hidden; border-radius: var(--radius-md) var(--radius-md) 0 0; position: relative;">
-                            <img src="https://covers.openlibrary.org/b/isbn/9780451524935-L.jpg" 
-                                 alt="1984" 
-                                 style="width: 100%; height: 100%; object-fit: cover; transition: transform var(--transition-base);"
-                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                            <div style="display: none; width: 100%; height: 100%; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.125rem; font-family: var(--font-display);">
+                        <div
+                            style="height: 280px; overflow: hidden; border-radius: var(--radius-md) var(--radius-md) 0 0; position: relative;">
+                            <img src="https://covers.openlibrary.org/b/isbn/9780451524935-L.jpg" alt="1984"
+                                style="width: 100%; height: 100%; object-fit: cover; transition: transform var(--transition-base);"
+                                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div
+                                style="display: none; width: 100%; height: 100%; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.125rem; font-family: var(--font-display);">
                                 1984
                             </div>
-                            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.1) 100%); pointer-events: none;"></div>
+                            <div
+                                style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.1) 100%); pointer-events: none;">
+                            </div>
                         </div>
                         <div class="card-body">
                             <h3 class="card-title" style="font-size: 1.1rem;">1984</h3>
@@ -178,15 +198,18 @@
                 <!-- Book Card 3 -->
                 <a href="pages/book-details.html" style="text-decoration: none; color: inherit;">
                     <div class="card">
-                        <div style="height: 280px; overflow: hidden; border-radius: var(--radius-md) var(--radius-md) 0 0; position: relative;">
-                            <img src="https://covers.openlibrary.org/b/isbn/9780132350884-L.jpg" 
-                                 alt="Clean Code" 
-                                 style="width: 100%; height: 100%; object-fit: cover; transition: transform var(--transition-base);"
-                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                            <div style="display: none; width: 100%; height: 100%; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.125rem; font-family: var(--font-display);">
+                        <div
+                            style="height: 280px; overflow: hidden; border-radius: var(--radius-md) var(--radius-md) 0 0; position: relative;">
+                            <img src="https://covers.openlibrary.org/b/isbn/9780132350884-L.jpg" alt="Clean Code"
+                                style="width: 100%; height: 100%; object-fit: cover; transition: transform var(--transition-base);"
+                                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div
+                                style="display: none; width: 100%; height: 100%; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.125rem; font-family: var(--font-display);">
                                 Clean Code
                             </div>
-                            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.1) 100%); pointer-events: none;"></div>
+                            <div
+                                style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.1) 100%); pointer-events: none;">
+                            </div>
                         </div>
                         <div class="card-body">
                             <h3 class="card-title" style="font-size: 1.1rem;">Clean Code</h3>
@@ -202,15 +225,18 @@
                 <!-- Book Card 4 -->
                 <a href="pages/book-details.html" style="text-decoration: none; color: inherit;">
                     <div class="card">
-                        <div style="height: 280px; overflow: hidden; border-radius: var(--radius-md) var(--radius-md) 0 0; position: relative;">
-                            <img src="https://covers.openlibrary.org/b/isbn/9780201633610-L.jpg" 
-                                 alt="Design Patterns" 
-                                 style="width: 100%; height: 100%; object-fit: cover; transition: transform var(--transition-base);"
-                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                            <div style="display: none; width: 100%; height: 100%; background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.125rem; font-family: var(--font-display);">
+                        <div
+                            style="height: 280px; overflow: hidden; border-radius: var(--radius-md) var(--radius-md) 0 0; position: relative;">
+                            <img src="https://covers.openlibrary.org/b/isbn/9780201633610-L.jpg" alt="Design Patterns"
+                                style="width: 100%; height: 100%; object-fit: cover; transition: transform var(--transition-base);"
+                                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div
+                                style="display: none; width: 100%; height: 100%; background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.125rem; font-family: var(--font-display);">
                                 Design Patterns
                             </div>
-                            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.1) 100%); pointer-events: none;"></div>
+                            <div
+                                style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.1) 100%); pointer-events: none;">
+                            </div>
                         </div>
                         <div class="card-body">
                             <h3 class="card-title" style="font-size: 1.1rem;">Design Patterns</h3>
@@ -233,7 +259,7 @@
                 <h2>Why Choose ShelfSync?</h2>
                 <p class="text-light" style="font-size: 1.125rem;">The best platform for book lovers and sellers.</p>
             </div>
-            
+
             <div class="grid-3">
                 <div class="text-center">
                     <div class="features-icon">🚀</div>
@@ -260,7 +286,8 @@
             <div class="footer-grid">
                 <div class="footer-col">
                     <h4>ShelfSync</h4>
-                    <p style="color: var(--text-light);">Connecting readers with their next favorite story. The smart way to buy and sell books.</p>
+                    <p style="color: var(--text-light);">Connecting readers with their next favorite story. The smart
+                        way to buy and sell books.</p>
                 </div>
                 <div class="footer-col">
                     <h4>Quick Links</h4>
@@ -296,4 +323,5 @@
     </footer>
 
 </body>
+
 </html>

@@ -135,9 +135,45 @@
                         style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">View Profile</a>
                 </div>
 
+                <div class="product-options">
+                    <div class="option-group">
+                        <label class="option-label">Format</label>
+                        <div class="option-buttons">
+                            <button class="option-btn selected" data-format="hardcover">Hardcover</button>
+                            <button class="option-btn" data-format="paperback">Paperback</button>
+                            <button class="option-btn" data-format="ebook">E-book</button>
+                        </div>
+                    </div>
+
+                    <div class="option-group">
+                        <label class="option-label">Condition</label>
+                        <div class="option-buttons">
+                            <button class="option-btn selected" data-condition="new">New</button>
+                            <button class="option-btn" data-condition="like-new">Like New</button>
+                            <button class="option-btn" data-condition="good">Good</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quantity-selector">
+                    <button class="quantity-btn" onclick="decreaseQuantity()">−</button>
+                    <input type="number" class="quantity-input" id="quantity" value="1" min="1" max="10">
+                    <button class="quantity-btn" onclick="increaseQuantity()">+</button>
+                </div>
+
                 <div class="action-buttons">
-                    <button class="btn btn-primary" style="flex: 1;">Add to Cart</button>
-                    <button class="btn btn-outline" style="flex: 1;">Buy Now</button>
+                    <button class="btn-add-cart" onclick="addToCart(this)">
+                        <span>🛒 Add to Cart</span>
+                    </button>
+                    <button class="btn-buy-now" onclick="buyNow(this)">
+                        <span>⚡ Buy Now</span>
+                    </button>
+                </div>
+
+                <div style="display: flex; gap: var(--spacing-md); margin-top: var(--spacing-md);">
+                    <button class="btn-wishlist" onclick="toggleWishlist(this)">
+                        <span>♡ Add to Wishlist</span>
+                    </button>
                 </div>
 
                 <div style="border-top: 1px solid var(--border-color); padding-top: var(--spacing-lg);">
@@ -154,7 +190,225 @@
         </div>
     </div>
 
-    <!-- Footer -->
+    <!-- Cart Notification -->
+    <div class="cart-notification" id="cartNotification">
+        <div class="cart-notification-header">
+            <div class="cart-notification-icon">🛒</div>
+            <div>
+                <div class="cart-notification-title">Added to Cart!</div>
+                <div class="cart-notification-message">The Great Gatsby has been added to your cart.</div>
+            </div>
+        </div>
+        <div class="cart-notification-actions">
+            <button class="btn btn-outline" onclick="hideNotification()">Continue Shopping</button>
+            <button class="btn btn-primary" onclick="goToCart()">View Cart</button>
+        </div>
+    </div>
+
+    <script>
+        const CART_KEY = 'shelfsync_cart_v1';
+
+        function loadCart() {
+            try {
+                const raw = localStorage.getItem(CART_KEY);
+                if (!raw) return [];
+                const parsed = JSON.parse(raw);
+                return Array.isArray(parsed) ? parsed : [];
+            } catch {
+                return [];
+            }
+        }
+
+        function saveCart(items) {
+            localStorage.setItem(CART_KEY, JSON.stringify(items));
+        }
+
+        function addItemToCart(item) {
+            const items = loadCart();
+            const existing = items.find(i => i.id === item.id);
+            if (existing) {
+                existing.qty = (Number(existing.qty) || 0) + (Number(item.qty) || 1);
+                existing.price = item.price;
+                existing.meta = item.meta;
+            } else {
+                items.push(item);
+            }
+            saveCart(items);
+        }
+
+        // Quantity selector functions
+        function increaseQuantity() {
+            const input = document.getElementById('quantity');
+            const currentValue = parseInt(input.value);
+            if (currentValue < 10) {
+                input.value = currentValue + 1;
+            }
+        }
+
+        function decreaseQuantity() {
+            const input = document.getElementById('quantity');
+            const currentValue = parseInt(input.value);
+            if (currentValue > 1) {
+                input.value = currentValue - 1;
+            }
+        }
+
+        // Product options selection
+        document.querySelectorAll('.option-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                // Remove selected class from siblings
+                const siblings = this.parentElement.querySelectorAll('.option-btn');
+                siblings.forEach(sibling => sibling.classList.remove('selected'));
+
+                // Add selected class to clicked button
+                this.classList.add('selected');
+
+                // Update price based on selection (example logic)
+                updatePrice();
+            });
+        });
+
+        function updatePrice() {
+            const format = document.querySelector('[data-format].selected')?.dataset.format;
+            const condition = document.querySelector('[data-condition].selected')?.dataset.condition;
+            const priceElement = document.querySelector('.price');
+
+            // Example price adjustment logic
+            let basePrice = 12.99;
+            if (format === 'ebook') basePrice = 8.99;
+            if (format === 'paperback') basePrice = 10.99;
+            if (condition === 'like-new') basePrice *= 0.9;
+            if (condition === 'good') basePrice *= 0.8;
+
+            priceElement.textContent = `$${basePrice.toFixed(2)}`;
+        }
+
+        // Add to cart function
+        function addToCart(button) {
+            const quantity = document.getElementById('quantity').value;
+            const format = document.querySelector('[data-format].selected')?.dataset.format;
+            const condition = document.querySelector('[data-condition].selected')?.dataset.condition;
+            const originalText = button.innerHTML;
+
+            const title = document.querySelector('.product-info h1')?.textContent?.trim() || 'Book';
+            const priceText = document.querySelector('.price')?.textContent || '$0';
+            const price = Number(String(priceText).replace(/[^0-9.]/g, '')) || 0;
+            const isbn = document.querySelector('li strong')?.parentElement?.textContent?.replace('ISBN:', '')?.trim();
+
+            const cartId = `${title}__${format || 'default'}__${condition || 'default'}`;
+            addItemToCart({
+                id: cartId,
+                title,
+                price,
+                qty: Number(quantity) || 1,
+                meta: {
+                    format,
+                    condition,
+                    isbn
+                }
+            });
+
+            console.log('Adding to cart:', { quantity, format, condition });
+
+            // Add loading state
+            button.classList.add('loading');
+            button.disabled = true;
+
+            // Simulate API call
+            setTimeout(() => {
+                button.classList.remove('loading');
+                button.classList.add('added');
+                button.innerHTML = '<span>✓ Added to Cart</span>';
+
+                // Show notification
+                showNotification();
+
+                // Reset button after 2 seconds
+                setTimeout(() => {
+                    button.classList.remove('added');
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                }, 2000);
+            }, 1000);
+        }
+
+        // Buy now function
+        function buyNow(button) {
+            const quantity = document.getElementById('quantity').value;
+            const originalText = button.innerHTML;
+
+            console.log('Buying now:', { quantity });
+
+            // Add loading state
+            button.classList.add('loading');
+            button.disabled = true;
+
+            // Simulate checkout process
+            setTimeout(() => {
+                button.classList.remove('loading');
+                // Redirect to checkout (in real app)
+                alert('Proceeding to checkout with ' + quantity + ' items');
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }, 1000);
+        }
+
+        // Wishlist function
+        function toggleWishlist(button) {
+            button.classList.toggle('wishlisted');
+            if (button.classList.contains('wishlisted')) {
+                button.innerHTML = '<span>♥ Wishlisted</span>';
+            } else {
+                button.innerHTML = '<span>♡ Add to Wishlist</span>';
+            }
+        }
+
+        // Notification functions
+        function showNotification() {
+            const notification = document.getElementById('cartNotification');
+            notification.classList.add('show');
+
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                hideNotification();
+            }, 5000);
+        }
+
+        function hideNotification() {
+            const notification = document.getElementById('cartNotification');
+            notification.classList.remove('show');
+        }
+
+        function goToCart() {
+            hideNotification();
+            window.location.href = 'view-cart.html';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function () {
+            // Add ripple effect to buttons
+            document.querySelectorAll('.btn-add-cart, .btn-buy-now, .btn-wishlist').forEach(btn => {
+                btn.addEventListener('click', function (e) {
+                    const ripple = document.createElement('span');
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size / 2;
+                    const y = e.clientY - rect.top - size / 2;
+
+                    ripple.style.width = ripple.style.height = size + 'px';
+                    ripple.style.left = x + 'px';
+                    ripple.style.top = y + 'px';
+                    ripple.classList.add('ripple');
+
+                    this.appendChild(ripple);
+
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                });
+            });
+        });
+    </script>
     <footer class="footer">
         <div class="container">
             <div class="footer-bottom">

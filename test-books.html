@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Books Loading</title>
+</head>
+<body>
+    <h1>Testing Books Data</h1>
+    <div id="result"></div>
+    
+    <script>
+        // Test loading books-database.json
+        fetch('books-database.json')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('result').innerHTML = 
+                    `<p>✅ Successfully loaded ${data.books.length} books from JSON file!</p>
+                     <p>First book: ${data.books[0].title} by ${data.books[0].author}</p>
+                     <p>Last book: ${data.books[data.books.length-1].title} by ${data.books[data.books.length-1].author}</p>`;
+            })
+            .catch(error => {
+                document.getElementById('result').innerHTML = 
+                    `<p>❌ Failed to load books: ${error.message}</p>
+                     <p>This is expected when opening with file:// protocol</p>`;
+            });
+    </script>
+</body>
+</html>
