@@ -10,30 +10,40 @@ import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-
 // Function to handle redirection based on role
 async function redirectBasedOnRole(user) {
     try {
+        console.log("Checking role for user:", user.email);
         const userDocRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userDocRef);
 
         if (userSnap.exists()) {
             const userData = userSnap.data();
             const role = userData.role;
-            console.log("Redirecting user with role:", role);
+            console.log("Role found:", role);
 
-            if (role === 'admin') {
-                window.location.href = "admin-dashboard.html";
-            } else if (role === 'seller') {
-                window.location.href = "seller-dashboard.html";
-            } else if (role === 'delivery') {
-                window.location.href = "delivery-dashboard.html";
-            } else if (role === 'customer') {
-                window.location.href = "all-books.html";
+            // Determine if we are in the 'pages' directory
+            const isInsidePages = window.location.pathname.includes('/pages/');
+
+            let targetPage = "";
+            if (role === 'admin') targetPage = "admin-dashboard.html";
+            else if (role === 'seller') targetPage = "seller-dashboard.html";
+            else if (role === 'delivery') targetPage = "delivery-dashboard.html";
+            else if (role === 'customer') targetPage = "all-books.html";
+
+            if (targetPage) {
+                // If we are not in 'pages/', we need to add the prefix
+                let finalPath = isInsidePages ? targetPage : "pages/" + targetPage;
+                console.log("Redirecting to:", finalPath);
+                window.location.href = finalPath;
             } else {
-                window.location.href = "../index.html";
+                console.warn("Unknown role:", role);
+                window.location.href = isInsidePages ? "../index.html" : "index.html";
             }
         } else {
-            console.warn("User profile not found in Firestore.");
+            console.error("No user document found for UID:", user.uid);
+            alert("User profile not found. Please ensure you have registered correctly.");
         }
     } catch (error) {
-        console.error("Error fetching user role:", error);
+        console.error("Error in redirectBasedOnRole:", error);
+        alert("Error fetching user data: " + error.message);
     }
 }
 
@@ -42,7 +52,10 @@ document.addEventListener('DOMContentLoaded', () => {
     onAuthStateChanged(auth, (user) => {
         if (user) {
             console.log("User already logged in, checking role...");
-            redirectBasedOnRole(user);
+            // Only redirect if we are on a login page
+            if (window.location.pathname.includes('login-')) {
+                redirectBasedOnRole(user);
+            }
         }
     });
 
@@ -54,23 +67,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
+        const submitBtn = loginForm.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.textContent;
 
         try {
+            // UI Feedback
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Authenticating...";
+
             // 2. Authenticate with Firebase Auth
+            console.log("Attempting login for:", email);
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
-            // Redirection will be handled by onAuthStateChanged or we can call it here for faster response
+            submitBtn.textContent = "Fetching profile...";
             await redirectBasedOnRole(user);
 
         } catch (error) {
             console.error("Login Error:", error);
-            let message = error.message; // Default to Firebase error message for better debugging
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalBtnText;
 
+            let message = "Login failed. Please check your credentials.";
             if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
                 message = "Invalid email or password. Please check your credentials.";
             } else if (error.code === 'auth/too-many-requests') {
                 message = "Too many failed attempts. Please try again later.";
+            } else if (error.code === 'auth/network-request-failed') {
+                message = "Network error. Please check your internet connection.";
             }
 
             alert(message);
