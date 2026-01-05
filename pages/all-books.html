@@ -436,6 +436,71 @@
                 padding: var(--spacing-xl);
             }
         }
+
+        /* Search Bar Styles */
+        .search-container {
+            flex: 1;
+            max-width: 750px;
+            margin: 0 var(--spacing-xl);
+            position: relative;
+        }
+
+        .search-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 3rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-full);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(44, 82, 130, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1.25rem;
+            color: var(--text-light);
+            font-size: 1.1rem;
+            pointer-events: none;
+            transition: color 0.3s ease;
+        }
+
+        .search-input:focus+.search-icon {
+            color: var(--primary-color);
+        }
+
+        @media (max-width: 1024px) {
+            .search-container {
+                margin: 0 var(--spacing-md);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .browse-header {
+                flex-direction: column;
+                align-items: stretch !important;
+                gap: var(--spacing-md);
+            }
+
+            .search-container {
+                margin: 0;
+                max-width: none;
+            }
+        }
     </style>
 </head>
 
@@ -497,13 +562,22 @@
                 </div>
             </aside>
             <main>
-                <div
+                <div class="browse-header"
                     style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg);">
                     <div>
-                        <h2>All Books</h2>
+                        <h2 style="white-space: nowrap;">All Books</h2>
                         <p id="pageInfo" style="color: var(--text-light); font-size: 0.875rem; margin-top: 0.25rem;">
                             Loading books...</p>
                     </div>
+
+                    <div class="search-container">
+                        <div class="search-input-wrapper">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" id="bookSearch" class="search-input"
+                                placeholder="Search by title, author, or ISBN..." oninput="handleSearch(this.value)">
+                        </div>
+                    </div>
+
                     <select class="form-control" style="width: auto;" id="sortSelect" onchange="handleSort()">
                         <option value="popularity">Sort by: Popularity</option>
                         <option value="price-low">Price: Low to High</option>
@@ -736,6 +810,7 @@
         function applyFilters() {
             const selectedCategories = Array.from(document.querySelectorAll('.category-filter:checked')).map(cb => cb.value);
             const selectedConditions = Array.from(document.querySelectorAll('.condition-filter:checked')).map(cb => cb.value);
+            const searchQuery = document.getElementById('bookSearch').value.toLowerCase().trim();
 
             // More robust price range selection
             const priceRadios = document.getElementsByName('price');
@@ -747,10 +822,16 @@
                 }
             }
 
-            console.log('Applying Filters:', { selectedCategories, selectedConditions, selectedPriceRange });
+            console.log('Applying Filters:', { selectedCategories, selectedConditions, selectedPriceRange, searchQuery });
             console.log('Total books before filter:', allBooks.length);
 
             displayBooks = allBooks.filter(book => {
+                // Search Filter
+                const searchMatch = !searchQuery ||
+                    book.title.toLowerCase().includes(searchQuery) ||
+                    book.author.toLowerCase().includes(searchQuery) ||
+                    (book.isbn && book.isbn.includes(searchQuery));
+
                 // Category Filter
                 const categoryMatch = selectedCategories.length === 0 || selectedCategories.includes(book.category);
 
@@ -771,7 +852,7 @@
                     priceMatch = price > 50;
                 }
 
-                return categoryMatch && conditionMatch && priceMatch;
+                return searchMatch && categoryMatch && conditionMatch && priceMatch;
             });
 
             console.log('Filtered Results Count:', displayBooks.length);
@@ -786,6 +867,7 @@
 
         function resetFilters() {
             document.querySelectorAll('.category-filter, .condition-filter').forEach(cb => cb.checked = false);
+            document.getElementById('bookSearch').value = '';
             const priceRadios = document.getElementsByName('price');
             for (const radio of priceRadios) {
                 if (radio.value === 'all') radio.checked = true;
@@ -817,6 +899,15 @@
             if (shouldShowPage) {
                 showPage(1);
             }
+        }
+
+        // Search Handling with Debounce
+        let searchTimeout;
+        function handleSearch(value) {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                applyFilters();
+            }, 300);
         }
 
         function addToCart(title, price) {
