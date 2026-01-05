@@ -300,6 +300,142 @@
                 height: 280px;
             }
         }
+
+        /* Quick View Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 0;
+            border-radius: var(--radius-2xl);
+            width: 90%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: modalFadeIn 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--text-light);
+            cursor: pointer;
+            z-index: 10;
+            transition: color 0.3s ease;
+            line-height: 1;
+        }
+
+        .close-modal:hover {
+            color: var(--accent-color);
+        }
+
+        .quick-view-container {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: var(--spacing-2xl);
+        }
+
+        .quick-view-image {
+            background: var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-xl);
+        }
+
+        .quick-view-image img {
+            width: 100%;
+            height: auto;
+            max-height: 500px;
+            object-fit: contain;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .quick-view-details {
+            padding: var(--spacing-2xl) var(--spacing-2xl) var(--spacing-2xl) 0;
+        }
+
+        .modal-title {
+            font-size: 2rem;
+            margin-bottom: var(--spacing-xs);
+            color: var(--primary-color);
+        }
+
+        .modal-author {
+            font-size: 1.25rem;
+            color: var(--text-light);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .modal-meta {
+            display: flex;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .modal-price {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent-color);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .modal-description {
+            color: var(--text-color);
+            line-height: 1.8;
+            margin-bottom: var(--spacing-xl);
+            font-size: 1rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: var(--spacing-md);
+        }
+
+        @media (max-width: 850px) {
+            .quick-view-container {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-view-details {
+                padding: var(--spacing-xl);
+            }
+
+            .quick-view-image {
+                padding: var(--spacing-xl);
+            }
+        }
     </style>
 </head>
 
@@ -397,6 +533,15 @@
             <button class="btn btn-primary" onclick="goToCart()">View Cart</button>
         </div>
     </div>
+    <div id="quickViewModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <div class="modal-body" id="modalBody">
+                <!-- Content will be injected here -->
+            </div>
+        </div>
+    </div>
+
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
@@ -493,7 +638,7 @@
                             <div class="book-cover-placeholder">${book.title}</div>
                         </div>
                         <div class="book-cover-overlay">
-                            <button class="quick-view-btn">Quick View</button>
+                            <button class="quick-view-btn" onclick="openQuickView('${book.isbn}')">Quick View</button>
                         </div>
                     </div>
                     <div class="card-content">
@@ -707,6 +852,63 @@
         function goToCart() {
             hideNotification();
             window.location.href = 'view-cart.html';
+        }
+
+        // Quick View Functions
+        function openQuickView(isbn) {
+            const book = allBooks.find(b => b.isbn === isbn);
+            if (!book) return;
+
+            const modal = document.getElementById('quickViewModal');
+            const modalBody = document.getElementById('modalBody');
+
+            const stockClass = book.stock.toLowerCase().replace(' ', '-');
+
+            modalBody.innerHTML = `
+                <div class="quick-view-container">
+                    <div class="quick-view-image">
+                        <img src="${book.cover}" alt="${book.title}" onerror="this.src='https://via.placeholder.com/300x450?text=No+Cover'">
+                    </div>
+                    <div class="quick-view-details">
+                        <h2 class="modal-title">${book.title}</h2>
+                        <p class="modal-author">by ${book.author}</p>
+                        <div class="modal-meta">
+                            <span class="book-tag tag-category">${book.category}</span>
+                            <span class="book-tag tag-condition">${book.condition}</span>
+                        </div>
+                        <div class="modal-price">$${book.price.toFixed(2)}</div>
+                        <div class="book-stock ${stockClass}">
+                            <span class="stock-dot"></span>
+                            ${book.stock}
+                        </div>
+                        <p class="modal-description">
+                            <strong>ISBN:</strong> ${book.isbn}<br><br>
+                            Experience the magic of "${book.title}" by ${book.author}. This ${book.condition.toLowerCase()} copy is a must-have for any ${book.category.toLowerCase()} enthusiast. Immerse yourself in the captivating world created by the author and discover why this book is a favorite among readers.
+                        </p>
+                        <div class="modal-actions">
+                            <button class="btn btn-primary" onclick="addToCart('${book.title.replace(/'/g, "\\'")}', ${book.price}); closeModal();">Add to Cart</button>
+                            <button class="btn btn-outline" onclick="buyNow('${book.title.replace(/'/g, "\\'")}', ${book.price}); closeModal();">Buy Now</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // Prevent scrolling
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('quickViewModal');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function (event) {
+            const modal = document.getElementById('quickViewModal');
+            if (event.target == modal) {
+                closeModal();
+            }
         }
 
         // Initialize the page
