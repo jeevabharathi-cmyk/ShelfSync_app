@@ -1,17 +1,10 @@
 import { auth, db } from './firebase-config.js';
 import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 /**
- * Firestore User Schema:
- * Collection: "users"
- * Document ID: user.uid
- * Fields:
- * - firstName: string
- * - lastName: string
- * - email: string
- * - role: string ("customer", "seller", "admin")
- * - createdAt: timestamp
+ * Signup logic for ShelfSync
+ * Handles user registration and profile creation in Firestore
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -45,14 +38,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
-            // 2. Create user document in Firestore
-            // We use setDoc with doc(db, "collection", "id") to specify the document ID
+            // 2. Create user document in Firestore (Production Way)
             await setDoc(doc(db, "users", user.uid), {
-                firstName,
-                lastName,
-                email,
-                role,
-                createdAt: serverTimestamp()
+                firstName: firstName,
+                lastName: lastName,
+                email: user.email, // Using email from auth object
+                role: role,
+                createdAt: new Date() // Using requested Date object
             });
 
             alert("Account created successfully!");
@@ -66,7 +58,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error("Signup Error:", error);
-            // Handle common Firebase errors
             let message = "An error occurred during signup.";
             if (error.code === 'auth/email-already-in-use') {
                 message = "This email is already registered.";

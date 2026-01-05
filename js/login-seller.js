@@ -23,29 +23,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const user = userCredential.user;
 
             // 2. Fetch user document from Firestore to check role
-            const userDocRef = doc(db, "users", user.uid);
-            const userSnap = await getDoc(userDocRef);
+            const snap = await getDoc(doc(db, "users", user.uid));
 
-            if (userSnap.exists()) {
-                const userData = userSnap.data();
-                console.log("User data:", userData);
-
-                // 3. Redirect based on role
-                // For login-seller.js, we specifically check for 'seller' role
-                if (userData.role === 'seller') {
-                    alert(`Welcome back, ${userData.firstName}!`);
-                    window.location.href = "seller-dashboard.html";
-                } else if (userData.role === 'admin') {
-                    // Admins might also log in here, but usually have their own page
-                    window.location.href = "admin-dashboard.html";
-                } else {
-                    // If a customer tries to log in to the seller portal
-                    alert("Access denied. This account is not registered as a seller.");
-                    // Optional: Sign out if they shouldn't be logged in at all on this page
-                    // await auth.signOut();
-                }
+            if (snap.exists() && snap.data().role === "seller") {
+                console.log("Seller authenticated:", snap.data());
+                window.location.href = "seller-dashboard.html";
             } else {
-                alert("User profile not found in database. Please contact support.");
+                alert("Access denied: Not a seller");
+                // Optional: Sign out if they shouldn't be logged in at all on this page
+                // await auth.signOut();
             }
 
         } catch (error) {
