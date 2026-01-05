@@ -536,14 +536,17 @@
                     <h4 class="filter-title">Price Range</h4>
                     <label class="filter-option"><input type="radio" name="price" class="price-filter" value="all"
                             checked> All Prices</label>
-                    <label class="filter-option"><input type="radio" name="price" class="price-filter" value="under-10">
-                        Under $10</label>
-                    <label class="filter-option"><input type="radio" name="price" class="price-filter" value="10-25">
-                        $10 - $25</label>
-                    <label class="filter-option"><input type="radio" name="price" class="price-filter" value="25-50">
-                        $25 - $50</label>
-                    <label class="filter-option"><input type="radio" name="price" class="price-filter" value="over-50">
-                        Over $50</label>
+                    <label class="filter-option"><input type="radio" name="price" class="price-filter"
+                            value="under-800">
+                        Under ₹800</label>
+                    <label class="filter-option"><input type="radio" name="price" class="price-filter" value="800-2000">
+                        ₹800 - ₹2000</label>
+                    <label class="filter-option"><input type="radio" name="price" class="price-filter"
+                            value="2000-4000">
+                        ₹2000 - ₹4000</label>
+                    <label class="filter-option"><input type="radio" name="price" class="price-filter"
+                            value="over-4000">
+                        Over ₹4000</label>
                 </div>
                 <div class="filter-section">
                     <h4 class="filter-title">Condition</h4>
@@ -649,6 +652,7 @@
         let displayBooks = [];
         let currentPage = 1;
         const booksPerPage = 50;
+        const USD_TO_INR = 83; // Conversion rate
 
         // Load books data
         async function loadBooksData() {
@@ -727,7 +731,7 @@
                             ${book.stock}
                         </div>
                         <div class="card-footer">
-                            <div class="book-price">$${book.price.toFixed(2)}</div>
+                            <div class="book-price">₹${(book.price * USD_TO_INR).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</div>
                             <div class="card-actions">
                                 <button class="btn btn-outline btn-sm" onclick="addToCart('${book.title.replace(/'/g, "\\'")}', ${book.price})">
                                     <span style="font-size: 1.1rem;">🛒</span>
@@ -840,16 +844,16 @@
 
                 // Price Filter
                 let priceMatch = true;
-                const price = parseFloat(book.price);
+                const priceINR = parseFloat(book.price) * USD_TO_INR;
 
-                if (selectedPriceRange === 'under-10') {
-                    priceMatch = price < 10;
-                } else if (selectedPriceRange === '10-25') {
-                    priceMatch = price >= 10 && price <= 25;
-                } else if (selectedPriceRange === '25-50') {
-                    priceMatch = price >= 25 && price <= 50;
-                } else if (selectedPriceRange === 'over-50') {
-                    priceMatch = price > 50;
+                if (selectedPriceRange === 'under-800') {
+                    priceMatch = priceINR < 800;
+                } else if (selectedPriceRange === '800-2000') {
+                    priceMatch = priceINR >= 800 && priceINR <= 2000;
+                } else if (selectedPriceRange === '2000-4000') {
+                    priceMatch = priceINR >= 2000 && priceINR <= 4000;
+                } else if (selectedPriceRange === 'over-4000') {
+                    priceMatch = priceINR > 4000;
                 }
 
                 return searchMatch && categoryMatch && conditionMatch && priceMatch;
@@ -926,7 +930,7 @@
         }
 
         function buyNow(title, price) {
-            alert('Proceeding to checkout for ' + title + ' - $' + price.toFixed(2));
+            alert('Proceeding to checkout for ' + title + ' - ₹' + (price * USD_TO_INR).toLocaleString('en-IN', { maximumFractionDigits: 2 }));
         }
 
         function showNotification(title) {
@@ -967,7 +971,7 @@
                             <span class="book-tag tag-category">${book.category}</span>
                             <span class="book-tag tag-condition">${book.condition}</span>
                         </div>
-                        <div class="modal-price">$${book.price.toFixed(2)}</div>
+                        <div class="modal-price">₹${(book.price * USD_TO_INR).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</div>
                         <div class="book-stock ${stockClass}">
                             <span class="stock-dot"></span>
                             ${book.stock}
