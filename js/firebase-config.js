@@ -1,4 +1,7 @@
-// Firebase Configuration - Replace with your actual Firebase project credentials
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
 const firebaseConfig = {
     apiKey: "AIzaSyDfyqcchPmY0MvKCaJQmwP0ILyf9UODMis",
     authDomain: "shelfsync-6fedf.firebaseapp.com",
@@ -9,15 +12,8 @@ const firebaseConfig = {
     measurementId: "G-2SSZLVQ1Z8"
 };
 
-// Initialize Firebase
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
+const app = initializeApp(firebaseConfig);
 
-// Initialize Services
-const db = firebase.firestore();
-const auth = firebase.auth();
+export const auth = getAuth(app);
+export const db = getFirestore(app);
 
-// Make them available globally if needed (though they usually are when defined with const/var in global scope)
-window.db = db;
-window.auth = auth;

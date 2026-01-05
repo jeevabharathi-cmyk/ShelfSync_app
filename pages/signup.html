@@ -2,38 +2,37 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up | ShelfSync</title>
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/layout.css">
-    <link rel="stylesheet" href="../css/components.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!DOCTYPE html>
+    <html lang="en">
 
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="../js/firebase-config.js"></script>
-    <style>
-        .auth-container {
-            max-width: 500px;
-            margin: var(--spacing-2xl) auto;
-            padding: var(--spacing-xl);
-        }
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Sign Up | ShelfSync</title>
+        <link rel="stylesheet" href="../css/style.css">
+        <link rel="stylesheet" href="../css/layout.css">
+        <link rel="stylesheet" href="../css/components.css">
+        <!-- Firebase Configuration and Logic -->
+        <script type="module" src="../js/signup.js"></script>
+        <style>
+            .auth-container {
+                max-width: 500px;
+                margin: var(--spacing-2xl) auto;
+                padding: var(--spacing-xl);
+            }
 
-        .auth-links {
-            text-align: center;
-            margin-top: var(--spacing-lg);
-            font-size: var(--small-size);
-        }
+            .auth-links {
+                text-align: center;
+                margin-top: var(--spacing-lg);
+                font-size: var(--small-size);
+            }
 
-        .auth-links a {
-            color: var(--primary-color);
-            font-weight: 500;
-        }
-    </style>
-</head>
+            .auth-links a {
+                color: var(--primary-color);
+                font-weight: 500;
+            }
+        </style>
+    </head>
 
 <body>
 
@@ -125,55 +124,6 @@
         </div>
     </footer>
 
-    <script>
-        const signupForm = document.getElementById('signupForm');
-
-        signupForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const firstName = document.getElementById('firstName').value;
-            const lastName = document.getElementById('lastName').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            const role = document.getElementById('role').value;
-
-            if (password !== confirmPassword) {
-                alert("Passwords do not match!");
-                return;
-            }
-
-            try {
-                // Create user in Firebase Auth
-                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-                const user = userCredential.user;
-
-                // Store additional user info in Firestore
-                await db.collection('users').doc(user.uid).set({
-                    firstName,
-                    lastName,
-                    email,
-                    role,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-
-                alert("Account created successfully!");
-
-                // Redirect based on role
-                if (role === 'seller') {
-                    window.location.href = 'login-seller.html';
-                } else if (role === 'delivery') {
-                    window.location.href = 'login-customer.html'; // Assuming delivery uses customer login for now
-                } else {
-                    window.location.href = 'login-customer.html';
-                }
-
-            } catch (error) {
-                console.error("Signup Error:", error);
-                alert(error.message);
-            }
-        });
-    </script>
 </body>
 
 </html>
