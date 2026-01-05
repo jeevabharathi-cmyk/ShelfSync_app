@@ -10,6 +10,11 @@
     <link rel="stylesheet" href="../css/components.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="../books-data.js"></script>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="../js/firebase-config.js"></script>
     <style>
         .browse-container {
             display: grid;
@@ -654,8 +659,39 @@
         const booksPerPage = 50;
         const USD_TO_INR = 83; // Conversion rate
 
+        // Initialize Books Data
+        window.addEventListener('DOMContentLoaded', loadBooksData);
+
         // Load books data
         async function loadBooksData() {
+            const grid = document.getElementById('booksGrid');
+            try {
+                if (typeof firebase !== 'undefined') {
+                    console.log('Fetching books from Firestore...');
+                    const snapshot = await db.collection('books').get();
+
+                    if (snapshot.empty) {
+                        console.log('Firestore collection is empty, falling back to local data');
+                        await loadLocalData();
+                    } else {
+                        allBooks = snapshot.docs.map(doc => ({
+                            id: doc.id,
+                            ...doc.data()
+                        }));
+                        console.log('Loaded ' + allBooks.length + ' books from Firestore');
+                        displayBooks = [...allBooks];
+                        showPage(1);
+                    }
+                } else {
+                    await loadLocalData();
+                }
+            } catch (error) {
+                console.error('Error loading books from Firestore:', error);
+                await loadLocalData();
+            }
+        }
+
+        async function loadLocalData() {
             try {
                 if (typeof booksData !== 'undefined') {
                     allBooks = booksData;
@@ -671,8 +707,7 @@
                     showPage(1);
                 }
             } catch (error) {
-                console.error('Error loading books:', error);
-                // Fallback: use embedded books data
+                console.error('Error loading local data:', error);
                 loadEmbeddedBooks();
             }
         }

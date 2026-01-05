@@ -9,6 +9,13 @@
     <link rel="stylesheet" href="../css/layout.css">
     <link rel="stylesheet" href="../css/components.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="../js/firebase-config.js"></script>
+
     <style>
         .auth-container {
             max-width: 400px;
@@ -82,14 +89,14 @@
                 <a href="login-admin.html">Admin</a>
             </div>
 
-            <form action="seller-dashboard.html"> <!-- Redirect to Seller Dashboard -->
+            <form id="loginForm">
                 <div class="form-group">
-                    <label class="form-label">Seller ID / Email</label>
-                    <input type="email" class="form-control" placeholder="store@example.com" required>
+                    <label class="form-label">Email Address</label>
+                    <input type="email" id="email" class="form-control" placeholder="store@example.com" required>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Password</label>
-                    <input type="password" class="form-control" placeholder="••••••••" required>
+                    <input type="password" id="password" class="form-control" placeholder="••••••••" required>
                 </div>
                 <button type="submit" class="btn btn-primary btn-block"
                     style="background-color: var(--accent-color);">Login to Dashboard</button>
@@ -110,6 +117,43 @@
         </div>
     </footer>
 
+    <script>
+        const loginForm = document.getElementById('loginForm');
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+
+                // Fetch user role from Firestore
+                const userDoc = await db.collection('users').doc(user.uid).get();
+
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+
+                    if (userData.role === 'seller') {
+                        alert(`Welcome back, ${userData.firstName}!`);
+                        window.location.href = 'seller-dashboard.html';
+                    } else {
+                        alert("Access denied. This account is not registered as a seller.");
+                        await auth.signOut();
+                    }
+                } else {
+                    alert("User profile not found.");
+                    await auth.signOut();
+                }
+
+            } catch (error) {
+                console.error("Login Error:", error);
+                alert(error.message);
+            }
+        });
+    </script>
 </body>
 
 </html>

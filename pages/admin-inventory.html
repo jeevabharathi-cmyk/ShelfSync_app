@@ -3,14 +3,25 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All Inventory | ShelfSync Admin</title>
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/layout.css">
-    <link rel="stylesheet" href="../css/components.css">
-    <link rel="stylesheet" href="../css/dashboard.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-</head>
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>All Inventory | ShelfSync Admin</title>
+        <link rel="stylesheet" href="../css/style.css">
+        <link rel="stylesheet" href="../css/layout.css">
+        <link rel="stylesheet" href="../css/components.css">
+        <link rel="stylesheet" href="../css/dashboard.css">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+            rel="stylesheet">
+        <!-- Firebase SDKs -->
+        <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+        <script src="../js/firebase-config.js"></script>
+
+    </head>
 
 <body>
 
@@ -83,104 +94,13 @@
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="inventoryBody">
                         <tr>
-                            <td>
-                                <div style="display: flex; align-items: center; gap: var(--spacing-sm);">
-                                    <div
-                                        style="width: 40px; height: 60px; background-color: #e2e8f0; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 0.75rem;">
-                                        Img</div>
-                                    <div>
-                                        <div style="font-weight: 600;">The Great Gatsby</div>
-                                        <div class="text-light" style="font-size: 0.8rem;">ISBN: 978-0743273565</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>BookHaven Store</td>
-                            <td>Fiction</td>
-                            <td style="font-weight: 600;">$12.99</td>
-                            <td>45</td>
-                            <td><span class="badge badge-success">In Stock</span></td>
-                            <td>
-                                <button class="btn btn-outline"
-                                    style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">View</button>
-                                <button class="btn btn-outline"
-                                    style="padding: 0.25rem 0.5rem; font-size: 0.75rem; color: var(--error-color); border-color: var(--error-color);">Remove</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div style="display: flex; align-items: center; gap: var(--spacing-sm);">
-                                    <div
-                                        style="width: 40px; height: 60px; background-color: #e2e8f0; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 0.75rem;">
-                                        Img</div>
-                                    <div>
-                                        <div style="font-weight: 600;">Clean Code</div>
-                                        <div class="text-light" style="font-size: 0.8rem;">ISBN: 978-0132350884</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>TechBooks Inc.</td>
-                            <td>Academic</td>
-                            <td style="font-weight: 600;">$35.00</td>
-                            <td>12</td>
-                            <td><span class="badge badge-success">In Stock</span></td>
-                            <td>
-                                <button class="btn btn-outline"
-                                    style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">View</button>
-                                <button class="btn btn-outline"
-                                    style="padding: 0.25rem 0.5rem; font-size: 0.75rem; color: var(--error-color); border-color: var(--error-color);">Remove</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div style="display: flex; align-items: center; gap: var(--spacing-sm);">
-                                    <div
-                                        style="width: 40px; height: 60px; background-color: #e2e8f0; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 0.75rem;">
-                                        Img</div>
-                                    <div>
-                                        <div style="font-weight: 600;">1984</div>
-                                        <div class="text-light" style="font-size: 0.8rem;">ISBN: 978-0451524935</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>Classic Reads</td>
-                            <td>Fiction</td>
-                            <td style="font-weight: 600;">$10.50</td>
-                            <td>3</td>
-                            <td><span class="badge badge-warning">Low Stock</span></td>
-                            <td>
-                                <button class="btn btn-outline"
-                                    style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">View</button>
-                                <button class="btn btn-outline"
-                                    style="padding: 0.25rem 0.5rem; font-size: 0.75rem; color: var(--error-color); border-color: var(--error-color);">Remove</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div style="display: flex; align-items: center; gap: var(--spacing-sm);">
-                                    <div
-                                        style="width: 40px; height: 60px; background-color: #e2e8f0; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 0.75rem;">
-                                        Img</div>
-                                    <div>
-                                        <div style="font-weight: 600;">Rare First Edition</div>
-                                        <div class="text-light" style="font-size: 0.8rem;">ISBN: N/A</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>Antique Books</td>
-                            <td>Collectibles</td>
-                            <td style="font-weight: 600;">$150.00</td>
-                            <td>0</td>
-                            <td><span class="badge badge-error">Out of Stock</span></td>
-                            <td>
-                                <button class="btn btn-outline"
-                                    style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">View</button>
-                                <button class="btn btn-outline"
-                                    style="padding: 0.25rem 0.5rem; font-size: 0.75rem; color: var(--error-color); border-color: var(--error-color);">Remove</button>
-                            </td>
+                            <td colspan="7" style="text-align: center; padding: 2rem;">Loading inventory from
+                                Firestore...</td>
                         </tr>
                     </tbody>
+
                 </table>
             </div>
 
@@ -196,6 +116,79 @@
         </main>
     </div>
 
+    <script>
+        // Initialize Firebase
+        if (typeof firebase !== 'undefined') {
+            firebase.initializeApp(firebaseConfig);
+            var db = firebase.firestore();
+        }
+
+        const USD_TO_INR = 83;
+
+        async function loadInventory() {
+            const body = document.getElementById('inventoryBody');
+            try {
+                if (typeof firebase === 'undefined' || firebaseConfig.apiKey === "YOUR_API_KEY") {
+                    body.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--error-color);">Firebase not configured. Please update js/firebase-config.js</td></tr>';
+                    return;
+                }
+
+                const snapshot = await db.collection('books').get();
+                if (snapshot.empty) {
+                    body.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem;">No books found in Firestore. Use the migration tool to upload data.</td></tr>';
+                    return;
+                }
+
+                body.innerHTML = '';
+                snapshot.docs.forEach(doc => {
+                    const book = doc.data();
+                    const tr = document.createElement('tr');
+                    const stockClass = book.stock.toLowerCase().includes('out') ? 'badge-error' :
+                        book.stock.toLowerCase().includes('low') ? 'badge-warning' : 'badge-success';
+
+                    tr.innerHTML = `
+                        <td>
+                            <div style="display: flex; align-items: center; gap: var(--spacing-sm);">
+                                <img src="${book.cover}" style="width: 40px; height: 60px; object-fit: cover; border-radius: 4px;" onerror="this.src='https://via.placeholder.com/40x60?text=No+Img'">
+                                <div>
+                                    <div style="font-weight: 600;">${book.title}</div>
+                                    <div class="text-light" style="font-size: 0.8rem;">ISBN: ${book.isbn || 'N/A'}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>ShelfSync Official</td>
+                        <td>${book.category}</td>
+                        <td style="font-weight: 600;">₹${(book.price * USD_TO_INR).toLocaleString('en-IN')}</td>
+                        <td>${book.stock === 'In Stock' ? '50+' : book.stock === 'Low Stock' ? '5' : '0'}</td>
+                        <td><span class="badge ${stockClass}">${book.stock}</span></td>
+                        <td>
+                            <button class="btn btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">View</button>
+                            <button class="btn btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.75rem; color: var(--error-color); border-color: var(--error-color);" onclick="deleteBook('${doc.id}')">Remove</button>
+                        </td>
+                    `;
+                    body.appendChild(tr);
+                });
+
+            } catch (error) {
+                console.error('Error loading inventory:', error);
+                body.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--error-color);">Error loading data from Firestore.</td></tr>';
+            }
+        }
+
+        async function deleteBook(id) {
+            if (confirm('Are you sure you want to remove this book from inventory?')) {
+                try {
+                    await db.collection('books').doc(id).delete();
+                    loadInventory();
+                } catch (error) {
+                    alert('Error deleting book: ' + error.message);
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadInventory);
+    </script>
 </body>
+
 
 </html>
