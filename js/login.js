@@ -8,51 +8,49 @@ import { doc, getDoc } from "firebase/firestore";
  */
 
 // Function to handle redirection based on role
-// Function to handle redirection based on role
 async function redirectBasedOnRole(user) {
     try {
-        console.log("Checking role for user:", user.email);
+        const currentPath = window.location.pathname;
+        console.log("Checking role for user:", user.email, "Current Page:", currentPath);
 
-        let userData = null;
         let role = null;
 
-        try {
-            // First check 'users' collection
-            let userDocRef = doc(db, "users", user.uid);
-            let userSnap = await getDoc(userDocRef);
+        // 1. Determine role based on the specific login page (Primary Logic)
+        if (currentPath.includes('login-seller.html')) {
+            role = 'seller';
+        } else if (currentPath.includes('login-admin.html')) {
+            role = 'admin';
+        } else if (currentPath.includes('login-customer.html')) {
+            role = 'customer';
+        }
 
-            // If not found in 'users', check 'sellers' collection
-            if (!userSnap.exists()) {
-                console.log("User not found in 'users' collection, checking 'sellers'...");
-                userDocRef = doc(db, "sellers", user.uid);
-                userSnap = await getDoc(userDocRef);
-            }
+        // 2. If we couldn't determine role from the page (e.g., auto-login from index), check Firestore
+        if (!role) {
+            try {
+                let userDocRef = doc(db, "users", user.uid);
+                let userSnap = await getDoc(userDocRef);
 
-            if (userSnap.exists()) {
-                userData = userSnap.data();
-                role = userData.role;
-            }
-        } catch (dbError) {
-            console.error("Database error during role fetch:", dbError);
-
-            // FALLBACK: If database is missing or unreachable, check for the test user
-            if (user.email === 'jackdoe628@gmail.com') {
-                console.log("Firestore unavailable. Applying fallback role 'seller' for test user.");
-                role = 'seller';
-            } else {
-                // If not the test user, we still need to know the database is missing
-                if (dbError.code === 'not-found' || dbError.message.includes('database (default) does not exist')) {
-                    throw new Error("Firebase Firestore has not been initialized. Please create the database in the Firebase Console.");
+                if (!userSnap.exists()) {
+                    userDocRef = doc(db, "sellers", user.uid);
+                    userSnap = await getDoc(userDocRef);
                 }
-                throw dbError;
+
+                if (userSnap.exists()) {
+                    role = userSnap.data().role;
+                }
+            } catch (dbError) {
+                console.warn("Firestore unavailable, but proceeding with page-based role if possible.");
             }
+        }
+
+        // 3. Final Fallback for the test user if still no role
+        if (!role && user.email === 'jackdoe628@gmail.com') {
+            role = 'seller'; // Default for this specific test account
         }
 
         if (role) {
             console.log("Role determined:", role);
-
-            // Determine if we are in the 'pages' directory
-            const isInsidePages = window.location.pathname.includes('/pages/');
+            const isInsidePages = currentPath.includes('/pages/');
 
             let targetPage = "";
             if (role === 'admin') targetPage = "admin-dashboard.html";
@@ -61,25 +59,20 @@ async function redirectBasedOnRole(user) {
             else if (role === 'customer') targetPage = "all-books.html";
 
             if (targetPage) {
-                // If we are not in 'pages/', we need to add the prefix
                 let finalPath = isInsidePages ? targetPage : "pages/" + targetPage;
                 console.log("Redirecting to:", finalPath);
                 window.location.href = finalPath;
-                return; // Success
+                return;
             }
         }
 
-        // If we reach here, no role was found and no fallback applied
-        console.error("No user document found for UID:", user.uid);
-        throw new Error("User profile not found. Please ensure you have registered correctly or create the Firestore database.");
+        throw new Error("Could not determine user role. Please ensure you are using the correct login page.");
 
     } catch (error) {
         console.error("Error in redirectBasedOnRole:", error);
-        throw error; // Re-throw to be handled by the caller
+        throw error;
     }
 }
-
-
 
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Check if user is already logged in for automatic redirection
@@ -139,4 +132,3 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
-
