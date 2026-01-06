@@ -20,7 +20,6 @@
       }
     }
     </script>
-    <script type="module" src="../js/browse-books.js"></script>
     <style>
         .browse-container {
             display: grid;
@@ -85,6 +84,7 @@
             flex-direction: column;
             height: 100%;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            position: relative;
         }
 
         .card:hover {
@@ -96,7 +96,7 @@
         .book-cover-container {
             position: relative;
             overflow: hidden;
-            height: 320px;
+            height: 280px;
             background-color: var(--border-light);
         }
 
@@ -149,14 +149,14 @@
         }
 
         .card-content {
-            padding: var(--spacing-lg);
+            padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg);
             flex-grow: 1;
             display: flex;
             flex-direction: column;
         }
 
         .card-title {
-            font-size: 1.125rem;
+            font-size: 1.25rem;
             font-weight: 700;
             margin-bottom: var(--spacing-xs);
             color: var(--primary-color);
@@ -170,15 +170,15 @@
         }
 
         .card-subtitle {
-            font-size: 0.875rem;
+            font-size: 0.9rem;
             color: var(--text-light);
-            margin-bottom: var(--spacing-md);
+            margin-bottom: var(--spacing-sm);
         }
 
         .book-meta {
             display: flex;
             gap: var(--spacing-xs);
-            margin-bottom: var(--spacing-md);
+            margin-bottom: var(--spacing-sm);
             flex-wrap: wrap;
         }
 
@@ -207,7 +207,7 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            margin-bottom: var(--spacing-lg);
+            margin-bottom: var(--spacing-md);
         }
 
         .stock-dot {
@@ -230,6 +230,128 @@
             background-color: #ef4444;
             box-shadow: 0 0 8px #ef4444;
         }
+
+        /* New styles for premium book card layout */
+
+        .card.premium .book-stock {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .card.premium .card-footer {
+            flex-direction: column;
+            gap: var(--spacing-md);
+            padding-top: var(--spacing-md);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .card.premium .price-container {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 0;
+        }
+
+        .card.premium .book-price {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            letter-spacing: -0.02em;
+        }
+
+        .card.premium .card-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+            width: 100%;
+        }
+
+        .card.premium .btn-buy {
+            flex: 1;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: var(--radius-lg);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
+        }
+
+        .card.premium .btn-buy:hover {
+            background: #e67e22;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);
+        }
+
+        .card.premium .btn-cart-img {
+            width: 42px;
+            height: 42px;
+            background: #f8f9fa;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .card.premium .btn-cart-img:hover {
+            background: #e9ecef;
+            border-color: var(--accent-color);
+            transform: scale(1.05);
+        }
+
+        .card.premium .btn-cart-img img {
+            width: 24px;
+            height: 24px;
+        }
+
+        .card.premium .like-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 5;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .card.premium .like-btn:hover {
+            transform: scale(1.1);
+            background: white;
+        }
+
+        .card.premium .like-btn.active {
+            color: #ef4444;
+        }
+
+        .card.premium .like-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            transition: all 0.3s ease;
+        }
+
+        .card.premium .like-btn.active svg {
+            fill: #ef4444;
+            stroke: #ef4444;
+        }
+
+        /* End new styles for premium book card layout */
 
         .card-footer {
             margin-top: auto;
@@ -522,6 +644,7 @@
             <ul class="nav-links">
                 <li><a href="../index.html" class="nav-link">Home</a></li>
                 <li><a href="all-books.html" class="nav-link active">Browse Books</a></li>
+                <li><a href="cart.html" class="nav-link">Cart</a></li>
                 <li><a href="login-customer.html" class="btn btn-outline">Login</a></li>
                 <li><a href="signup.html" class="btn btn-primary">Sign Up</a></li>
             </ul>
@@ -532,15 +655,15 @@
             <aside class="sidebar">
                 <div class="filter-section">
                     <h4 class="filter-title">Categories</h4>
-                    <label class="filter-option"><input type="checkbox" class="category-filter" value="Fiction">
+                    <label class="filter-option"><input type="checkbox" class="category-filter" value="FICTION">
                         Fiction</label>
-                    <label class="filter-option"><input type="checkbox" class="category-filter" value="Non-Fiction">
+                    <label class="filter-option"><input type="checkbox" class="category-filter" value="NON-FICTION">
                         Non-Fiction</label>
-                    <label class="filter-option"><input type="checkbox" class="category-filter" value="Science & Tech">
+                    <label class="filter-option"><input type="checkbox" class="category-filter" value="SCIENCE & TECH">
                         Science & Tech</label>
-                    <label class="filter-option"><input type="checkbox" class="category-filter" value="Business">
+                    <label class="filter-option"><input type="checkbox" class="category-filter" value="BUSINESS">
                         Business</label>
-                    <label class="filter-option"><input type="checkbox" class="category-filter" value="History">
+                    <label class="filter-option"><input type="checkbox" class="category-filter" value="HISTORY">
                         History</label>
                 </div>
                 <div class="filter-section">
@@ -561,11 +684,11 @@
                 </div>
                 <div class="filter-section">
                     <h4 class="filter-title">Condition</h4>
-                    <label class="filter-option"><input type="checkbox" class="condition-filter" value="New">
+                    <label class="filter-option"><input type="checkbox" class="condition-filter" value="NEW">
                         New</label>
-                    <label class="filter-option"><input type="checkbox" class="condition-filter" value="Like New"> Like
+                    <label class="filter-option"><input type="checkbox" class="condition-filter" value="LIKE NEW"> Like
                         New</label>
-                    <label class="filter-option"><input type="checkbox" class="condition-filter" value="Used">
+                    <label class="filter-option"><input type="checkbox" class="condition-filter" value="USED">
                         Used</label>
                 </div>
                 <div class="filter-actions" style="display: flex; gap: 10px; margin-top: 20px;">
@@ -658,7 +781,8 @@
         </div>
     </footer>
     <!-- Firebase Configuration and Logic -->
-    <script type="module" src="../js/browse-books.js"></script>
+    <script src="../js/cart-manager.js"></script>
+    <script src="../js/browse-books.js"></script>
 </body>
 
 </html>

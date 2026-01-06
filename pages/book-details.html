@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="../css/layout.css">
     <link rel="stylesheet" href="../css/components.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="../js/cart-manager.js"></script>
     <style>
         .product-container {
             display: grid;
@@ -116,7 +117,7 @@
                     <span class="badge badge-success">In Stock</span>
                 </div>
 
-                <div class="price">$12.99</div>
+                <div class="price">₹1,078.17</div>
 
                 <p style="margin-bottom: var(--spacing-xl);">
                     The Great Gatsby, F. Scott Fitzgerald's third book, stands as the supreme achievement of his career.
@@ -206,36 +207,6 @@
     </div>
 
     <script>
-        const CART_KEY = 'shelfsync_cart_v1';
-
-        function loadCart() {
-            try {
-                const raw = localStorage.getItem(CART_KEY);
-                if (!raw) return [];
-                const parsed = JSON.parse(raw);
-                return Array.isArray(parsed) ? parsed : [];
-            } catch {
-                return [];
-            }
-        }
-
-        function saveCart(items) {
-            localStorage.setItem(CART_KEY, JSON.stringify(items));
-        }
-
-        function addItemToCart(item) {
-            const items = loadCart();
-            const existing = items.find(i => i.id === item.id);
-            if (existing) {
-                existing.qty = (Number(existing.qty) || 0) + (Number(item.qty) || 1);
-                existing.price = item.price;
-                existing.meta = item.meta;
-            } else {
-                items.push(item);
-            }
-            saveCart(items);
-        }
-
         // Quantity selector functions
         function increaseQuantity() {
             const input = document.getElementById('quantity');
@@ -263,7 +234,7 @@
                 // Add selected class to clicked button
                 this.classList.add('selected');
 
-                // Update price based on selection (example logic)
+                // Update price based on selection
                 updatePrice();
             });
         });
@@ -274,13 +245,13 @@
             const priceElement = document.querySelector('.price');
 
             // Example price adjustment logic
-            let basePrice = 12.99;
-            if (format === 'ebook') basePrice = 8.99;
-            if (format === 'paperback') basePrice = 10.99;
+            let basePrice = 1078.17;
+            if (format === 'ebook') basePrice = 746.17;
+            if (format === 'paperback') basePrice = 912.17;
             if (condition === 'like-new') basePrice *= 0.9;
             if (condition === 'good') basePrice *= 0.8;
 
-            priceElement.textContent = `$${basePrice.toFixed(2)}`;
+            priceElement.textContent = `₹${basePrice.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
         }
 
         // Add to cart function
@@ -291,21 +262,17 @@
             const originalText = button.innerHTML;
 
             const title = document.querySelector('.product-info h1')?.textContent?.trim() || 'Book';
-            const priceText = document.querySelector('.price')?.textContent || '$0';
+            const priceText = document.querySelector('.price')?.textContent || '₹0';
             const price = Number(String(priceText).replace(/[^0-9.]/g, '')) || 0;
             const isbn = document.querySelector('li strong')?.parentElement?.textContent?.replace('ISBN:', '')?.trim();
 
-            const cartId = `${title}__${format || 'default'}__${condition || 'default'}`;
-            addItemToCart({
-                id: cartId,
+            window.CartManager.addToCart({
                 title,
                 price,
-                qty: Number(quantity) || 1,
-                meta: {
-                    format,
-                    condition,
-                    isbn
-                }
+                quantity: Number(quantity) || 1,
+                format,
+                condition,
+                isbn
             });
 
             console.log('Adding to cart:', { quantity, format, condition });
@@ -335,22 +302,21 @@
         // Buy now function
         function buyNow(button) {
             const quantity = document.getElementById('quantity').value;
-            const originalText = button.innerHTML;
+            const format = document.querySelector('[data-format].selected')?.dataset.format;
+            const condition = document.querySelector('[data-condition].selected')?.dataset.condition;
+            const title = document.querySelector('.product-info h1')?.textContent?.trim() || 'Book';
+            const priceText = document.querySelector('.price')?.textContent || '₹0';
+            const price = Number(String(priceText).replace(/[^0-9.]/g, '')) || 0;
 
-            console.log('Buying now:', { quantity });
+            window.CartManager.addToCart({
+                title,
+                price,
+                quantity: Number(quantity) || 1,
+                format,
+                condition
+            });
 
-            // Add loading state
-            button.classList.add('loading');
-            button.disabled = true;
-
-            // Simulate checkout process
-            setTimeout(() => {
-                button.classList.remove('loading');
-                // Redirect to checkout (in real app)
-                alert('Proceeding to checkout with ' + quantity + ' items');
-                button.innerHTML = originalText;
-                button.disabled = false;
-            }, 1000);
+            window.location.href = 'cart.html';
         }
 
         // Wishlist function
@@ -381,7 +347,7 @@
 
         function goToCart() {
             hideNotification();
-            window.location.href = 'view-cart.html';
+            window.location.href = 'cart.html';
         }
 
         // Initialize

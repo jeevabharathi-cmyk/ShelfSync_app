@@ -1,12 +1,12 @@
-import { db } from './firebase-config.js';
-import { collection, getDocs } from "firebase/firestore";
+// Firebase will be loaded dynamically to support file:// protocol
+let db;
+let collection, getDocs;
 
 // Load books data from JSON file
 let allBooks = [];
 let displayBooks = [];
 let currentPage = 1;
 const booksPerPage = 50;
-const USD_TO_INR = 83; // Conversion rate
 
 // Initialize Books Data
 document.addEventListener('DOMContentLoaded', loadBooksData);
@@ -14,40 +14,51 @@ document.addEventListener('DOMContentLoaded', loadBooksData);
 // Load books data
 async function loadBooksData() {
     const grid = document.getElementById('booksGrid');
-    try {
-        console.log('Fetching books from Firestore...');
-        // Modular SDK: collection(db, "path")
-        const booksCollection = collection(db, 'books');
-        const snapshot = await getDocs(booksCollection);
 
-        if (snapshot.empty) {
-            console.log('Firestore collection is empty, falling back to local data');
-            await loadLocalData();
-        } else {
-            allBooks = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
-            console.log('Loaded ' + allBooks.length + ' books from Firestore');
-            displayBooks = [...allBooks];
-            showPage(1);
+    // Try to load Firebase dynamically
+    try {
+        if (window.location.protocol !== 'file:') {
+            console.log('Fetching books from Firestore...');
+            const firebaseConfig = await import('./firebase-config.js');
+            db = firebaseConfig.db;
+            const firestore = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+            collection = firestore.collection;
+            getDocs = firestore.getDocs;
+
+            const booksCollection = collection(db, 'books');
+            const snapshot = await getDocs(booksCollection);
+
+            if (!snapshot.empty) {
+                allBooks = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                console.log('Loaded ' + allBooks.length + ' books from Firestore');
+                displayBooks = [...allBooks];
+                showPage(1);
+                return;
+            }
         }
     } catch (error) {
-        console.error('Error loading books from Firestore:', error);
-        await loadLocalData();
+        console.warn('Firestore not available or blocked by protocol:', error);
     }
+
+    // Fallback to local data
+    await loadLocalData();
 }
 
 async function loadLocalData() {
     try {
-        // Check if booksData is available from books-data.js
-        if (typeof window.booksData !== 'undefined') {
-            allBooks = window.booksData;
-            console.log('Loaded ' + allBooks.length + ' books from JS file');
+        // Check if booksData is available from books-data.js (global variable)
+        if (typeof booksData !== 'undefined') {
+            allBooks = booksData;
+            console.log('Loaded ' + allBooks.length + ' books from global variable');
             displayBooks = [...allBooks];
             showPage(1);
         } else {
+            console.log('Attempting to fetch books-database.json...');
             const response = await fetch('../books-database.json');
+            if (!response.ok) throw new Error('Failed to fetch JSON');
             const data = await response.json();
             allBooks = data.books;
             console.log('Loaded ' + allBooks.length + ' books from JSON file');
@@ -64,16 +75,8 @@ async function loadLocalData() {
 function loadEmbeddedBooks() {
     console.log('Using embedded fallback books');
     allBooks = [
-        { "title": "The Great Gatsby", "author": "F. Scott Fitzgerald", "price": 65.51, "category": "Fiction", "condition": "Used", "stock": "Limited Stock", "gradient": "sapiens", "isbn": "9780743273565", "cover": "https://covers.openlibrary.org/b/isbn/9780743273565-L.jpg" },
-        { "title": "1984", "author": "George Orwell", "price": 22.18, "category": "Fiction", "condition": "New", "stock": "Limited Stock", "gradient": "orwell", "isbn": "9780451524935", "cover": "https://covers.openlibrary.org/b/isbn/9780451524935-L.jpg" },
-        { "title": "To Kill a Mockingbird", "author": "Harper Lee", "price": 58.48, "category": "Fiction", "condition": "Like New", "stock": "In Stock", "gradient": "orwell", "isbn": "9780061120084", "cover": "https://covers.openlibrary.org/b/isbn/9780061120084-L.jpg" },
-        { "title": "Pride and Prejudice", "author": "Jane Austen", "price": 23.79, "category": "Fiction", "condition": "Like New", "stock": "In Stock", "gradient": "code", "isbn": "9780141439518", "cover": "https://covers.openlibrary.org/b/isbn/9780141439518-L.jpg" },
-        { "title": "The Catcher in the Rye", "author": "J.D. Salinger", "price": 21.13, "category": "Fiction", "condition": "Like New", "stock": "In Stock", "gradient": "code", "isbn": "9780316769174", "cover": "https://covers.openlibrary.org/b/isbn/9780316769174-L.jpg" },
-        { "title": "The Hobbit", "author": "J.R.R. Tolkien", "price": 29.23, "category": "Fiction", "condition": "Used", "stock": "Low Stock", "gradient": "gatsby", "isbn": "9780547928227", "cover": "https://covers.openlibrary.org/b/isbn/9780547928227-L.jpg" },
-        { "title": "The Alchemist", "author": "Paulo Coelho", "price": 71.78, "category": "Fiction", "condition": "Like New", "stock": "In Stock", "gradient": "code", "isbn": "9780062315007", "cover": "https://covers.openlibrary.org/b/isbn/9780062315007-L.jpg" },
-        { "title": "Animal Farm", "author": "George Orwell", "price": 63.0, "category": "Fiction", "condition": "Used", "stock": "In Stock", "gradient": "orwell", "isbn": "9780451526342", "cover": "https://covers.openlibrary.org/b/isbn/9780451526342-L.jpg" },
-        { "title": "Brave New World", "author": "Aldous Huxley", "price": 79.61, "category": "Fiction", "condition": "Used", "stock": "Limited Stock", "gradient": "orwell", "isbn": "9780060850524", "cover": "https://covers.openlibrary.org/b/isbn/9780060850524-L.jpg" },
-        { "title": "The Handmaid's Tale", "author": "Margaret Atwood", "price": 44.52, "category": "Fiction", "condition": "Like New", "stock": "In Stock", "gradient": "gatsby", "isbn": "9780385490818", "cover": "https://covers.openlibrary.org/b/isbn/9780385490818-L.jpg" }
+        { "title": "The Great Gatsby", "author": "F. Scott Fitzgerald", "price": 5437.33, "category": "FICTION", "condition": "USED", "stock": "Limited Stock", "gradient": "sapiens", "isbn": "9780743273565", "cover": "https://covers.openlibrary.org/b/isbn/9780743273565-L.jpg" },
+        { "title": "1984", "author": "George Orwell", "price": 1840.94, "category": "FICTION", "condition": "NEW", "stock": "Limited Stock", "gradient": "orwell", "isbn": "9780451524935", "cover": "https://covers.openlibrary.org/b/isbn/9780451524935-L.jpg" }
     ];
     displayBooks = [...allBooks];
     showPage(1);
@@ -88,9 +91,16 @@ function renderBooks(books) {
 
     const html = books.map(book => {
         const stockClass = book.stock.toLowerCase().replace(' ', '-');
+        const isLiked = localStorage.getItem(`liked_${book.isbn}`) === 'true';
+
         return `
-        <div class="card">
+        <div class="card premium">
             <div class="book-cover-container">
+                <button class="like-btn ${isLiked ? 'active' : ''}" onclick="toggleLike(this, '${book.isbn}')">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                </button>
                 <img class="book-cover" 
                      src="${book.cover}" 
                      alt="${book.title}"
@@ -114,12 +124,14 @@ function renderBooks(books) {
                     ${book.stock}
                 </div>
                 <div class="card-footer">
-                    <div class="book-price">₹${(book.price * USD_TO_INR).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</div>
+                    <div class="price-container">
+                        <div class="book-price">₹${book.price.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</div>
+                    </div>
                     <div class="card-actions">
-                        <button class="btn btn-outline btn-sm" onclick="addToCart('${book.title.replace(/'/g, "\\'")}', ${book.price})">
-                            <span style="font-size: 1.1rem;">🛒</span>
+                        <button class="btn-cart-img" onclick="addToCart('${book.title.replace(/'/g, "\\'")}', ${book.price})" title="Add to Cart">
+                            <img src="https://cdn-icons-png.flaticon.com/512/1170/1170678.png" alt="Cart">
                         </button>
-                        <button class="btn btn-primary btn-sm" onclick="buyNow('${book.title.replace(/'/g, "\\'")}', ${book.price})">Buy Now</button>
+                        <button class="btn-buy" onclick="buyNow('${book.title.replace(/'/g, "\\'")}', ${book.price})">Buy Now</button>
                     </div>
                 </div>
             </div>
@@ -128,6 +140,15 @@ function renderBooks(books) {
 
     grid.innerHTML = html;
 }
+
+window.toggleLike = (btn, isbn) => {
+    const isActive = btn.classList.toggle('active');
+    localStorage.setItem(`liked_${isbn}`, isActive);
+
+    // Optional: Add a small animation effect
+    btn.style.transform = 'scale(1.3)';
+    setTimeout(() => btn.style.transform = '', 200);
+};
 
 function showPage(page) {
     currentPage = page;
@@ -212,7 +233,7 @@ window.openQuickView = (isbn) => {
                     <span class="book-tag tag-category">${book.category}</span>
                     <span class="book-tag tag-condition">${book.condition}</span>
                 </div>
-                <div class="modal-price">₹${(book.price * USD_TO_INR).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</div>
+                <div class="modal-price">₹${book.price.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</div>
                 <p class="modal-description">
                     Experience the magic of "${book.title}" by ${book.author}. This ${book.condition.toLowerCase()} copy in the ${book.category} category is a must-have for any book lover.
                 </p>
@@ -232,6 +253,9 @@ window.closeModal = () => {
 };
 
 window.addToCart = (title, price) => {
+    const book = allBooks.find(b => b.title === title) || { title, price };
+    window.CartManager.addToCart(book);
+
     const notification = document.getElementById('quickCartNotification');
     const message = document.getElementById('quickCartMessage');
     message.textContent = `"${title}" has been added to your cart.`;
@@ -240,7 +264,9 @@ window.addToCart = (title, price) => {
 };
 
 window.buyNow = (title, price) => {
-    alert(`Redirecting to checkout for: ${title}`);
+    const book = allBooks.find(b => b.title === title) || { title, price };
+    window.CartManager.addToCart(book);
+    window.location.href = 'cart.html';
 };
 
 window.hideNotification = () => {
@@ -286,7 +312,7 @@ window.applyFilters = () => {
         const condMatch = selectedConditions.length === 0 || selectedConditions.includes(book.condition);
 
         let priceMatch = true;
-        const priceINR = book.price * USD_TO_INR;
+        const priceINR = book.price;
         if (priceRange === 'under-800') priceMatch = priceINR < 800;
         else if (priceRange === '800-2000') priceMatch = priceINR >= 800 && priceINR <= 2000;
         else if (priceRange === '2000-4000') priceMatch = priceINR > 2000 && priceINR <= 4000;
@@ -304,3 +330,4 @@ window.resetFilters = () => {
     displayBooks = [...allBooks];
     showPage(1);
 };
+

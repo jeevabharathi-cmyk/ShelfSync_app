@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout | ShelfSync</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="../js/cart-manager.js"></script>
+    <style>
+        :root {
+            --ss-primary: #2C5282;
+            --ss-primary-dark: #1A365D;
+            --ss-secondary: #1A202C;
+            --ss-accent: #C05621;
+            --ss-bg: #F7FAFC;
+            --ss-surface: #FFFFFF;
+            --ss-border: #E2E8F0;
+            --ss-text: #2D3748;
+            --ss-text-light: #718096;
+            --ss-success: #38A169;
+        }
+
+        body {
+            background: var(--ss-bg);
+            background-attachment: fixed;
+            color: var(--ss-text);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .checkout-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--spacing-xl) var(--spacing-md);
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: var(--spacing-xl);
+        }
+
+        .checkout-main {
+            display: grid;
+            gap: var(--spacing-lg);
+        }
+
+        .checkout-section {
+            background: var(--ss-surface);
+            border-radius: 12px;
+            padding: var(--spacing-lg);
+            border: 1px solid var(--ss-border);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-md);
+            border-bottom: 1px solid var(--ss-border);
+            padding-bottom: var(--spacing-sm);
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--ss-secondary);
+        }
+
+        .section-number {
+            background: var(--ss-primary);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        /* Address Styles */
+        .address-card {
+            border: 2px solid var(--ss-border);
+            border-radius: 10px;
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .address-card.selected {
+            border-color: var(--ss-primary);
+            background-color: rgba(44, 82, 130, 0.03);
+        }
+
+        .address-name {
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: var(--ss-secondary);
+        }
+
+        .address-details {
+            font-size: 0.9rem;
+            color: var(--ss-text-light);
+            line-height: 1.5;
+        }
+
+        /* Payment Styles */
+        .payment-option {
+            border: 1px solid var(--ss-border);
+            border-radius: 10px;
+            margin-bottom: var(--spacing-sm);
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .payment-option-header {
+            padding: var(--spacing-md);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            background: #fcfcfc;
+        }
+
+        .payment-option.active {
+            border-color: var(--ss-primary);
+            box-shadow: 0 0 0 1px var(--ss-primary);
+        }
+
+        .payment-option.active .payment-option-header {
+            background: white;
+        }
+
+        .payment-option-content {
+            padding: 0 var(--spacing-md);
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+        }
+
+        .payment-option.active .payment-option-content {
+            max-height: 500px;
+            padding: var(--spacing-md);
+            border-top: 1px solid var(--ss-border);
+        }
+
+        .radio-circle {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--ss-border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+        }
+
+        .payment-option.active .radio-circle {
+            border-color: var(--ss-primary);
+        }
+
+        .payment-option.active .radio-circle::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background: var(--ss-primary);
+            border-radius: 50%;
+        }
+
+        .bank-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .bank-item {
+            border: 1px solid var(--ss-border);
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .bank-item:hover {
+            border-color: var(--ss-primary);
+            color: var(--ss-primary);
+            background: rgba(44, 82, 130, 0.02);
+        }
+
+        /* Sidebar Styles */
+        .order-summary {
+            background: var(--ss-surface);
+            border-radius: 12px;
+            padding: var(--spacing-lg);
+            border: 1px solid var(--ss-border);
+            position: sticky;
+            top: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+            color: var(--ss-text-light);
+        }
+
+        .summary-total {
+            border-top: 2px solid var(--ss-border);
+            margin-top: 15px;
+            padding-top: 15px;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--ss-accent);
+        }
+
+        .btn-ss-primary {
+            background: var(--ss-primary);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            display: block;
+            width: 100%;
+            padding: 14px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1rem;
+            margin-top: 20px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px rgba(44, 82, 130, 0.2);
+        }
+
+        .btn-ss-primary:hover {
+            background: var(--ss-primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 8px rgba(44, 82, 130, 0.3);
+        }
+
+        /* Cart Item Styles */
+        .mini-cart-item {
+            display: flex;
+            gap: 20px;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--ss-border);
+        }
+
+        .mini-cart-item:last-child {
+            border-bottom: none;
+        }
+
+        .mini-thumb {
+            width: 70px;
+            height: 95px;
+            object-fit: cover;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .mini-details h4 {
+            margin: 0 0 6px;
+            font-size: 1rem;
+            color: var(--ss-secondary);
+            font-weight: 700;
+        }
+
+        .mini-details p {
+            margin: 0;
+            font-size: 0.85rem;
+            color: var(--ss-text-light);
+        }
+
+        .qty-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--ss-bg);
+            padding: 4px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--ss-border);
+            width: fit-content;
+        }
+
+        .qty-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: var(--ss-primary);
+            padding: 0 4px;
+            font-weight: 700;
+        }
+
+        .qty-input {
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: var(--ss-secondary);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--ss-secondary);
+            color: white;
+            padding: 16px 32px;
+            border-radius: 10px;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            font-weight: 600;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .toast.show {
+            display: block;
+        }
+
+        .btn-link {
+            color: var(--ss-primary);
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.9rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+
+        .btn-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar"
+        style="background: var(--ss-secondary); padding: 15px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        <div class="container" style="display: flex; align-items: center; justify-content: space-between;">
+            <a href="../index.html" class="logo"
+                style="color: white; font-size: 1.6rem; text-decoration: none; font-weight: 800; letter-spacing: -0.5px;">
+                ShelfSync<span style="color: var(--ss-accent);">.in</span>
+            </a>
+            <div style="color: rgba(255,255,255,0.8); font-size: 1rem; font-weight: 500;">
+                Secure Checkout
+            </div>
+            <div style="color: white;">
+                <svg style="width: 24px; height: 24px;" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                        d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
+                </svg>
+            </div>
+        </div>
+    </nav>
+
+    <div class="checkout-container">
+        <main class="checkout-main">
+            <!-- Section 1: Delivery Address -->
+            <section class="checkout-section">
+                <div class="section-header">
+                    <h2 class="section-title"><span class="section-number">1</span> Delivery Address</h2>
+                    <button class="btn-link">Change</button>
+                </div>
+                <div class="address-card selected">
+                    <div class="address-name">Jeeva Bharathi</div>
+                    <div class="address-details">
+                        123, Book Street, Knowledge Nagar<br>
+                        Chennai, Tamil Nadu 600001<br>
+                        India<br>
+                        Phone: +91 98765 43210
+                    </div>
+                </div>
+                <button class="btn btn-outline" style="font-size: 0.85rem; padding: 8px 16px; border-radius: 8px;">+ Add
+                    a new address</button>
+            </section>
+
+            <!-- Section 2: Payment Method -->
+            <section class="checkout-section">
+                <div class="section-header">
+                    <h2 class="section-title"><span class="section-number">2</span> Select a payment method</h2>
+                </div>
+
+                <div class="payment-options-list">
+                    <!-- Credit/Debit Card -->
+                    <div class="payment-option active" id="opt-card">
+                        <div class="payment-option-header" onclick="selectPayment('card')">
+                            <div class="radio-circle"></div>
+                            <div class="payment-option-title" style="font-weight: 600;">Credit or Debit Card</div>
+                        </div>
+                        <div class="payment-option-content">
+                            <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+                                <img src="https://img.icons8.com/color/48/000000/visa.png" width="36">
+                                <img src="https://img.icons8.com/color/48/000000/mastercard.png" width="36">
+                                <img src="https://img.icons8.com/color/48/000000/rupay.png" width="36">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Card number"
+                                    style="margin-bottom: 12px; border-radius: 8px;">
+                                <div style="display: flex; gap: 12px;">
+                                    <input type="text" class="form-control" placeholder="MM/YY"
+                                        style="border-radius: 8px;">
+                                    <input type="password" class="form-control" placeholder="CVV"
+                                        style="border-radius: 8px;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Net Banking -->
+                    <div class="payment-option" id="opt-netbanking">
+                        <div class="payment-option-header" onclick="selectPayment('netbanking')">
+                            <div class="radio-circle"></div>
+                            <div class="payment-option-title" style="font-weight: 600;">Net Banking</div>
+                        </div>
+                        <div class="payment-option-content">
+                            <select class="form-control" style="border-radius: 8px; margin-bottom: 15px;">
+                                <option>Choose an Option</option>
+                                <option>HDFC Bank</option>
+                                <option>ICICI Bank</option>
+                                <option>State Bank of India</option>
+                                <option>Axis Bank</option>
+                            </select>
+                            <div class="bank-grid">
+                                <div class="bank-item">HDFC</div>
+                                <div class="bank-item">ICICI</div>
+                                <div class="bank-item">SBI</div>
+                                <div class="bank-item">Axis</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Other UPI -->
+                    <div class="payment-option" id="opt-upi">
+                        <div class="payment-option-header" onclick="selectPayment('upi')">
+                            <div class="radio-circle"></div>
+                            <div class="payment-option-title" style="font-weight: 600;">Other UPI Apps</div>
+                        </div>
+                        <div class="payment-option-content">
+                            <p style="font-size: 0.85rem; color: var(--ss-text-light); margin-bottom: 12px;">Please
+                                enter your UPI ID</p>
+                            <div style="display: flex; gap: 12px;">
+                                <input type="text" class="form-control" placeholder="Ex: mobileNumber@upi"
+                                    style="border-radius: 8px;">
+                                <button class="btn btn-ss-primary"
+                                    style="width: auto; margin-top: 0; padding: 8px 20px;">Verify</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- EMI -->
+                    <div class="payment-option" id="opt-emi">
+                        <div class="payment-option-header" onclick="selectPayment('emi')">
+                            <div class="radio-circle"></div>
+                            <div class="payment-option-title" style="font-weight: 600;">EMI</div>
+                        </div>
+                        <div class="payment-option-content">
+                            <p style="font-size: 0.85rem; color: var(--ss-text-light);">No EMI options available for
+                                this order.</p>
+                        </div>
+                    </div>
+
+                    <!-- Cash on Delivery -->
+                    <div class="payment-option" id="opt-cod">
+                        <div class="payment-option-header" onclick="selectPayment('cod')">
+                            <div class="radio-circle"></div>
+                            <div class="payment-option-title" style="font-weight: 600;">Cash on Delivery</div>
+                        </div>
+                        <div class="payment-option-content">
+                            <p style="font-size: 0.85rem; color: var(--ss-text-light);">Scan & Pay using any UPI App or
+                                pay cash to the delivery associate.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Review Items -->
+            <section class="checkout-section">
+                <div class="section-header">
+                    <h2 class="section-title"><span class="section-number">3</span> Review items and delivery</h2>
+                </div>
+                <div id="reviewItems">
+                    <!-- Items will be injected here -->
+                </div>
+            </section>
+        </main>
+
+        <aside class="checkout-sidebar">
+            <div class="order-summary">
+                <button class="btn-ss-primary" id="placeOrderBtn" style="margin-top: 0; margin-bottom: 15px;">Use this
+                    payment method</button>
+                <p
+                    style="font-size: 0.75rem; color: var(--ss-text-light); text-align: center; margin-bottom: 15px; line-height: 1.4;">
+                    Choose a payment method to continue checking out. You'll still have a chance to review and edit your
+                    order before it's final.
+                </p>
+
+                <div style="height: 1px; background: var(--ss-border); margin: 15px 0;"></div>
+
+                <h3 style="font-size: 1.1rem; margin-bottom: 15px; color: var(--ss-secondary); font-weight: 700;">Order
+                    Summary</h3>
+                <div class="summary-row">
+                    <span>Items:</span>
+                    <span id="subtotalText">₹0.00</span>
+                </div>
+                <div class="summary-row">
+                    <span>Delivery:</span>
+                    <span id="deliveryText">₹50.00</span>
+                </div>
+                <div class="summary-row">
+                    <span>Total Tax:</span>
+                    <span id="taxText">₹0.00</span>
+                </div>
+                <div class="summary-total">
+                    <div class="summary-row" style="margin-bottom: 0;">
+                        <span>Order Total:</span>
+                        <span id="totalText">₹0.00</span>
+                    </div>
+                </div>
+
+                <div
+                    style="background: var(--ss-bg); padding: 12px; border-radius: 8px; margin-top: 20px; font-size: 0.8rem; border: 1px solid var(--ss-border);">
+                    <a href="#" class="btn-link" style="font-size: 0.8rem;">How are delivery costs calculated?</a>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <div id="toast" class="toast">Order Placed Successfully!</div>
+
+    <script>
+        function money(n) {
+            return `₹${Number(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        }
+
+        function selectPayment(method) {
+            document.querySelectorAll('.payment-option').forEach(opt => {
+                opt.classList.remove('active');
+            });
+            document.getElementById('opt-' + method).classList.add('active');
+        }
+
+        function renderCheckout() {
+            const items = window.CartManager.getCart();
+            const container = document.getElementById('reviewItems');
+
+            if (items.length === 0) {
+                container.innerHTML = '<p style="padding: 30px; text-align: center; color: var(--ss-text-light);">Your cart is empty. <a href="all-books.html" class="btn-link">Go back to shopping</a></p>';
+                updateTotals([]);
+                return;
+            }
+
+            container.innerHTML = '';
+            items.forEach(item => {
+                const el = document.createElement('div');
+                el.className = 'mini-cart-item';
+                el.innerHTML = `
+                    <img src="${item.cover || 'https://via.placeholder.com/70x95?text=' + item.title.charAt(0)}" class="mini-thumb">
+                    <div class="mini-details" style="flex: 1;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <h4 style="margin:0;">${item.title}</h4>
+                            <span style="color: var(--ss-accent); font-weight: 800; font-size: 1.1rem;">${money(item.price * item.quantity)}</span>
+                        </div>
+                        <p style="margin: 4px 0;">${item.author || 'Unknown Author'}</p>
+                        <div style="display: flex; align-items: center; gap: 20px; margin-top: 15px;">
+                            <div class="qty-control">
+                                <button class="qty-btn" onclick="updateQty('${item.title.replace(/'/g, "\\'")}', ${item.quantity - 1})">−</button>
+                                <span class="qty-input">${item.quantity}</span>
+                                <button class="qty-btn" onclick="updateQty('${item.title.replace(/'/g, "\\'")}', ${item.quantity + 1})">+</button>
+                            </div>
+                            <button onclick="removeItem('${item.title.replace(/'/g, "\\'")}')" class="btn-link" style="color: var(--ss-text-light); font-size: 0.85rem;">Remove</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(el);
+            });
+
+            updateTotals(items);
+        }
+
+        function updateQty(title, qty) {
+            if (qty < 1) {
+                removeItem(title);
+            } else {
+                window.CartManager.updateQuantity(title, qty);
+                renderCheckout();
+            }
+        }
+
+        function removeItem(title) {
+            window.CartManager.removeFromCart(title);
+            showToast('Item removed from cart');
+            renderCheckout();
+        }
+
+        function updateTotals(items) {
+            const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const delivery = items.length > 0 ? 50 : 0;
+            const tax = subtotal * 0.18;
+            const total = subtotal + delivery + tax;
+
+            document.getElementById('subtotalText').textContent = money(subtotal);
+            document.getElementById('deliveryText').textContent = money(delivery);
+            document.getElementById('taxText').textContent = money(tax);
+            document.getElementById('totalText').textContent = money(total);
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        document.getElementById('placeOrderBtn').onclick = () => {
+            const items = window.CartManager.getCart();
+            if (items.length === 0) {
+                showToast('Your cart is empty');
+                return;
+            }
+
+            const activeMethod = document.querySelector('.payment-option.active .payment-option-title').textContent;
+            showToast('Order Placed with ' + activeMethod + '!');
+
+            window.CartManager.clearCart();
+            setTimeout(() => {
+                window.location.href = '../index.html';
+            }, 2000);
+        };
+
+        // Initial render
+        renderCheckout();
+    </script>
+</body>
+
+</html>

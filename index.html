@@ -118,6 +118,7 @@
             <ul class="nav-links">
                 <li><a href="index.html" class="nav-link active">Home</a></li>
                 <li><a href="pages/all-books.html" class="nav-link">Browse Books</a></li>
+                <li><a href="pages/cart.html" class="nav-link">Cart</a></li>
                 <li><a href="pages/login-customer.html" class="btn btn-outline">Login</a></li>
                 <li><a href="pages/signup.html" class="btn btn-primary">Sign Up</a></li>
             </ul>
@@ -166,15 +167,34 @@
                                 The Great Gatsby
                             </div>
                             <div
-                                style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.1) 100%); pointer-events: none;">
+                                style="position: absolute; top: 15px; right: 15px; width: 36px; height: 36px; background: rgba(255, 255, 255, 0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #ef4444; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                                <svg style="width: 20px; height: 20px;" viewBox="0 0 24 24" fill="currentColor">
+                                    <path
+                                        d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                                </svg>
                             </div>
                         </div>
-                        <div class="card-body">
-                            <h3 class="card-title" style="font-size: 1.1rem;">The Great Gatsby</h3>
-                            <p class="card-subtitle">F. Scott Fitzgerald</p>
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <span style="font-weight: 700; color: var(--primary-color);">$12.99</span>
-                                <span class="badge badge-success">In Stock</span>
+                        <div class="card-body" style="padding: var(--spacing-lg);">
+                            <h3 class="card-title" style="font-size: 1.25rem; margin-bottom: 0.25rem;">The Great Gatsby
+                            </h3>
+                            <p class="card-subtitle" style="margin-bottom: var(--spacing-md);">F. Scott Fitzgerald</p>
+                            <div
+                                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-md);">
+                                <span
+                                    style="font-weight: 800; color: var(--primary-color); font-size: 1.25rem;">₹5,437.33</span>
+                                <span class="badge badge-warning">Limited Stock</span>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn btn-outline"
+                                    onclick="event.preventDefault(); addToCart('The Great Gatsby', 5437.33)"
+                                    style="padding: 8px; flex: 0 0 42px; display: flex; align-items: center; justify-content: center;">
+                                    <img src="https://cdn-icons-png.flaticon.com/512/1170/1170678.png"
+                                        style="width: 20px; height: 20px;" alt="Cart">
+                                </button>
+                                <button class="btn btn-primary"
+                                    onclick="event.preventDefault(); buyNow('The Great Gatsby', 5437.33)"
+                                    style="flex: 1; font-weight: 700; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em;">Buy
+                                    Now</button>
                             </div>
                         </div>
                     </div>
@@ -193,15 +213,34 @@
                                 1984
                             </div>
                             <div
-                                style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.1) 100%); pointer-events: none;">
+                                style="position: absolute; top: 15px; right: 15px; width: 36px; height: 36px; background: rgba(255, 255, 255, 0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #cbd5e0; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                                <svg style="width: 20px; height: 20px;" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path
+                                        d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                                </svg>
                             </div>
                         </div>
-                        <div class="card-body">
-                            <h3 class="card-title" style="font-size: 1.1rem;">1984</h3>
-                            <p class="card-subtitle">George Orwell</p>
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <span style="font-weight: 700; color: var(--primary-color);">$10.50</span>
-                                <span class="badge badge-warning">Low Stock</span>
+                        <div class="card-body" style="padding: var(--spacing-lg);">
+                            <h3 class="card-title" style="font-size: 1.25rem; margin-bottom: 0.25rem;">1984</h3>
+                            <p class="card-subtitle" style="margin-bottom: var(--spacing-md);">George Orwell</p>
+                            <div
+                                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-md);">
+                                <span
+                                    style="font-weight: 800; color: var(--primary-color); font-size: 1.25rem;">₹1,840.94</span>
+                                <span class="badge badge-success">In Stock</span>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn btn-outline"
+                                    onclick="event.preventDefault(); addToCart('1984', 1840.94)"
+                                    style="padding: 8px; flex: 0 0 42px; display: flex; align-items: center; justify-content: center;">
+                                    <img src="https://cdn-icons-png.flaticon.com/512/1170/1170678.png"
+                                        style="width: 20px; height: 20px;" alt="Cart">
+                                </button>
+                                <button class="btn btn-primary"
+                                    onclick="event.preventDefault(); buyNow('1984', 1840.94)"
+                                    style="flex: 1; font-weight: 700; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em;">Buy
+                                    Now</button>
                             </div>
                         </div>
                     </div>
@@ -220,15 +259,31 @@
                                 Clean Code
                             </div>
                             <div
-                                style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.1) 100%); pointer-events: none;">
+                                style="position: absolute; top: 15px; right: 15px; width: 36px; height: 36px; background: rgba(255, 255, 255, 0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #ef4444; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                                <svg style="width: 20px; height: 20px;" viewBox="0 0 24 24" fill="currentColor">
+                                    <path
+                                        d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                                </svg>
                             </div>
                         </div>
-                        <div class="card-body">
-                            <h3 class="card-title" style="font-size: 1.1rem;">Clean Code</h3>
-                            <p class="card-subtitle">Robert C. Martin</p>
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <span style="font-weight: 700; color: var(--primary-color);">$35.00</span>
+                        <div class="card-body" style="padding: var(--spacing-lg);">
+                            <h3 class="card-title" style="font-size: 1.25rem; margin-bottom: 0.25rem;">Clean Code</h3>
+                            <p class="card-subtitle" style="margin-bottom: var(--spacing-md);">Robert C. Martin</p>
+                            <div
+                                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-md);">
+                                <span
+                                    style="font-weight: 800; color: var(--primary-color); font-size: 1.25rem;">₹2,905.00</span>
                                 <span class="badge badge-success">In Stock</span>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn btn-outline"
+                                    style="padding: 8px; flex: 0 0 42px; display: flex; align-items: center; justify-content: center;">
+                                    <img src="https://cdn-icons-png.flaticon.com/512/1170/1170678.png"
+                                        style="width: 20px; height: 20px;" alt="Cart">
+                                </button>
+                                <button class="btn btn-primary"
+                                    style="flex: 1; font-weight: 700; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em;">Buy
+                                    Now</button>
                             </div>
                         </div>
                     </div>
@@ -247,15 +302,35 @@
                                 Design Patterns
                             </div>
                             <div
-                                style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.1) 100%); pointer-events: none;">
+                                style="position: absolute; top: 15px; right: 15px; width: 36px; height: 36px; background: rgba(255, 255, 255, 0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #cbd5e0; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                                <svg style="width: 20px; height: 20px;" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path
+                                        d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                                </svg>
                             </div>
                         </div>
-                        <div class="card-body">
-                            <h3 class="card-title" style="font-size: 1.1rem;">Design Patterns</h3>
-                            <p class="card-subtitle">Gang of Four</p>
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <span style="font-weight: 700; color: var(--primary-color);">$42.00</span>
+                        <div class="card-body" style="padding: var(--spacing-lg);">
+                            <h3 class="card-title" style="font-size: 1.25rem; margin-bottom: 0.25rem;">Design Patterns
+                            </h3>
+                            <p class="card-subtitle" style="margin-bottom: var(--spacing-md);">Gang of Four</p>
+                            <div
+                                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-md);">
+                                <span
+                                    style="font-weight: 800; color: var(--primary-color); font-size: 1.25rem;">₹3,486.00</span>
                                 <span class="badge badge-success">In Stock</span>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn btn-outline"
+                                    onclick="event.preventDefault(); addToCart('Design Patterns', 3486.00)"
+                                    style="padding: 8px; flex: 0 0 42px; display: flex; align-items: center; justify-content: center;">
+                                    <img src="https://cdn-icons-png.flaticon.com/512/1170/1170678.png"
+                                        style="width: 20px; height: 20px;" alt="Cart">
+                                </button>
+                                <button class="btn btn-primary"
+                                    onclick="event.preventDefault(); buyNow('Design Patterns', 3486.00)"
+                                    style="flex: 1; font-weight: 700; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em;">Buy
+                                    Now</button>
                             </div>
                         </div>
                     </div>
@@ -334,6 +409,44 @@
         </div>
     </footer>
 
+    <div class="cart-notification" id="quickCartNotification">
+        <div class="cart-notification-header">
+            <div class="cart-notification-icon">🛒</div>
+            <div>
+                <div class="cart-notification-title">Added to Cart!</div>
+                <div class="cart-notification-message" id="quickCartMessage">Book has been added to your cart.</div>
+            </div>
+        </div>
+        <div class="cart-notification-actions">
+            <button class="btn btn-outline" onclick="hideNotification()">Continue Shopping</button>
+            <button class="btn btn-primary" onclick="goToCart()">View Cart</button>
+        </div>
+    </div>
+
+    <script src="js/cart-manager.js"></script>
+    <script>
+        window.addToCart = (title, price) => {
+            window.CartManager.addToCart({ title, price });
+            const notification = document.getElementById('quickCartNotification');
+            const message = document.getElementById('quickCartMessage');
+            message.textContent = `"${title}" has been added to your cart.`;
+            notification.classList.add('show');
+            setTimeout(() => notification.classList.remove('show'), 5000);
+        };
+
+        window.buyNow = (title, price) => {
+            window.CartManager.addToCart({ title, price });
+            window.location.href = 'pages/cart.html';
+        };
+
+        window.hideNotification = () => {
+            document.getElementById('quickCartNotification').classList.remove('show');
+        };
+
+        window.goToCart = () => {
+            window.location.href = 'pages/cart.html';
+        };
+    </script>
 </body>
 
 </html>
