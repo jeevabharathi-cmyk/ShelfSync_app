@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Quick Fix | ShelfSync</title>
+    <script type="importmap">
+    {
+      "imports": {
+        "firebase/app": "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js",
+        "firebase/auth": "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js",
+        "firebase/firestore": "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"
+      }
+    }
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f0f4f8;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #2563eb;
+        }
+
+        .alert {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .alert-error {
+            background: #fee;
+            color: #c00;
+        }
+
+        .alert-success {
+            background: #efe;
+            color: #0c0;
+        }
+
+        .alert-warning {
+            background: #ffe;
+            color: #c90;
+        }
+
+        .alert-info {
+            background: #eef;
+            color: #009;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #10b981;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+
+        .step {
+            background: #f8fafc;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #2563eb;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🔧 Firebase Database Quick Fix</h1>
+        <p>This tool will initialize your Firestore database and create the test user profile.</p>
+
+        <div id="status" class="alert alert-info">
+            ⏳ Ready to start. Click the button below to fix your database.
+        </div>
+
+        <button onclick="fixDatabase()" id="fixBtn">🚀 Initialize & Fix Database</button>
+
+        <div id="logs"></div>
+
+        <div class="step">
+            <h3>📋 What is the Issue?</h3>
+            <p>The error "Failed to get document because the client is offline" means:</p>
+            <ul>
+                <li>Your Firestore database hasn't been created in Firebase Console yet</li>
+                <li>OR the database exists but has permission issues</li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <h3>✅ What This Tool Does:</h3>
+            <ol>
+                <li>Tests connection to Firebase Authentication</li>
+                <li>Tests connection to Firestore</li>
+                <li>Creates the database if it doesn't exist (by adding a document)</li>
+                <li>Creates a seller profile for: jackdoe628@gmail.com</li>
+                <li>Verifies everything is working</li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h3>⚠️ If This Doesn't Work:</h3>
+            <p>You need to create the database manually:</p>
+            <ol>
+                <li>Go to: <a href="https://console.firebase.google.com/project/shelfsync-6fedf/firestore"
+                        target="_blank">Firebase Console - Firestore</a></li>
+                <li>Click "Create Database"</li>
+                <li>Choose location: <strong>nam5 (us-central)</strong></li>
+                <li>Start in <strong>Test Mode</strong></li>
+                <li>Click "Enable"</li>
+                <li>Come back here and run this tool again</li>
+            </ol>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'firebase/app';
+        import { getAuth, onAuthStateChanged } from 'firebase/auth';
+        import { getFirestore, collection, doc, setDoc, getDoc, getDocs } from 'firebase/firestore';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDfyqcchPmY0MvKCaJQmwP0ILyf9UODMis",
+            authDomain: "shelfsync-6fedf.firebaseapp.com",
+            projectId: "shelfsync-6fedf",
+            storageBucket: "shelfsync-6fedf.firebasestorage.app",
+            messagingSenderId: "328141524902",
+            appId: "1:328141524902:web:5616c7b58d48deda3f0967",
+            measurementId: "G-2SSZLVQ1Z8"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        function log(message, type = 'info') {
+            const logsDiv = document.getElementById('logs');
+            const alertClass = `alert alert-${type}`;
+            logsDiv.innerHTML += `<div class="${alertClass}">${message}</div>`;
+            console.log(message);
+        }
+
+        function updateStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = `alert alert-${type}`;
+            statusDiv.innerHTML = message;
+        }
+
+        window.fixDatabase = async function () {
+            const btn = document.getElementById('fixBtn');
+            btn.disabled = true;
+            document.getElementById('logs').innerHTML = '';
+
+            try {
+                // Step 1: Check Authentication
+                updateStatus('⏳ Step 1/5: Checking Firebase Authentication...', 'info');
+                log('🔐 Checking if user is authenticated...', 'info');
+
+                const currentUser = await new Promise((resolve) => {
+                    onAuthStateChanged(auth, (user) => resolve(user));
+                });
+
+                if (!currentUser) {
+                    throw new Error('You are not logged in! Please log in with jackdoe628@gmail.com first, then run this tool.');
+                }
+
+                log(`✅ Authenticated as: ${currentUser.email} (UID: ${currentUser.uid})`, 'success');
+
+                // Step 2: Test Firestore Connection
+                updateStatus('⏳ Step 2/5: Testing Firestore connection...', 'info');
+                log('🗄️ Attempting to connect to Firestore...', 'info');
+
+                try {
+                    const testDoc = await getDoc(doc(db, 'users', 'test'));
+                    log('✅ Firestore is accessible!', 'success');
+                } catch (firestoreError) {
+                    if (firestoreError.code === 'not-found' || firestoreError.message.includes('database (default) does not exist')) {
+                        log('❌ Database does not exist yet!', 'error');
+                        log('📝 Attempting to create it by adding a document...', 'warning');
+                    } else {
+                        throw firestoreError;
+                    }
+                }
+
+                // Step 3: Initialize Collections
+                updateStatus('⏳ Step 3/5: Initializing database collections...', 'info');
+                log('📁 Creating test documents in collections...', 'info');
+
+                // Create init doc in users collection
+                await setDoc(doc(db, 'users', 'init-doc'), {
+                    purpose: 'Database initialization',
+                    createdAt: new Date(),
+                    note: 'This document can be deleted'
+                });
+                log('✅ Created users collection', 'success');
+
+                // Create init doc in sellers collection  
+                await setDoc(doc(db, 'sellers', 'init-doc'), {
+                    purpose: 'Database initialization',
+                    createdAt: new Date(),
+                    note: 'This document can be deleted'
+                });
+                log('✅ Created sellers collection', 'success');
+
+                // Step 4: Create User Profile
+                updateStatus('⏳ Step 4/5: Creating your seller profile...', 'info');
+                log(`📝 Creating seller profile for ${currentUser.email}...`, 'info');
+
+                await setDoc(doc(db, 'sellers', currentUser.uid), {
+                    email: currentUser.email,
+                    role: 'seller',
+                    createdAt: new Date(),
+                    storeName: 'My Bookstore',
+                    verified: true
+                });
+                log('✅ Seller profile created!', 'success');
+
+                // Step 5: Verify Data
+                updateStatus('⏳ Step 5/5: Verifying data...', 'info');
+                log('🔍 Verifying your profile was saved...', 'info');
+
+                const userDoc = await getDoc(doc(db, 'sellers', currentUser.uid));
+                if (userDoc.exists()) {
+                    log(`✅ Profile verified! Role: ${userDoc.data().role}`, 'success');
+                    log(`<pre>${JSON.stringify(userDoc.data(), null, 2)}</pre>`, 'success');
+                } else {
+                    throw new Error('Profile verification failed');
+                }
+
+                // Final Success
+                updateStatus('🎉 Database initialized successfully! Your login should work now.', 'success');
+                log('✨ All done! Try logging in again.', 'success');
+
+            } catch (error) {
+                console.error('Error:', error);
+                updateStatus(`❌ Error: ${error.message}`, 'error');
+                log(`❌ ${error.message}`, 'error');
+
+                if (error.code === 'not-found' || error.message.includes('database (default) does not exist')) {
+                    log('⚠️ The database needs to be created in Firebase Console first. See instructions above.', 'warning');
+                }
+            } finally {
+                btn.disabled = false;
+            }
+        };
+
+        // Auto-check on load
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                log(`👤 You are logged in as: ${user.email}`, 'info');
+            } else {
+                log('⚠️ You are not logged in. Please log in first before running this tool.', 'warning');
+            }
+        });
+    </script>
+</body>
+
+</html>
