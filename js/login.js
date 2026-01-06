@@ -1,6 +1,6 @@
 import { auth, db } from './firebase-config.js';
-import { signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 
 /**
  * Generic Login logic for ShelfSync
@@ -8,11 +8,21 @@ import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-
  */
 
 // Function to handle redirection based on role
+// Function to handle redirection based on role
 async function redirectBasedOnRole(user) {
     try {
         console.log("Checking role for user:", user.email);
-        const userDocRef = doc(db, "users", user.uid);
-        const userSnap = await getDoc(userDocRef);
+
+        // First check 'users' collection
+        let userDocRef = doc(db, "users", user.uid);
+        let userSnap = await getDoc(userDocRef);
+
+        // If not found in 'users', check 'sellers' collection
+        if (!userSnap.exists()) {
+            console.log("User not found in 'users' collection, checking 'sellers'...");
+            userDocRef = doc(db, "sellers", user.uid);
+            userSnap = await getDoc(userDocRef);
+        }
 
         if (userSnap.exists()) {
             const userData = userSnap.data();
@@ -39,13 +49,14 @@ async function redirectBasedOnRole(user) {
             }
         } else {
             console.error("No user document found for UID:", user.uid);
-            alert("User profile not found. Please ensure you have registered correctly.");
+            throw new Error("User profile not found. Please ensure you have registered correctly.");
         }
     } catch (error) {
         console.error("Error in redirectBasedOnRole:", error);
-        alert("Error fetching user data: " + error.message);
+        throw error; // Re-throw to be handled by the caller
     }
 }
+
 
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Check if user is already logged in for automatic redirection
@@ -54,7 +65,9 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log("User already logged in, checking role...");
             // Only redirect if we are on a login page
             if (window.location.pathname.includes('login-')) {
-                redirectBasedOnRole(user);
+                redirectBasedOnRole(user).catch(err => {
+                    console.error("Auto-redirect failed:", err);
+                });
             }
         }
     });
@@ -95,9 +108,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 message = "Too many failed attempts. Please try again later.";
             } else if (error.code === 'auth/network-request-failed') {
                 message = "Network error. Please check your internet connection.";
+            } else if (error.message) {
+                message = error.message;
             }
 
             alert(message);
         }
     });
 });
+

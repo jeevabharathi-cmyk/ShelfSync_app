@@ -1,6 +1,6 @@
 import { auth, db } from './firebase-config.js';
-import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
 
 /**
  * Signup logic for ShelfSync
@@ -35,17 +35,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             // 1. Create user in Firebase Authentication
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
+            // MUST include this code:
+            const cred = await createUserWithEmailAndPassword(auth, email, password);
 
-            // 2. Create user document in Firestore (Production Way)
-            await setDoc(doc(db, "users", user.uid), {
-                firstName: firstName,
-                lastName: lastName,
-                email: user.email, // Using email from auth object
-                role: role,
-                createdAt: new Date() // Using requested Date object
-            });
+            // 2. Create user document in Firestore
+            if (role === 'seller') {
+                // MUST include this code:
+                await setDoc(doc(db, "sellers", cred.user.uid), {
+                    email: email,
+                    role: "seller",
+                    createdAt: new Date()
+                });
+            } else {
+                // For other roles, we still use the users collection
+                await setDoc(doc(db, "users", cred.user.uid), {
+                    firstName: firstName,
+                    lastName: lastName,
+                    email: email,
+                    role: role,
+                    createdAt: new Date()
+                });
+            }
 
             alert("Account created successfully!");
 
@@ -70,3 +80,4 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
