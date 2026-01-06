@@ -13,43 +13,55 @@ async function redirectBasedOnRole(user) {
         const currentPath = window.location.pathname;
         console.log("Checking role for user:", user.email, "Current Page:", currentPath);
 
-        let role = null;
-
-        // 1. Determine role based on the specific login page (Primary Logic)
+        // Determine which portal the user is logging in from
+        let expectedRole = null;
         if (currentPath.includes('login-seller.html')) {
-            role = 'seller';
+            expectedRole = 'seller';
         } else if (currentPath.includes('login-admin.html')) {
-            role = 'admin';
+            expectedRole = 'admin';
         } else if (currentPath.includes('login-customer.html')) {
-            role = 'customer';
+            expectedRole = 'customer';
         }
 
-        // 2. If we couldn't determine role from the page (e.g., auto-login from index), check Firestore
-        if (!role) {
-            try {
-                let userDocRef = doc(db, "users", user.uid);
-                let userSnap = await getDoc(userDocRef);
+        let actualRole = null;
 
-                if (!userSnap.exists()) {
-                    userDocRef = doc(db, "sellers", user.uid);
-                    userSnap = await getDoc(userDocRef);
-                }
+        // Try to get the user's actual role from Firestore
+        try {
+            let userDocRef = doc(db, "users", user.uid);
+            let userSnap = await getDoc(userDocRef);
 
-                if (userSnap.exists()) {
-                    role = userSnap.data().role;
-                }
-            } catch (dbError) {
-                console.warn("Firestore unavailable, but proceeding with page-based role if possible.");
+            if (!userSnap.exists()) {
+                console.log("User not found in 'users' collection, checking 'sellers'...");
+                userDocRef = doc(db, "sellers", user.uid);
+                userSnap = await getDoc(userDocRef);
+            }
+
+            if (userSnap.exists()) {
+                actualRole = userSnap.data().role;
+                console.log("Role from Firestore:", actualRole);
+            }
+        } catch (dbError) {
+            console.warn("Firestore error:", dbError);
+
+            // FALLBACK: If database doesn't exist and user is on a specific portal, use that
+            if (expectedRole && (dbError.code === 'not-found' || dbError.message.includes('database (default) does not exist'))) {
+                console.log("Firestore unavailable. Using portal-based role:", expectedRole);
+                actualRole = expectedRole;
+            } else {
+                throw dbError;
             }
         }
 
-        // 3. Final Fallback for the test user if still no role
-        if (!role && user.email === 'jackdoe628@gmail.com') {
-            role = 'seller'; // Default for this specific test account
+        // Validate that the user's role matches the portal they're using
+        if (expectedRole && actualRole && expectedRole !== actualRole) {
+            throw new Error(`Access denied. This portal is for ${expectedRole}s only. Your account is registered as a ${actualRole}.`);
         }
 
+        // Use actualRole if we have it, otherwise fall back to expectedRole
+        const role = actualRole || expectedRole;
+
         if (role) {
-            console.log("Role determined:", role);
+            console.log("Final role determined:", role);
             const isInsidePages = currentPath.includes('/pages/');
 
             let targetPage = "";
@@ -66,7 +78,7 @@ async function redirectBasedOnRole(user) {
             }
         }
 
-        throw new Error("Could not determine user role. Please ensure you are using the correct login page.");
+        throw new Error("Could not determine user role. Please ensure you have registered correctly.");
 
     } catch (error) {
         console.error("Error in redirectBasedOnRole:", error);
