@@ -90,15 +90,33 @@
                 </div>
                 <div class="form-group">
                     <label class="form-label">Password</label>
-                    <div class="container">
-                        <div class="footer-bottom">
-                            <p>&copy; 2025 ShelfSync. All rights reserved.</p>
-                        </div>
-                    </div>
-                    </footer>
+                    <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block"
+                    style="background-color: var(--accent-color);">Login to Dashboard</button>
+            </form>
 
-                    <!-- Firebase Configuration and Logic -->
-                    <script type="importmap">
+            <div class="auth-links">
+                <p>Want to sell with us? <a href="signup.html">Register as a Seller</a></p>
+                <p style="margin-top: 10px; border-top: 1px solid #eee; padding-top: 10px;">
+                    <small>Having trouble? <a href="../firebase-direct-fix.html" style="color: #f59e0b;">Run First-Time
+                            Setup</a></small>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2025 ShelfSync. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Firebase Configuration and Logic -->
+    <script type="importmap">
     {
       "imports": {
         "firebase/app": "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js",
@@ -107,7 +125,7 @@
       }
     }
     </script>
-                    <script type="module" src="../js/login.js"></script>
+    <script type="module" src="../js/login.js"></script>
 </body>
 
 </html>
