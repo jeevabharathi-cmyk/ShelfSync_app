@@ -322,281 +322,90 @@
             border-radius: 10px;
             display: none;
             z-index: 1000;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            font-weight: 600;
-            animation: slideUp 0.3s ease-out;
-        }
+            style="background: var(--ss-secondary); padding: 15px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.1);"><div class="container" style="display: flex; align-items: center; justify-content: space-between;"><a href="../index.html" class="logo"
+            style="color: white; font-size: 1.6rem; text-decoration: none; font-weight: 800; letter-spacing: -0.5px;">ShelfSync </a><div style="color: white;"><svg style="width: 24px; height: 24px;" fill="currentColor" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" /></svg></div></div></nav><div class="checkout-container"><main class="checkout-main">< !-- Section 1: Delivery Address --> <section class="checkout-section" > <div class="section-header" > <h2 class="section-title" ><span class="section-number" >1</span> Delivery Address</h2> <button class="btn-link" onclick="openAddressModal()" >Change</button> </div> <div class="address-card selected" > <div class="address-name" >Jeeva Bharathi</div> <div class="address-details" > 123, Book Street, Knowledge Nagar<br> Chennai, Tamil Nadu 600001<br> India<br> Phone: +91 98765 43210 </div> </div> <button class="btn btn-outline" style="font-size: 0.85rem; padding: 8px 16px; border-radius: 8px;"
+                onclick="openAddressModal()" >+ Add a new address</button> </section> < !-- Section 2: Payment Method --> <section class="checkout-section" > <div class="section-header" > <h2 class="section-title" ><span class="section-number" >2</span> Select a payment method</h2> </div> <div class="payment-options-list" > < !-- Credit/Debit Card --> <div class="payment-option active" id="opt-card" > <div class="payment-option-header" onclick="selectPayment('card')" > <div class="radio-circle" ></div> <div class="payment-option-title" style="font-weight: 600;" >Credit or Debit Card</div> </div> <div class="payment-option-content" > <div style="display: flex; gap: 12px; margin-bottom: 20px;" > <img src="https://img.icons8.com/color/48/000000/visa.png" width="36" > <img src="https://img.icons8.com/color/48/000000/mastercard.png" width="36" > <img src="https://img.icons8.com/color/48/000000/rupay.png" width="36" > </div> <div class="form-group" > <input type="text" class="form-control" placeholder="Card number"
+                style="margin-bottom: 12px; border-radius: 8px;" > <div style="display: flex; gap: 12px;" > <input type="text" class="form-control" placeholder="MM/YY"
+                style="border-radius: 8px;" > <input type="password" class="form-control" placeholder="CVV"
+                style="border-radius: 8px;" > </div> </div> </div> </div> < !-- Net Banking --> <div class="payment-option" id="opt-netbanking" > <div class="payment-option-header" onclick="selectPayment('netbanking')" > <div class="radio-circle" ></div> <div class="payment-option-title" style="font-weight: 600;" >Net Banking</div> </div> <div class="payment-option-content" > <select class="form-control" style="border-radius: 8px; margin-bottom: 15px;" > <option>Choose an Option</option> <option>HDFC Bank</option> <option>ICICI Bank</option> <option>State Bank of India</option> <option>Axis Bank</option> </select> <div class="bank-grid" > <div class="bank-item" >HDFC</div> <div class="bank-item" >ICICI</div> <div class="bank-item" >SBI</div> <div class="bank-item" >Axis</div> </div> </div> </div> < !-- Other UPI --> <div class="payment-option" id="opt-upi" > <div class="payment-option-header" onclick="selectPayment('upi')" > <div class="radio-circle" ></div> <div class="payment-option-title" style="font-weight: 600;" >Other UPI Apps</div> </div> <div class="payment-option-content" > <p style="font-size: 0.85rem; color: var(--ss-text-light); margin-bottom: 12px;" >Please enter your UPI ID</p> <div style="display: flex; gap: 12px;" > <input type="text" class="form-control" placeholder="Ex: mobileNumber@upi"
+                style="border-radius: 8px;" > <button class="btn btn-ss-primary"
+                style="width: auto; margin-top: 0; padding: 8px 20px;" >Verify</button> </div> </div> </div> < !-- EMI --> <div class="payment-option" id="opt-emi" > <div class="payment-option-header" onclick="selectPayment('emi')" > <div class="radio-circle" ></div> <div class="payment-option-title" style="font-weight: 600;" >EMI</div> </div> <div class="payment-option-content" > <p style="font-size: 0.85rem; color: var(--ss-text-light);" >No EMI options available for this order.</p> </div> </div> < !-- Cash on Delivery --> <div class="payment-option" id="opt-cod" > <div class="payment-option-header" onclick="selectPayment('cod')" > <div class="radio-circle" ></div> <div class="payment-option-title" style="font-weight: 600;" >Cash on Delivery</div> </div> <div class="payment-option-content" > <p style="font-size: 0.85rem; color: var(--ss-text-light);" >Scan & Pay using any UPI App or pay cash to the delivery associate.</p> </div> </div> </div> </section> < !-- Section 3: Review Items --> <section class="checkout-section" > <div class="section-header" > <h2 class="section-title" ><span class="section-number" >3</span> Review items and delivery</h2> </div> <div id="reviewItems" > < !-- Items will be injected here --> </div> </section> </main> <aside class="checkout-sidebar" > <div class="order-summary" > <button class="btn-ss-primary" id="placeOrderBtn" style="margin-top: 0; margin-bottom: 15px;" >Use this payment method</button> <p style="font-size: 0.75rem; color: var(--ss-text-light); text-align: center; margin-bottom: 15px; line-height: 1.4;" > Choose a payment method to continue checking out. You'll still have a chance to review and edit your
+ order before it's final.
+ </p> <div style="height: 1px; background: var(--ss-border); margin: 15px 0;" ></div> <h3 style="font-size: 1.1rem; margin-bottom: 15px; color: var(--ss-secondary); font-weight: 700;" >Order Summary</h3> <div class="summary-row" > <span>Items:</span> <span id="subtotalText" >₹0.00</span> </div> <div class="summary-row" > <span>Delivery:</span> <span id="deliveryText" >₹50.00</span> </div> <div class="summary-row" > <span>Total Tax:</span> <span id="taxText" >₹0.00</span> </div> <div class="summary-total" > <div class="summary-row" style="margin-bottom: 0;" > <span>Order Total:</span> <span id="totalText" >₹0.00</span> </div> </div> <div style="background: var(--ss-bg); padding: 12px; border-radius: 8px; margin-top: 20px; font-size: 0.8rem; border: 1px solid var(--ss-border);" > <a href="#" class="btn-link" style="font-size: 0.8rem;" >How are delivery costs calculated?</a> </div> </div> </aside> </div> <div id="toast" class="toast" >Order Placed Successfully !</div> < !-- Address Modal --> <div class="modal-overlay" id="addressModal" > <div class="address-modal" > <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;" > <h3 style="margin:0; font-size: 1.25rem;" >Select Delivery Address</h3> <button onclick="closeAddressModal()"
+                style="background:none; border:none; font-size:1.5rem; cursor:pointer; color: var(--ss-text-light);" >&times;
+            </button></div><div id="addressList">< !-- Existing Address Item --><div class="address-option" onclick="selectAddress(this)"><div class="address-name">Jeeva Bharathi</div><div class="address-details">123,
+            Book Street,
+            Knowledge Nagar<br>Chennai,
+            Tamil Nadu 600001<br>India<br>Phone: +91 98765 43210 </div> </div> <button class="btn btn-outline" style="width:100%; margin-top: 10px;" onclick="openAddAddressMode()" >+ Add New Address</button> </div> <div id="addAddressForm" style="display:none;" > <button class="btn btn-outline"
+                style="margin-bottom:15px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;"
+                onclick="useCurrentLocation()" > <svg style="width:20px;height:20px" fill="none" stroke="currentColor" viewBox="0 0 24 24" > <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" > </path> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" ></path> </svg> Use Current Location </button> <div id="map" class="map-container" ></div> <div class="form-group" > <input type="text" class="form-control" id="newAddrName" placeholder="Full Name"
+                style="margin-bottom:10px;" > <input type="text" class="form-control" id="newAddrLine"
+                placeholder="Address Line (House No, Street)" style="margin-bottom:10px;" > <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;" > <input type="text" class="form-control" id="newAddrCity" placeholder="City"
+                style="margin-bottom:10px;" > <input type="text" class="form-control" id="newAddrZip" placeholder="ZIP Code"
 
-        @keyframes slideUp {
-            from {
-                transform: translateY(20px);
-                opacity: 0;
+                style="margin-bottom:10px;" > </div> </div> <div style="display:flex; gap:10px; margin-top: 15px;" > <button class="btn btn-ss-primary" style="margin:0; flex: 1;" onclick="saveNewAddress()" >Save Address</button> <button class="btn btn-outline" style="flex: 1;" onclick="showAddressList()" >Cancel</button> </div> </div> </div> </div> <script> function money(n) {
+                return `₹$ {
+                    Number(n || 0).toLocaleString('en-IN', {
+                        minimumFractionDigits: 2, maximumFractionDigits: 2
+                    })
             }
 
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .toast.show {
-            display: block;
-        }
-
-        .btn-link {
-            color: var(--ss-primary);
-            font-weight: 600;
-            text-decoration: none;
-            font-size: 0.9rem;
-            border: none;
-            background: none;
-            cursor: pointer;
-        }
-
-        .btn-link:hover {
-            text-decoration: underline;
-        }
-    </style>
-</head>
-
-<body>
-    <nav class="navbar"
-        style="background: var(--ss-secondary); padding: 15px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-        <div class="container" style="display: flex; align-items: center; justify-content: space-between;">
-            <a href="../index.html" class="logo"
-                style="color: white; font-size: 1.6rem; text-decoration: none; font-weight: 800; letter-spacing: -0.5px;">
-                ShelfSync<span style="color: var(--ss-accent);">.in</span>
-            </a>
-            <div style="color: rgba(255,255,255,0.8); font-size: 1rem; font-weight: 500;">
-                Secure Checkout
-            </div>
-            <div style="color: white;">
-                <svg style="width: 24px; height: 24px;" fill="currentColor" viewBox="0 0 24 24">
-                    <path
-                        d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
-                </svg>
-            </div>
-        </div>
-    </nav>
-
-    <div class="checkout-container">
-        <main class="checkout-main">
-            <!-- Section 1: Delivery Address -->
-            <section class="checkout-section">
-                <div class="section-header">
-                    <h2 class="section-title"><span class="section-number">1</span> Delivery Address</h2>
-                    <button class="btn-link">Change</button>
-                </div>
-                <div class="address-card selected">
-                    <div class="address-name">Jeeva Bharathi</div>
-                    <div class="address-details">
-                        123, Book Street, Knowledge Nagar<br>
-                        Chennai, Tamil Nadu 600001<br>
-                        India<br>
-                        Phone: +91 98765 43210
-                    </div>
-                </div>
-                <button class="btn btn-outline" style="font-size: 0.85rem; padding: 8px 16px; border-radius: 8px;">+ Add
-                    a new address</button>
-            </section>
-
-            <!-- Section 2: Payment Method -->
-            <section class="checkout-section">
-                <div class="section-header">
-                    <h2 class="section-title"><span class="section-number">2</span> Select a payment method</h2>
-                </div>
-
-                <div class="payment-options-list">
-                    <!-- Credit/Debit Card -->
-                    <div class="payment-option active" id="opt-card">
-                        <div class="payment-option-header" onclick="selectPayment('card')">
-                            <div class="radio-circle"></div>
-                            <div class="payment-option-title" style="font-weight: 600;">Credit or Debit Card</div>
-                        </div>
-                        <div class="payment-option-content">
-                            <div style="display: flex; gap: 12px; margin-bottom: 20px;">
-                                <img src="https://img.icons8.com/color/48/000000/visa.png" width="36">
-                                <img src="https://img.icons8.com/color/48/000000/mastercard.png" width="36">
-                                <img src="https://img.icons8.com/color/48/000000/rupay.png" width="36">
-                            </div>
-                            <div class="form-group">
-                                <input type="text" class="form-control" placeholder="Card number"
-                                    style="margin-bottom: 12px; border-radius: 8px;">
-                                <div style="display: flex; gap: 12px;">
-                                    <input type="text" class="form-control" placeholder="MM/YY"
-                                        style="border-radius: 8px;">
-                                    <input type="password" class="form-control" placeholder="CVV"
-                                        style="border-radius: 8px;">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Net Banking -->
-                    <div class="payment-option" id="opt-netbanking">
-                        <div class="payment-option-header" onclick="selectPayment('netbanking')">
-                            <div class="radio-circle"></div>
-                            <div class="payment-option-title" style="font-weight: 600;">Net Banking</div>
-                        </div>
-                        <div class="payment-option-content">
-                            <select class="form-control" style="border-radius: 8px; margin-bottom: 15px;">
-                                <option>Choose an Option</option>
-                                <option>HDFC Bank</option>
-                                <option>ICICI Bank</option>
-                                <option>State Bank of India</option>
-                                <option>Axis Bank</option>
-                            </select>
-                            <div class="bank-grid">
-                                <div class="bank-item">HDFC</div>
-                                <div class="bank-item">ICICI</div>
-                                <div class="bank-item">SBI</div>
-                                <div class="bank-item">Axis</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Other UPI -->
-                    <div class="payment-option" id="opt-upi">
-                        <div class="payment-option-header" onclick="selectPayment('upi')">
-                            <div class="radio-circle"></div>
-                            <div class="payment-option-title" style="font-weight: 600;">Other UPI Apps</div>
-                        </div>
-                        <div class="payment-option-content">
-                            <p style="font-size: 0.85rem; color: var(--ss-text-light); margin-bottom: 12px;">Please
-                                enter your UPI ID</p>
-                            <div style="display: flex; gap: 12px;">
-                                <input type="text" class="form-control" placeholder="Ex: mobileNumber@upi"
-                                    style="border-radius: 8px;">
-                                <button class="btn btn-ss-primary"
-                                    style="width: auto; margin-top: 0; padding: 8px 20px;">Verify</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- EMI -->
-                    <div class="payment-option" id="opt-emi">
-                        <div class="payment-option-header" onclick="selectPayment('emi')">
-                            <div class="radio-circle"></div>
-                            <div class="payment-option-title" style="font-weight: 600;">EMI</div>
-                        </div>
-                        <div class="payment-option-content">
-                            <p style="font-size: 0.85rem; color: var(--ss-text-light);">No EMI options available for
-                                this order.</p>
-                        </div>
-                    </div>
-
-                    <!-- Cash on Delivery -->
-                    <div class="payment-option" id="opt-cod">
-                        <div class="payment-option-header" onclick="selectPayment('cod')">
-                            <div class="radio-circle"></div>
-                            <div class="payment-option-title" style="font-weight: 600;">Cash on Delivery</div>
-                        </div>
-                        <div class="payment-option-content">
-                            <p style="font-size: 0.85rem; color: var(--ss-text-light);">Scan & Pay using any UPI App or
-                                pay cash to the delivery associate.</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Section 3: Review Items -->
-            <section class="checkout-section">
-                <div class="section-header">
-                    <h2 class="section-title"><span class="section-number">3</span> Review items and delivery</h2>
-                </div>
-                <div id="reviewItems">
-                    <!-- Items will be injected here -->
-                </div>
-            </section>
-        </main>
-
-        <aside class="checkout-sidebar">
-            <div class="order-summary">
-                <button class="btn-ss-primary" id="placeOrderBtn" style="margin-top: 0; margin-bottom: 15px;">Use this
-                    payment method</button>
-                <p
-                    style="font-size: 0.75rem; color: var(--ss-text-light); text-align: center; margin-bottom: 15px; line-height: 1.4;">
-                    Choose a payment method to continue checking out. You'll still have a chance to review and edit your
-                    order before it's final.
-                </p>
-
-                <div style="height: 1px; background: var(--ss-border); margin: 15px 0;"></div>
-
-                <h3 style="font-size: 1.1rem; margin-bottom: 15px; color: var(--ss-secondary); font-weight: 700;">Order
-                    Summary</h3>
-                <div class="summary-row">
-                    <span>Items:</span>
-                    <span id="subtotalText">₹0.00</span>
-                </div>
-                <div class="summary-row">
-                    <span>Delivery:</span>
-                    <span id="deliveryText">₹50.00</span>
-                </div>
-                <div class="summary-row">
-                    <span>Total Tax:</span>
-                    <span id="taxText">₹0.00</span>
-                </div>
-                <div class="summary-total">
-                    <div class="summary-row" style="margin-bottom: 0;">
-                        <span>Order Total:</span>
-                        <span id="totalText">₹0.00</span>
-                    </div>
-                </div>
-
-                <div
-                    style="background: var(--ss-bg); padding: 12px; border-radius: 8px; margin-top: 20px; font-size: 0.8rem; border: 1px solid var(--ss-border);">
-                    <a href="#" class="btn-link" style="font-size: 0.8rem;">How are delivery costs calculated?</a>
-                </div>
-            </div>
-        </aside>
-    </div>
-
-    <div id="toast" class="toast">Order Placed Successfully!</div>
-
-    <script>
-        function money(n) {
-            return `₹${Number(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            `;
         }
 
         function selectPayment(method) {
-            document.querySelectorAll('.payment-option').forEach(opt => {
-                opt.classList.remove('active');
-            });
+            document.querySelectorAll('.payment-option').forEach(opt=> {
+                    opt.classList.remove('active');
+                });
             document.getElementById('opt-' + method).classList.add('active');
         }
 
         function renderCheckout() {
-            const items = window.CartManager.getCart();
-            const container = document.getElementById('reviewItems');
+            const items=window.CartManager.getCart();
+            const container=document.getElementById('reviewItems');
 
-            if (items.length === 0) {
-                container.innerHTML = '<p style="padding: 30px; text-align: center; color: var(--ss-text-light);">Your cart is empty. <a href="all-books.html" class="btn-link">Go back to shopping</a></p>';
+            if (items.length===0) {
+                container.innerHTML='<p style="padding: 30px; text-align: center; color: var(--ss-text-light);">Your cart is empty. <a href="all-books.html" class="btn-link">Go back to shopping</a></p>';
                 updateTotals([]);
                 return;
             }
 
-            container.innerHTML = '';
-            items.forEach(item => {
-                const el = document.createElement('div');
-                el.className = 'mini-cart-item';
-                el.innerHTML = `
-                    <img src="${item.cover || 'https://via.placeholder.com/70x95?text=' + item.title.charAt(0)}" class="mini-thumb">
-                    <div class="mini-details" style="flex: 1;">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                            <h4 style="margin:0;">${item.title}</h4>
-                            <span style="color: var(--ss-accent); font-weight: 800; font-size: 1.1rem;">${money(item.price * item.quantity)}</span>
-                        </div>
-                        <p style="margin: 4px 0;">${item.author || 'Unknown Author'}</p>
-                        <div style="display: flex; align-items: center; gap: 20px; margin-top: 15px;">
-                            <div class="qty-control">
-                                <button class="qty-btn" onclick="updateQty('${item.title.replace(/'/g, "\\'")}', ${item.quantity - 1})">−</button>
-                                <span class="qty-input">${item.quantity}</span>
-                                <button class="qty-btn" onclick="updateQty('${item.title.replace(/'/g, "\\'")}', ${item.quantity + 1})">+</button>
-                            </div>
-                            <button onclick="removeItem('${item.title.replace(/'/g, "\\'")}')" class="btn-link" style="color: var(--ss-text-light); font-size: 0.85rem;">Remove</button>
-                        </div>
-                    </div>
-                `;
+            container.innerHTML='';
+
+            items.forEach(item=> {
+                    const el=document.createElement('div');
+                    el.className='mini-cart-item';
+
+                    el.innerHTML=` <img src="${item.cover || 'https://via.placeholder.com/70x95?text=' + item.title.charAt(0)}" class="mini-thumb" > <div class="mini-details" style="flex: 1;" > <div style="display: flex; justify-content: space-between; align-items: flex-start;" > <h4 style="margin:0;" >$ {
+                        item.title
+                    }
+
+                    </h4> <span style="color: var(--ss-accent); font-weight: 800; font-size: 1.1rem;" >$ {
+                        money(item.price * item.quantity)
+                    }
+
+                    </span> </div> <p style="margin: 4px 0;" >$ {
+                        item.author || 'Unknown Author'
+                    }
+
+                    </p> <div style="display: flex; align-items: center; gap: 20px; margin-top: 15px;" > <div class="qty-control" > <button class="qty-btn" onclick="updateQty('${item.title.replace(/'/g, " \\'")}', $ {
+                        item.quantity - 1
+
+                    })">−</button>
+ <span class="qty-input">$ {
+                    item.quantity
+                }
+
+                </span><button class="qty-btn" onclick="updateQty('${item.title.replace(/'/g, " \\'")}',
+                $ {
+                    item.quantity+1
+                })">+</button>
+ </div><button onclick="removeItem('${item.title.replace(/'/g, " \\'")}')" class=" btn-link" style=" color: var(--ss-text-light);
+                font-size: 0.85rem;
+                ">Remove</button>
+ </div></div>`;
                 container.appendChild(el);
             });
 
@@ -606,7 +415,9 @@
         function updateQty(title, qty) {
             if (qty < 1) {
                 removeItem(title);
-            } else {
+            }
+
+            else {
                 window.CartManager.updateQuantity(title, qty);
                 renderCheckout();
             }
@@ -619,43 +430,188 @@
         }
 
         function updateTotals(items) {
-            const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            const delivery = items.length > 0 ? 50 : 0;
-            const tax = subtotal * 0.18;
-            const total = subtotal + delivery + tax;
+            const subtotal=items.reduce((sum, item)=> sum + (item.price * item.quantity), 0);
+            const delivery=items.length>0 ? 50: 0;
+            const tax=subtotal * 0.18;
+            const total=subtotal+delivery+tax;
 
-            document.getElementById('subtotalText').textContent = money(subtotal);
-            document.getElementById('deliveryText').textContent = money(delivery);
-            document.getElementById('taxText').textContent = money(tax);
-            document.getElementById('totalText').textContent = money(total);
+            document.getElementById('subtotalText').textContent=money(subtotal);
+            document.getElementById('deliveryText').textContent=money(delivery);
+            document.getElementById('taxText').textContent=money(tax);
+            document.getElementById('totalText').textContent=money(total);
         }
 
         function showToast(msg) {
-            const toast = document.getElementById('toast');
-            toast.textContent = msg;
+            const toast=document.getElementById('toast');
+            toast.textContent=msg;
             toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
+            setTimeout(()=> toast.classList.remove('show'), 3000);
         }
 
-        document.getElementById('placeOrderBtn').onclick = () => {
-            const items = window.CartManager.getCart();
-            if (items.length === 0) {
+        document.getElementById('placeOrderBtn').onclick=()=> {
+            const items=window.CartManager.getCart();
+
+            if (items.length===0) {
                 showToast('Your cart is empty');
                 return;
             }
 
-            const activeMethod = document.querySelector('.payment-option.active .payment-option-title').textContent;
+            const activeMethod=document.querySelector('.payment-option.active .payment-option-title').textContent;
             showToast('Order Placed with ' + activeMethod + '!');
 
             window.CartManager.clearCart();
-            setTimeout(() => {
-                window.location.href = '../index.html';
-            }, 2000);
-        };
+
+            setTimeout(()=> {
+                    window.location.href='../index.html';
+                }
+
+                , 2000);
+        }
+
+        ;
 
         // Initial render
         renderCheckout();
-    </script>
-</body>
 
-</html>
+        // --- Address Modal & Map Logic ---
+
+        // Load Google Maps API (Placeholder Key)
+        (function () {
+                var script=document.createElement('script');
+                // REPLACE 'YOUR_GOOGLE_MAPS_API_KEY' WITH YOUR ACTUAL KEY
+                script.src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&callback=initMap";
+                script.async=true;
+                script.defer=true;
+                document.head.appendChild(script);
+            })();
+
+        let map,
+        marker;
+
+        function initMap() {
+
+            // Default to India Center
+            const defaultLoc= {
+                lat: 20.5937, lng: 78.9629
+            }
+
+            ;
+
+            map=new google.maps.Map(document.getElementById("map"), {
+                zoom: 5,
+                center: defaultLoc,
+                mapTypeControl: false,
+                streetViewControl: false
+            });
+
+        marker=new google.maps.Marker({
+            position: defaultLoc,
+            map: map,
+            draggable: true,
+            title: "Drag me to your location"
+        });
+
+        marker.addListener('dragend', function () {
+                const pos=marker.getPosition();
+                console.log("New position:", pos.toJSON());
+                // In a real app, use Geocoding API here to get address details
+            });
+        }
+
+        function openAddressModal() {
+            document.getElementById('addressModal').classList.add('show');
+            showAddressList();
+        }
+
+        function closeAddressModal() {
+            document.getElementById('addressModal').classList.remove('show');
+        }
+
+        function showAddressList() {
+            document.getElementById('addressList').style.display='block';
+            document.getElementById('addAddressForm').style.display='none';
+        }
+
+        function openAddAddressMode() {
+            document.getElementById('addressList').style.display='none';
+            document.getElementById('addAddressForm').style.display='block';
+
+            // Trigger map resize to prevent gray box
+            if (map) {
+                setTimeout(()=> {
+                        google.maps.event.trigger(map, 'resize');
+                        map.setCenter(marker.getPosition());
+                    }
+
+                    , 100);
+            }
+        }
+
+        function useCurrentLocation() {
+            if (navigator.geolocation) {
+                const btn=event.currentTarget;
+                const originalText=btn.innerHTML;
+                btn.innerHTML='Locating...';
+
+                navigator.geolocation.getCurrentPosition((position)=> {
+                        const pos= {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude,
+                        }
+
+                        ;
+                        map.setCenter(pos);
+                        map.setZoom(15);
+                        marker.setPosition(pos);
+
+                        // Mock auto-fill for demo
+                        document.getElementById('newAddrCity').value="Detected City";
+                        document.getElementById('newAddrZip').value="600000";
+
+                        btn.innerHTML=originalText;
+                    }
+
+                    ,
+                    (error)=> {
+                        alert("Error: The Geolocation service failed. " + error.message);
+                        btn.innerHTML=originalText;
+                    });
+            }
+
+            else {
+                alert("Error: Your browser doesn't support geolocation.");
+            }
+        }
+
+        function saveNewAddress() {
+            const name=document.getElementById('newAddrName').value;
+            const line=document.getElementById('newAddrLine').value;
+
+            if ( !name || !line) {
+                alert("Please fill in at least Name and Address Line");
+                return;
+            }
+
+            // In a real app, save to backend/localstorage
+            alert("Address Saved! (Mock)");
+            showAddressList();
+        }
+
+        function selectAddress(el) {
+            // Visual selection logic
+            document.querySelectorAll('.address-option').forEach(opt=> opt.style.borderColor='var(--ss-border)');
+            el.style.borderColor='var(--ss-primary)';
+
+            // Close modal after brief delay
+            setTimeout(()=> {
+                    closeAddressModal();
+                    // Update main view (mock)
+                    document.querySelector('.address-name').textContent=el.querySelector('.address-name').textContent;
+                    document.querySelector('.address-details').innerHTML=el.querySelector('.address-details').innerHTML;
+                    showToast("Delivery address updated");
+                }
+
+                , 300);
+        }
+
+        </script></body></html>
