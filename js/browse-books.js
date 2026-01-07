@@ -16,7 +16,8 @@ async function loadBooksData() {
 
     // Try to load Supabase dynamically - replaces Firebase
     try {
-        if (window.location.protocol !== 'file:' && supabase) {
+        if (window.location.protocol !== 'file:' && supabase && 
+            window.SUPABASE_URL && window.SUPABASE_URL !== "YOUR_SUPABASE_PROJECT_URL") {
             console.log('Fetching books from Supabase...');
             
             // Supabase query - replaces Firestore getDocs
@@ -36,9 +37,11 @@ async function loadBooksData() {
                 showPage(1);
                 return;
             }
+        } else {
+            console.log('Supabase not configured, falling back to local data...');
         }
     } catch (error) {
-        console.warn('Supabase not available or blocked by protocol:', error);
+        console.warn('Supabase error, falling back to local data:', error);
     }
 
     // Fallback to local data
@@ -47,24 +50,42 @@ async function loadBooksData() {
 
 async function loadLocalData() {
     try {
-        // Check if booksData is available from books-data.js (global variable)
-        if (typeof booksData !== 'undefined') {
+        console.log('Loading local data...');
+        
+        // First try to fetch the JSON file (more reliable)
+        try {
+            console.log('Attempting to fetch books-database.json...');
+            const response = await fetch('../books-database.json');
+            if (response.ok) {
+                const data = await response.json();
+                if (data.books && data.books.length > 0) {
+                    allBooks = data.books;
+                    console.log('Loaded ' + allBooks.length + ' books from JSON file');
+                    displayBooks = [...allBooks];
+                    showPage(1);
+                    return;
+                }
+            }
+        } catch (jsonError) {
+            console.log('JSON fetch failed:', jsonError);
+        }
+        
+        // Fallback to global variable
+        if (typeof booksData !== 'undefined' && booksData.length > 0) {
+            console.log('Found booksData global variable with', booksData.length, 'books');
             allBooks = booksData;
             console.log('Loaded ' + allBooks.length + ' books from global variable');
             displayBooks = [...allBooks];
             showPage(1);
-        } else {
-            console.log('Attempting to fetch books-database.json...');
-            const response = await fetch('../books-database.json');
-            if (!response.ok) throw new Error('Failed to fetch JSON');
-            const data = await response.json();
-            allBooks = data.books;
-            console.log('Loaded ' + allBooks.length + ' books from JSON file');
-            displayBooks = [...allBooks];
-            showPage(1);
+            return;
         }
+        
+        // If both fail, throw error to trigger embedded books
+        throw new Error('No local data sources available');
+        
     } catch (error) {
         console.error('Error loading local data:', error);
+        console.log('Falling back to embedded books...');
         loadEmbeddedBooks();
     }
 }
@@ -77,6 +98,7 @@ function loadEmbeddedBooks() {
         { "title": "1984", "author": "George Orwell", "price": 1840.94, "category": "FICTION", "condition": "NEW", "stock": "Limited Stock", "gradient": "orwell", "isbn": "9780451524935", "cover": "https://covers.openlibrary.org/b/isbn/9780451524935-L.jpg" }
     ];
     displayBooks = [...allBooks];
+    console.log('Embedded books loaded:', allBooks.length, 'books');
     showPage(1);
 }
 
