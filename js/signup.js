@@ -1,10 +1,10 @@
-import { auth, db } from './firebase-config.js';
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+// Supabase Authentication - Replaces Firebase Auth
+const supabase = window.supabaseClient;
 
 /**
  * Signup logic for ShelfSync
- * Handles user registration and profile creation in Firestore
+ * Handles user registration with Supabase Auth
+ * User profile creation handled by database trigger
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -34,32 +34,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            // 1. Create user in Firebase Authentication
-            // MUST include this code:
-            const cred = await createUserWithEmailAndPassword(auth, email, password);
+            // 1. Create user in Supabase Authentication - replaces Firebase createUserWithEmailAndPassword
+            const { data, error } = await supabase.auth.signUp({
+                email: email,
+                password: password,
+                options: {
+                    data: {
+                        first_name: firstName,
+                        last_name: lastName,
+                        role: role
+                    }
+                }
+            });
 
-            // 2. Create user document in Firestore
-            if (role === 'seller') {
-                // MUST include this code:
-                await setDoc(doc(db, "sellers", cred.user.uid), {
-                    email: email,
-                    role: "seller",
-                    createdAt: new Date()
-                });
-            } else {
-                // For other roles, we still use the users collection
-                await setDoc(doc(db, "users", cred.user.uid), {
-                    firstName: firstName,
-                    lastName: lastName,
-                    email: email,
-                    role: role,
-                    createdAt: new Date()
-                });
-            }
+            if (error) throw error;
+
+            // 2. User profile creation handled by Supabase trigger
+            // No manual database insertion needed - trigger creates user/seller record
 
             alert("Account created successfully!");
 
-            // 3. Redirect based on role
+            // 3. Redirect based on role - EXACT same logic as Firebase
             if (role === 'seller') {
                 window.location.href = 'login-seller.html';
             } else {
@@ -69,11 +64,11 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error("Signup Error:", error);
             let message = "An error occurred during signup.";
-            if (error.code === 'auth/email-already-in-use') {
+            if (error.message?.includes('already registered')) {
                 message = "This email is already registered.";
-            } else if (error.code === 'auth/invalid-email') {
+            } else if (error.message?.includes('invalid email')) {
                 message = "Please enter a valid email address.";
-            } else if (error.code === 'auth/weak-password') {
+            } else if (error.message?.includes('weak password')) {
                 message = "The password is too weak.";
             }
             alert(message);

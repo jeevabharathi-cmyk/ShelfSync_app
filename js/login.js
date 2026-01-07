@@ -1,26 +1,30 @@
-import { auth, db } from './firebase-config.js';
-import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+// Supabase Authentication - Replaces Firebase Auth
+const supabase = window.supabaseClient;
 
 async function redirectBasedOnRole(user) {
     const path = window.location.pathname;
 
-    // STRICT: Seller portal -> 'sellers' collection, Others -> 'users' collection
-    const collectionName = path.includes("login-seller") ? "sellers" : "users";
+    // STRICT: Seller portal -> 'sellers' table, Others -> 'users' table
+    const tableName = path.includes("login-seller") ? "sellers" : "users";
 
-    console.log(`[Login] Checking role for UID: ${user.uid} in collection: ${collectionName}`);
+    console.log(`[Login] Checking role for UID: ${user.id} in table: ${tableName}`);
 
-    const snap = await getDoc(doc(db, collectionName, user.uid));
+    // Supabase query - replaces Firestore getDoc
+    const { data, error } = await supabase
+        .from(tableName)
+        .select('role')
+        .eq('id', user.id)
+        .single();
 
-    if (!snap.exists()) {
-        console.error(`[Login] Document not found in ${collectionName}`);
-        throw new Error(`User profile not found in ${collectionName}. Please contact support.`);
+    if (error || !data) {
+        console.error(`[Login] Document not found in ${tableName}:`, error);
+        throw new Error(`User profile not found in ${tableName}. Please contact support.`);
     }
 
-    const role = snap.data().role;
+    const role = data.role;
     console.log(`[Login] User role found: ${role}`);
 
-    // Portal validation
+    // Portal validation - EXACT same logic as Firebase
     if (path.includes("login-seller") && role !== "seller")
         throw new Error("Access denied. Seller account required.");
 
@@ -30,7 +34,7 @@ async function redirectBasedOnRole(user) {
     if (path.includes("login-customer") && role !== "customer")
         throw new Error("Access denied. Customer account required.");
 
-    // Redirect
+    // Redirect - EXACT same logic as Firebase
     if (role === "admin") window.location.href = "admin-dashboard.html";
     if (role === "seller") window.location.href = "seller-dashboard.html";
     if (role === "customer") window.location.href = "all-books.html";
@@ -38,9 +42,10 @@ async function redirectBasedOnRole(user) {
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    onAuthStateChanged(auth, (user) => {
-        if (user && window.location.pathname.includes("login-")) {
-            redirectBasedOnRole(user).catch(console.error);
+    // Supabase auth state listener - replaces Firebase onAuthStateChanged
+    supabase.auth.onAuthStateChange((event, session) => {
+        if (session?.user && window.location.pathname.includes("login-")) {
+            redirectBasedOnRole(session.user).catch(console.error);
         }
     });
 
@@ -54,8 +59,15 @@ document.addEventListener("DOMContentLoaded", () => {
         const password = document.getElementById('passwordInput').value;
 
         try {
-            const cred = await signInWithEmailAndPassword(auth, email, password);
-            await redirectBasedOnRole(cred.user);
+            // Supabase login - replaces Firebase signInWithEmailAndPassword
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
+
+            if (error) throw error;
+
+            await redirectBasedOnRole(data.user);
         } catch (err) {
             alert(err.message);
         }

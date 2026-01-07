@@ -1,6 +1,5 @@
-// Firebase will be loaded dynamically to support file:// protocol
-let db;
-let collection, getDocs;
+// Supabase will be loaded dynamically to support file:// protocol
+const supabase = window.supabaseClient;
 
 // Load books data from JSON file
 let allBooks = [];
@@ -15,32 +14,31 @@ document.addEventListener('DOMContentLoaded', loadBooksData);
 async function loadBooksData() {
     const grid = document.getElementById('booksGrid');
 
-    // Try to load Firebase dynamically
+    // Try to load Supabase dynamically - replaces Firebase
     try {
-        if (window.location.protocol !== 'file:') {
-            console.log('Fetching books from Firestore...');
-            const firebaseConfig = await import('./firebase-config.js');
-            db = firebaseConfig.db;
-            const firestore = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
-            collection = firestore.collection;
-            getDocs = firestore.getDocs;
+        if (window.location.protocol !== 'file:' && supabase) {
+            console.log('Fetching books from Supabase...');
+            
+            // Supabase query - replaces Firestore getDocs
+            const { data: books, error } = await supabase
+                .from('books')
+                .select('*');
 
-            const booksCollection = collection(db, 'books');
-            const snapshot = await getDocs(booksCollection);
+            if (error) throw error;
 
-            if (!snapshot.empty) {
-                allBooks = snapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
+            if (books && books.length > 0) {
+                allBooks = books.map(book => ({
+                    id: book.id,
+                    ...book
                 }));
-                console.log('Loaded ' + allBooks.length + ' books from Firestore');
+                console.log('Loaded ' + allBooks.length + ' books from Supabase');
                 displayBooks = [...allBooks];
                 showPage(1);
                 return;
             }
         }
     } catch (error) {
-        console.warn('Firestore not available or blocked by protocol:', error);
+        console.warn('Supabase not available or blocked by protocol:', error);
     }
 
     // Fallback to local data

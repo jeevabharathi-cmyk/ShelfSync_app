@@ -16,10 +16,9 @@
         <link rel="stylesheet" href="../css/dashboard.css">
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
             rel="stylesheet">
-        <!-- Firebase SDKs -->
-        <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-        <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-        <script src="../js/firebase-config.js"></script>
+        <!-- Supabase Configuration -->
+        <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+        <script src="../js/supabase.js"></script>
 
     </head>
 
@@ -117,31 +116,27 @@
     </div>
 
     <script>
-        // Initialize Firebase
-        if (typeof firebase !== 'undefined') {
-            firebase.initializeApp(firebaseConfig);
-            var db = firebase.firestore();
-        }
+        // Initialize Supabase
+        const supabase = window.supabaseClient;
 
         const USD_TO_INR = 83;
 
         async function loadInventory() {
             const body = document.getElementById('inventoryBody');
             try {
-                if (typeof firebase === 'undefined' || firebaseConfig.apiKey === "YOUR_API_KEY") {
-                    body.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--error-color);">Firebase not configured. Please update js/firebase-config.js</td></tr>';
+                if (!supabase) {
+                    body.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--error-color);">Supabase not configured. Please update js/supabase.js</td></tr>';
                     return;
                 }
 
-                const snapshot = await db.collection('books').get();
-                if (snapshot.empty) {
-                    body.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem;">No books found in Firestore. Use the migration tool to upload data.</td></tr>';
+                const { data: books, error } = await supabase.from('books').select('*');
+                if (error || !books || books.length === 0) {
+                    body.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem;">No books found in Supabase. Use the migration tool to upload data.</td></tr>';
                     return;
                 }
 
                 body.innerHTML = '';
-                snapshot.docs.forEach(doc => {
-                    const book = doc.data();
+                books.forEach(book => {
                     const tr = document.createElement('tr');
                     const stockClass = book.stock.toLowerCase().includes('out') ? 'badge-error' :
                         book.stock.toLowerCase().includes('low') ? 'badge-warning' : 'badge-success';
