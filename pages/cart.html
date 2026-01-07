@@ -390,11 +390,65 @@
 
         .map-container {
             width: 100%;
-            height: 200px;
+            height: 300px;
             background: #eee;
             border-radius: 8px;
             margin-bottom: 15px;
             margin-top: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .map-loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.9);
+            z-index: 10;
+        }
+
+        .spinner-border {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid var(--ss-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .location-error {
+            background: #fff5f5;
+            border: 1px solid #feb2b2;
+            color: #c53030;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+
+        .api-key-input {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            width: 100%;
         }
 
         @keyframes fadeIn {
@@ -621,6 +675,16 @@
             </div>
 
             <div id="addAddressForm" style="display:none;">
+                <div class="form-group">
+                    <label style="font-size: 0.9rem; font-weight: 600; margin-bottom: 8px; display: block;">Google Maps
+                        API Key</label>
+                    <input type="text" class="api-key-input" id="gmapsApiKey"
+                        placeholder="Enter your Google Maps API key (optional)">
+                    <small style="color: var(--ss-text-light); font-size: 0.8rem;">Get your free API key from <a
+                            href="https://console.cloud.google.com/google/maps-apikey" target="_blank"
+                            style="color: var(--ss-primary);">Google Cloud Console</a></small>
+                </div>
+
                 <button class="btn btn-outline"
                     style="margin-bottom:15px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;"
                     onclick="useCurrentLocation()">
@@ -633,7 +697,17 @@
                     </svg>
                     Use Current Location
                 </button>
-                <div id="map" class="map-container"></div>
+
+                <div id="mapContainer" style="position: relative;">
+                    <div id="map" class="map-container"></div>
+                    <div id="mapLoading" class="map-loading" style="display: none;">
+                        <div class="spinner-border"></div>
+                        <span style="margin-left: 10px;">Loading map...</span>
+                    </div>
+                </div>
+
+                <div id="locationError" class="location-error" style="display: none;"></div>
+
                 <div class="form-group">
                     <input type="text" class="form-control" id="newAddrName" placeholder="Full Name"
                         style="margin-bottom:10px;">
@@ -761,68 +835,190 @@
         // Initial render
         renderCheckout();
 
-        // --- Address Modal & Map Logic ---
+        // --- Enhanced Address Modal & Map Logic ---
 
-        // Configuration
-        // REPLACE THIS WITH YOUR ACTUAL API KEY FOR LIVE TESTING
-        const GOOGLE_MAPS_API_KEY = 'YOUR_GOOGLE_MAPS_API_KEY';
+        // Configuration and API Key Management
+        const GMAPS_KEY = 'shelfsync_gmaps_js_key_v1';
 
-        // Load Google Maps API
-        (function () {
-            // Check for file protocol
+        function getApiKey() {
+            // Try to get from user input first
+            const userKey = document.getElementById('gmapsApiKey')?.value?.trim();
+            if (userKey) return userKey;
+
+            // Try to get from localStorage
+            const storedKey = localStorage.getItem(GMAPS_KEY);
+            if (storedKey) return storedKey;
+
+            // Fallback to demo key (you should replace with your own)
+            return 'YOUR_GOOGLE_MAPS_API_KEY';
+        }
+
+        function saveApiKey(key) {
+            if (key && key !== 'YOUR_GOOGLE_MAPS_API_KEY') {
+                localStorage.setItem(GMAPS_KEY, key);
+            }
+        }
+
+        let map, marker, geocoder;
+        let isMapLoaded = false;
+
+        // Enhanced Google Maps Loader
+        function loadGoogleMaps() {
+            const apiKey = getApiKey();
+
+            if (apiKey === 'YOUR_GOOGLE_MAPS_API_KEY') {
+                showMapError('Please enter a Google Maps API key to use location features.');
+                return false;
+            }
+
             if (window.location.protocol === 'file:') {
-                console.error("Geolocation requires a server (localhost or HTTPS).");
-                const mapDiv = document.getElementById("map");
-                if (mapDiv) {
-                    mapDiv.innerHTML = '<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:#C05621; text-align:center; padding:20px; background:#fff5f5; border:1px solid #feb2b2; border-radius:8px;"><strong>Geolocation Unavailable</strong><span style="font-size:0.9rem; margin-top:5px;">Please use a local server (localhost) to use location features.</span></div>';
-                }
-                return;
+                showMapError('Geolocation requires a server (localhost or HTTPS). Please run this on a local server.');
+                return false;
+            }
+
+            showMapLoading(true);
+
+            // Remove existing script if any
+            const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
+            if (existingScript) {
+                existingScript.remove();
             }
 
             const script = document.createElement('script');
-            script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&callback=initMap&loading=async`;
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=onMapsLoaded&libraries=geocoding&loading=async`;
             script.async = true;
             script.defer = true;
-            script.onerror = function () {
-                console.error('Failed to load Google Maps API.');
-                const mapDiv = document.getElementById("map");
-                if (mapDiv) {
-                    mapDiv.innerHTML = '<div style="display:flex; align-items:center; justify-content:center; height:100%; color:#e53e3e; text-align:center; padding:20px; background:#fff5f5; border:1px solid #feb2b2; border-radius:8px;"><strong>Map Load Error</strong><br><span style="font-size:0.8rem">Check API Key and Internet Connection</span></div>';
-                }
+
+            script.onload = () => {
+                console.log('Google Maps API loaded successfully');
+                saveApiKey(apiKey);
             };
+
+            script.onerror = () => {
+                showMapError('Failed to load Google Maps API. Please check your API key and internet connection.');
+                showMapLoading(false);
+            };
+
             document.head.appendChild(script);
-        })();
+            return true;
+        }
 
-        let map, marker;
-
-        function initMap() {
-            if (typeof google === 'undefined' || !google.maps) return;
-
-            const defaultLoc = { lat: 20.5937, lng: 78.9629 }; // India
+        function onMapsLoaded() {
+            if (typeof google === 'undefined' || !google.maps) {
+                showMapError('Google Maps failed to load properly.');
+                showMapLoading(false);
+                return;
+            }
 
             try {
+                const defaultLoc = { lat: 20.5937, lng: 78.9629 }; // India center
+
                 map = new google.maps.Map(document.getElementById("map"), {
                     zoom: 5,
                     center: defaultLoc,
                     mapTypeControl: false,
-                    streetViewControl: false
+                    streetViewControl: false,
+                    fullscreenControl: false,
+                    zoomControl: true,
+                    gestureHandling: 'cooperative'
                 });
 
                 marker = new google.maps.Marker({
                     position: defaultLoc,
                     map: map,
                     draggable: true,
-                    title: "Drag to set location"
+                    title: "Drag to set delivery location"
                 });
+
+                geocoder = new google.maps.Geocoder();
 
                 marker.addListener('dragend', function () {
                     const pos = marker.getPosition();
                     console.log("New position:", pos.toJSON());
+                    reverseGeocode(pos);
                 });
+
+                isMapLoaded = true;
+                showMapLoading(false);
+
+                // Trigger resize to fix display issues
+                setTimeout(() => {
+                    google.maps.event.trigger(map, 'resize');
+                }, 100);
 
             } catch (e) {
                 console.error("Error initializing map:", e);
+                showMapError('Error initializing map: ' + e.message);
+                showMapLoading(false);
             }
+        }
+
+        function showMapLoading(show) {
+            const loadingEl = document.getElementById('mapLoading');
+            if (loadingEl) {
+                loadingEl.style.display = show ? 'flex' : 'none';
+            }
+        }
+
+        function showMapError(message) {
+            const mapDiv = document.getElementById("map");
+            const errorDiv = document.getElementById('locationError');
+
+            if (mapDiv) {
+                mapDiv.innerHTML = `
+                    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:#c53030; text-align:center; padding:20px; background:#fff5f5; border:1px solid #feb2b2; border-radius:8px;">
+                        <svg style="width:24px;height:24px;margin-bottom:8px" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <strong>Map Error</strong>
+                        <span style="font-size:0.8rem; margin-top:5px;">${message}</span>
+                    </div>
+                `;
+            }
+
+            if (errorDiv) {
+                errorDiv.textContent = message;
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        function hideMapError() {
+            const errorDiv = document.getElementById('locationError');
+            if (errorDiv) {
+                errorDiv.style.display = 'none';
+            }
+        }
+
+        function reverseGeocode(position) {
+            if (!geocoder) return;
+
+            geocoder.geocode({ location: position }, (results, status) => {
+                if (status === 'OK' && results[0]) {
+                    const address = results[0];
+                    const components = address.address_components;
+
+                    let city = '', zip = '', state = '';
+
+                    components.forEach(component => {
+                        if (component.types.includes('locality')) {
+                            city = component.long_name;
+                        } else if (component.types.includes('postal_code')) {
+                            zip = component.long_name;
+                        } else if (component.types.includes('administrative_area_level_1')) {
+                            state = component.long_name;
+                        }
+                    });
+
+                    // Auto-fill address fields
+                    document.getElementById('newAddrCity').value = city;
+                    document.getElementById('newAddrZip').value = zip;
+                    document.getElementById('newAddrLine').value = address.formatted_address.split(',')[0];
+
+                    showToast('Location detected successfully!');
+                } else {
+                    console.warn('Geocoding failed:', status);
+                }
+            });
         }
 
         function openAddressModal() {
@@ -843,8 +1039,11 @@
             document.getElementById('addressList').style.display = 'none';
             document.getElementById('addAddressForm').style.display = 'block';
 
-            // Trigger map resize to prevent gray box
-            if (map && typeof google !== 'undefined') {
+            // Load map if not already loaded
+            if (!isMapLoaded) {
+                setTimeout(() => loadGoogleMaps(), 100);
+            } else if (map) {
+                // Trigger resize to fix display issues
                 setTimeout(() => {
                     google.maps.event.trigger(map, 'resize');
                     map.setCenter(marker.getPosition());
@@ -857,75 +1056,152 @@
             const originalText = btn.innerHTML;
 
             if (window.location.protocol === 'file:') {
-                alert("Geolocation requires a local server (localhost).");
+                showMapError('Geolocation requires a local server (localhost).');
                 return;
             }
 
             if (!navigator.geolocation) {
-                alert("Browser does not support geolocation.");
+                showMapError('Your browser does not support geolocation.');
                 return;
             }
 
-            if (typeof google === 'undefined' || !map) {
-                alert("Google Maps not loaded. Please check API Key.");
+            if (!isMapLoaded) {
+                showMapError('Please wait for the map to load, or check your API key.');
                 return;
             }
 
-            btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Locating...';
+            btn.innerHTML = '<div class="spinner-border"></div><span style="margin-left: 8px;">Locating...</span>';
             btn.disabled = true;
+            hideMapError();
 
-            navigator.geolocation.getCurrentPosition((position) => {
-                const pos = {
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude,
-                };
+            const options = {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 60000
+            };
 
-                map.setCenter(pos);
-                map.setZoom(15);
-                marker.setPosition(pos);
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const pos = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
 
-                // Mock fill
-                document.getElementById('newAddrCity').value = "Detected City";
-                document.getElementById('newAddrZip').value = "600000";
+                    if (map && marker) {
+                        map.setCenter(pos);
+                        map.setZoom(15);
+                        marker.setPosition(pos);
 
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }, (error) => {
-                console.error("Geolocation error:", error);
-                alert("Could not get location. Check permissions.");
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }, { enableHighAccuracy: true });
+                        // Get address from coordinates
+                        reverseGeocode(marker.getPosition());
+                    }
+
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    showToast('Location found! Address fields updated.');
+                },
+                (error) => {
+                    console.error("Geolocation error:", error);
+                    let errorMessage = 'Could not get your location.';
+
+                    switch (error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMessage = 'Location access denied. Please enable location permissions.';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMessage = 'Location information is unavailable.';
+                            break;
+                        case error.TIMEOUT:
+                            errorMessage = 'Location request timed out.';
+                            break;
+                    }
+
+                    showMapError(errorMessage);
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                },
+                options
+            );
         }
 
         function saveNewAddress() {
-            const name = document.getElementById('newAddrName').value;
-            const line = document.getElementById('newAddrLine').value;
+            const name = document.getElementById('newAddrName').value.trim();
+            const line = document.getElementById('newAddrLine').value.trim();
+            const city = document.getElementById('newAddrCity').value.trim();
+            const zip = document.getElementById('newAddrZip').value.trim();
 
             if (!name || !line) {
-                alert("Please fill in at least Name and Address Line");
+                showMapError('Please fill in at least Name and Address Line');
                 return;
             }
 
-            // In a real app, save to backend/localstorage
-            alert("Address Saved! (Mock)");
-            showAddressList();
+            // Get marker position if available
+            let location = null;
+            if (marker && isMapLoaded) {
+                const pos = marker.getPosition();
+                location = {
+                    lat: pos.lat(),
+                    lng: pos.lng()
+                };
+            }
+
+            // Save address (in real app, save to backend/localStorage)
+            const newAddress = {
+                name,
+                line,
+                city,
+                zip,
+                location,
+                timestamp: new Date().toISOString()
+            };
+
+            console.log('Saving address:', newAddress);
+
+            // Update the main view
+            document.querySelector('.address-name').textContent = name;
+            document.querySelector('.address-details').innerHTML = `
+                ${line}<br>
+                ${city}${zip ? ', ' + zip : ''}<br>
+                India<br>
+                Phone: +91 98765 43210
+            `;
+
+            showToast('Address saved successfully!');
+            closeAddressModal();
         }
 
         function selectAddress(el) {
             // Visual selection logic
-            document.querySelectorAll('.address-option').forEach(opt => opt.style.borderColor = 'var(--ss-border)');
+            document.querySelectorAll('.address-option').forEach(opt => {
+                opt.style.borderColor = 'var(--ss-border)';
+                opt.style.background = 'white';
+            });
+
             el.style.borderColor = 'var(--ss-primary)';
+            el.style.background = '#f8fafc';
 
             // Close modal after brief delay
             setTimeout(() => {
                 closeAddressModal();
-                // Update main view (mock)
+                // Update main view
                 document.querySelector('.address-name').textContent = el.querySelector('.address-name').textContent;
                 document.querySelector('.address-details').innerHTML = el.querySelector('.address-details').innerHTML;
                 showToast("Delivery address updated");
             }, 300);
         }
+
+        // Initialize map when page loads
+        document.addEventListener('DOMContentLoaded', function () {
+            // Auto-load map when add address form is opened
+            const addAddressBtn = document.querySelector('button[onclick="openAddAddressMode()"]');
+            if (addAddressBtn) {
+                addAddressBtn.addEventListener('click', function () {
+                    if (!isMapLoaded) {
+                        setTimeout(() => loadGoogleMaps(), 100);
+                    }
+                });
+            }
+        });
     </script>
 </body>
 
