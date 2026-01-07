@@ -763,38 +763,85 @@
 
         // --- Address Modal & Map Logic ---
 
-        // Load Google Maps API (Placeholder Key)
+        // Load Google Maps API (Dynamic Key)
         (function () {
-            const apiKey = 'YOUR_GOOGLE_MAPS_API_KEY';
             const mapDiv = document.getElementById("map");
+            const storedKey = localStorage.getItem('googleMapsApiKey');
+            const placeholderKey = 'YOUR_GOOGLE_MAPS_API_KEY';
 
+            // Function to render the Setup UI
+            window.renderMapSetup = function () {
+                if (mapDiv) {
+                    mapDiv.innerHTML = `
+                        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:var(--ss-text); text-align:center; padding:20px; background:#f8fafc; border:1px dashed var(--ss-border); border-radius:8px;">
+                            <div style="margin-bottom:10px; font-weight:600; color:var(--ss-secondary);">Setup Google Maps</div>
+                            <p style="font-size:0.85rem; color:var(--ss-text-light); margin-bottom:15px; max-width:250px;">
+                                Enter your API Key to enable map features. It will be saved to your browser.
+                            </p>
+                            <div style="display:flex; gap:8px; width:100%; max-width:300px;">
+                                <input type="text" id="apiKeyInput" placeholder="Paste API Key here" class="form-control" style="margin-bottom:0; font-size:0.85rem;">
+                                <button onclick="saveApiKey()" class="btn-ss-primary" style="margin:0; padding:8px 16px; width:auto; font-size:0.85rem;">Save</button>
+                            </div>
+                            <div style="margin-top:10px; font-size:0.75rem; color:var(--ss-text-light);">
+                                <a href="https://developers.google.com/maps/documentation/javascript/get-api-key" target="_blank" style="color:var(--ss-primary); text-decoration:none;">Get an API Key</a>
+                            </div>
+                        </div>`;
+                }
+            };
+
+            // Check protocol
             if (window.location.protocol === 'file:') {
                 console.error("Geolocation requires a server (localhost or HTTPS). It will not work on file:// protocol.");
                 if (mapDiv) {
                     mapDiv.innerHTML = '<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:#C05621; text-align:center; padding:20px; background:#fff5f5; border:1px solid #feb2b2; border-radius:8px;"><strong>Geolocation Unavailable</strong><span style="font-size:0.9rem; margin-top:5px;">You are opening this file directly. Please use a local server (e.g., Live Server) or HTTPS to use location features.</span></div>';
                 }
-                return; // Stop execution if on file protocol
+                return;
             }
 
-            if (apiKey === 'YOUR_GOOGLE_MAPS_API_KEY') {
-                console.warn('Google Maps API Key is missing.');
-                if (mapDiv) {
-                    mapDiv.innerHTML = '<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:#C05621; text-align:center; padding:20px; background:#fff5f5; border:1px solid #feb2b2; border-radius:8px;"><strong>Map Configuration Required</strong><span style="font-size:0.9rem; margin-top:5px;">Please replace "YOUR_GOOGLE_MAPS_API_KEY" in the code with a valid Google Maps API Key.</span></div>';
-                }
+            // If no key stored, show setup UI
+            if (!storedKey) {
+                console.warn('Google Maps API Key not found in localStorage.');
+                // We delay this slightly to ensure the modal is open/ready if called immediately, 
+                // but mostly this runs on page load. The modal opening will trigger openAddAddressMode which also checks.
+                return;
             }
 
+            // If key exists, load script
             var script = document.createElement('script');
-            script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap&loading=async`;
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${storedKey}&callback=initMap&loading=async`;
             script.async = true;
             script.defer = true;
             script.onerror = function () {
                 console.error('Failed to load Google Maps API.');
                 if (mapDiv) {
-                    mapDiv.innerHTML = '<div style="display:flex; align-items:center; justify-content:center; height:100%; color:red; text-align:center; padding:20px;">Failed to load Google Maps.<br>Check internet connection or API Key.</div>';
+                    mapDiv.innerHTML = `
+                        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:#e53e3e; text-align:center; padding:20px; background:#fff5f5; border:1px solid #feb2b2; border-radius:8px;">
+                            <strong>Failed to load Map</strong>
+                            <span style="font-size:0.85rem; margin:5px 0;">Invalid API Key or Network Error.</span>
+                            <button onclick="clearApiKey()" style="background:none; border:1px solid #e53e3e; color:#e53e3e; padding:4px 12px; border-radius:4px; cursor:pointer; font-size:0.8rem; margin-top:10px;">Reset Key</button>
+                        </div>`;
                 }
             };
             document.head.appendChild(script);
         })();
+
+        // Global functions for API Key management
+        window.saveApiKey = function () {
+            const input = document.getElementById('apiKeyInput');
+            if (input && input.value.trim()) {
+                localStorage.setItem('googleMapsApiKey', input.value.trim());
+                location.reload(); // Reload to apply key
+            } else {
+                alert("Please enter a valid API Key");
+            }
+        };
+
+        window.clearApiKey = function () {
+            if (confirm("Are you sure you want to remove the saved API Key?")) {
+                localStorage.removeItem('googleMapsApiKey');
+                location.reload();
+            }
+        };
 
         let map, marker;
 
@@ -826,6 +873,14 @@
                     const pos = marker.getPosition();
                     console.log("New position:", pos.toJSON());
                 });
+
+                // Add "Reset Key" button to map
+                const resetBtn = document.createElement("button");
+                resetBtn.textContent = "Reset API Key";
+                resetBtn.style.cssText = "background:white; border:1px solid #ccc; padding:5px 10px; font-size:10px; position:absolute; bottom:5px; right:5px; z-index:1000; cursor:pointer; opacity:0.7;";
+                resetBtn.onclick = window.clearApiKey;
+                document.getElementById("map").appendChild(resetBtn);
+
             } catch (e) {
                 console.error("Error initializing map:", e);
             }
@@ -855,6 +910,9 @@
                     google.maps.event.trigger(map, 'resize');
                     map.setCenter(marker.getPosition());
                 }, 100);
+            } else if (!localStorage.getItem('googleMapsApiKey')) {
+                // Ensure setup UI is visible if no key
+                window.renderMapSetup();
             }
         }
 
@@ -875,7 +933,12 @@
 
             // Check if map is initialized (implies API key is valid)
             if (typeof google === 'undefined' || !map) {
-                alert("Google Maps is not ready. Please check if you have added a valid API Key.");
+                if (!localStorage.getItem('googleMapsApiKey')) {
+                    alert("Please enter your Google Maps API Key in the map box first.");
+                    document.getElementById('apiKeyInput')?.focus();
+                } else {
+                    alert("Google Maps is not ready. Please check your internet connection.");
+                }
                 return;
             }
 
