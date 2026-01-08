@@ -346,6 +346,18 @@
 
         /* End new styles for premium book card layout */
 
+        .loading-spinner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-2xl);
+            font-size: 1.25rem;
+            color: var(--text-light);
+            text-align: center;
+            min-height: 200px;
+            grid-column: 1 / -1;
+        }
+
         .card-footer {
             margin-top: auto;
             display: flex;
@@ -775,6 +787,22 @@
     </footer>
     <!-- Supabase Configuration and Logic -->
     <script src="../js/cart-manager.js"></script>
+    <script>
+        // Add debugging before loading browse-books.js
+        console.log('Page loaded, checking booksData...');
+        console.log('booksData available:', typeof booksData !== 'undefined');
+        if (typeof booksData !== 'undefined') {
+            console.log('booksData length:', booksData.length);
+        }
+        
+        // Check if required elements exist
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM loaded, checking elements...');
+            console.log('booksGrid element:', document.getElementById('booksGrid') ? 'found' : 'NOT FOUND');
+            console.log('pageInfo element:', document.getElementById('pageInfo') ? 'found' : 'NOT FOUND');
+            console.log('paginationContainer element:', document.getElementById('paginationContainer') ? 'found' : 'NOT FOUND');
+        });
+    </script>
     <script src="../js/browse-books.js"></script>
 </body>
 

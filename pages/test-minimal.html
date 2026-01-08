@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimal Books Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+        .book-card { border: 1px solid #ddd; padding: 10px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Minimal Books Test</h1>
+    <div id="status">Loading...</div>
+    <div id="pagination"></div>
+    <div id="books" class="book-grid"></div>
+
+    <script src="../books-data.js"></script>
+    <script>
+        console.log('Minimal test page loaded');
+        
+        let allBooks = [];
+        let currentPage = 1;
+        const booksPerPage = 24;
+        
+        function showBooks() {
+            const statusEl = document.getElementById('status');
+            const booksEl = document.getElementById('books');
+            const paginationEl = document.getElementById('pagination');
+            
+            if (typeof booksData === 'undefined') {
+                statusEl.textContent = 'ERROR: booksData not loaded!';
+                return;
+            }
+            
+            allBooks = booksData;
+            statusEl.textContent = `Loaded ${allBooks.length} books`;
+            
+            // Show current page
+            const startIndex = (currentPage - 1) * booksPerPage;
+            const endIndex = startIndex + booksPerPage;
+            const pageBooks = allBooks.slice(startIndex, endIndex);
+            
+            booksEl.innerHTML = pageBooks.map(book => `
+                <div class="book-card">
+                    <h3>${book.title}</h3>
+                    <p>by ${book.author}</p>
+                    <p>₹${book.price}</p>
+                    <p>${book.category}</p>
+                </div>
+            `).join('');
+            
+            // Show pagination
+            const totalPages = Math.ceil(allBooks.length / booksPerPage);
+            paginationEl.innerHTML = `
+                <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>Previous</button>
+                <span>Page ${currentPage} of ${totalPages}</span>
+                <button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Next</button>
+            `;
+        }
+        
+        function changePage(page) {
+            const totalPages = Math.ceil(allBooks.length / booksPerPage);
+            if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                showBooks();
+            }
+        }
+        
+        // Load books when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM ready, loading books...');
+            setTimeout(showBooks, 100);
+        });
+    </script>
+</body>
+</html>

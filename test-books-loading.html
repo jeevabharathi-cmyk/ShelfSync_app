@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Books Loading</title>
+</head>
+<body>
+    <h1>Books Loading Test</h1>
+    <div id="status">Loading...</div>
+    <div id="count"></div>
+    <div id="sample"></div>
+
+    <script src="books-data.js"></script>
+    <script>
+        console.log('Test page loaded');
+        console.log('booksData type:', typeof booksData);
+        console.log('booksData available:', typeof booksData !== 'undefined');
+        
+        if (typeof booksData !== 'undefined') {
+            console.log('booksData length:', booksData.length);
+            document.getElementById('status').textContent = 'Books data loaded successfully!';
+            document.getElementById('count').textContent = `Total books: ${booksData.length}`;
+            
+            if (booksData.length > 0) {
+                document.getElementById('sample').innerHTML = `
+                    <h3>First book:</h3>
+                    <p>Title: ${booksData[0].title}</p>
+                    <p>Author: ${booksData[0].author}</p>
+                    <p>Price: ₹${booksData[0].price}</p>
+                `;
+            }
+        } else {
+            console.error('booksData is not available');
+            document.getElementById('status').textContent = 'ERROR: Books data not loaded!';
+        }
+    </script>
+</body>
+</html>

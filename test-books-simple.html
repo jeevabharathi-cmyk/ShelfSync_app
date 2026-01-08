@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Books Loading</title>
+</head>
+<body>
+    <h1>Test Books Loading</h1>
+    <div id="result">Loading...</div>
+    
+    <script src="books-data.js"></script>
+    <script>
+        console.log('Test script loaded');
+        console.log('booksData available:', typeof booksData !== 'undefined');
+        if (typeof booksData !== 'undefined') {
+            console.log('Books count:', booksData.length);
+            document.getElementById('result').innerHTML = 'Books loaded: ' + booksData.length;
+        } else {
+            document.getElementById('result').innerHTML = 'booksData not available';
+        }
+    </script>
+</body>
+</html>
