@@ -468,6 +468,8 @@
         <p class="toast-msg" id="toastMsg">Your draft has been saved.</p>
     </div>
 
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="../js/supabase.js"></script>
     <script>
         const DRAFT_KEY = 'shelfsync_seller_add_book_draft_v1';
 
@@ -690,7 +692,7 @@
             showToast('Cleared', 'Form and draft have been cleared.');
         });
 
-        form.addEventListener('submit', (e) => {
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
             const ok = validateForm();
@@ -704,18 +706,97 @@
             btn.classList.add('loading');
             btn.disabled = true;
 
-            setTimeout(() => {
+            try {
+                // Get form data
+                const formData = getFormDataObject();
+                
+                // Handle image upload
+                let imageUrl = null;
+                const imageFiles = imagesInput.files;
+                
+                if (imageFiles && imageFiles.length > 0) {
+                    // Check if user is authenticated
+                    const { data: { user } } = await window.supabaseClient.auth.getUser();
+                    
+                    if (!user) {
+                        throw new Error('You must be logged in to upload images');
+                    }
+                    
+                    // Upload the first image as the cover
+                    const file = imageFiles[0];
+                    const fileExt = file.name.split('.').pop();
+                    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+                    
+                    console.log('Uploading image:', fileName);
+                    
+                    const { data: uploadData, error: uploadError } = await window.supabaseClient.storage
+                        .from('book-images')
+                        .upload(fileName, file);
+                    
+                    if (uploadError) {
+                        console.error('Upload error:', uploadError);
+                        throw new Error('Failed to upload image: ' + uploadError.message);
+                    }
+                    
+                    // Get public URL
+                    const { data: urlData } = window.supabaseClient.storage
+                        .from('book-images')
+                        .getPublicUrl(fileName);
+                    
+                    imageUrl = urlData.publicUrl;
+                    console.log('Image uploaded successfully:', imageUrl);
+                }
+                
+                // Prepare book data for database
+                const bookData = {
+                    title: formData.title,
+                    author: formData.author,
+                    isbn: formData.isbn || null,
+                    category: formData.category,
+                    language: formData.language,
+                    publisher: formData.publisher || null,
+                    format: formData.format,
+                    condition: formData.condition,
+                    price: parseFloat(formData.price),
+                    stock: parseInt(formData.stock),
+                    description: formData.description,
+                    cover: imageUrl, // Store the public URL
+                    created_at: new Date().toISOString()
+                };
+                
+                // Insert book into database
+                const { data: insertData, error: insertError } = await window.supabaseClient
+                    .from('books')
+                    .insert([bookData])
+                    .select();
+                
+                if (insertError) {
+                    console.error('Database insert error:', insertError);
+                    throw new Error('Failed to save book: ' + insertError.message);
+                }
+                
+                console.log('Book saved successfully:', insertData);
+                
                 btn.classList.remove('loading');
                 btn.disabled = false;
                 btn.innerHTML = original;
 
                 clearDraft();
-                showToast('Published', 'Your book is added (demo). Redirecting to inventory…');
+                showToast('Published', 'Your book has been added successfully! Redirecting to inventory…');
 
                 setTimeout(() => {
                     window.location.href = 'inventory.html';
                 }, 1200);
-            }, 900);
+                
+            } catch (error) {
+                console.error('Error publishing book:', error);
+                
+                btn.classList.remove('loading');
+                btn.disabled = false;
+                btn.innerHTML = original;
+                
+                showToast('Error', error.message || 'Failed to publish book. Please try again.');
+            }
         });
 
         imagesInput.addEventListener('change', () => {

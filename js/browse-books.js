@@ -44,10 +44,53 @@ async function loadBooksData() {
     // Update loading message
     const grid = document.getElementById('booksGrid');
     if (grid) {
-        grid.innerHTML = '<div class="loading-spinner">📚 Processing 2000+ books...</div>';
+        grid.innerHTML = '<div class="loading-spinner">📚 Loading books from database...</div>';
     }
     
-    // Force use of global variable first
+    // Try Supabase first
+    try {
+        if (supabase && supabase.supabaseUrl && 
+            supabase.supabaseUrl !== "YOUR_SUPABASE_PROJECT_URL") {
+            console.log('Fetching books from Supabase...');
+            
+            // Supabase query
+            const { data: books, error } = await supabase
+                .from('books')
+                .select('*');
+
+            if (error) throw error;
+
+            if (books && books.length > 0) {
+                allBooks = books.map(book => ({
+                    id: book.id,
+                    title: book.title,
+                    author: book.author,
+                    price: book.price,
+                    category: book.category,
+                    condition: book.condition,
+                    stock: book.stock || 'In Stock',
+                    gradient: book.gradient || 'sapiens', // fallback gradient
+                    isbn: book.isbn,
+                    cover: book.cover || `https://via.placeholder.com/400x600?text=${encodeURIComponent(book.title)}`, // Use uploaded image or fallback
+                    publisher: book.publisher,
+                    format: book.format,
+                    language: book.language,
+                    description: book.description
+                }));
+                console.log('Loaded ' + allBooks.length + ' books from Supabase');
+                displayBooks = [...allBooks];
+                updatePageInfo();
+                showPage(1);
+                return;
+            }
+        } else {
+            console.log('Supabase not configured, trying fallback data...');
+        }
+    } catch (error) {
+        console.warn('Supabase error, trying fallback data:', error);
+    }
+    
+    // Fallback to global variable
     if (typeof booksData !== 'undefined' && Array.isArray(booksData) && booksData.length > 0) {
         console.log('Using booksData global variable with', booksData.length, 'books');
         
@@ -72,46 +115,9 @@ async function loadBooksData() {
         }
     }
     
-    console.log('booksData not available or invalid, trying Supabase...');
+    console.log('booksData not available or invalid, trying local files...');
     
-    // Try to load Supabase dynamically
-    try {
-        if (window.location.protocol !== 'file:' && supabase && supabase.supabaseUrl && 
-            supabase.supabaseUrl !== "YOUR_SUPABASE_PROJECT_URL") {
-            console.log('Fetching books from Supabase...');
-            
-            // Supabase query
-            const { data: books, error } = await supabase
-                .from('books')
-                .select('*');
-
-            if (error) throw error;
-
-            if (books && books.length > 0) {
-                allBooks = books.map(book => ({
-                    id: book.id,
-                    ...book
-                }));
-                console.log('Loaded ' + allBooks.length + ' books from Supabase');
-                displayBooks = [...allBooks];
-                showPage(1);
-                return;
-            }
-        } else {
-            console.log('Supabase not configured, falling back to local data...');
-        }
-    } catch (error) {
-        console.warn('Supabase error, falling back to local data:', error);
-    }
-
-    // Fallback to local data
-    await loadLocalData();
-}
-
-async function loadLocalData() {
-    console.log('loadLocalData called');
-    
-    // Try JSON files
+    // Try to load local JSON files
     const jsonPaths = ['../books-database.json', './books-database.json', 'books-database.json'];
     
     for (const path of jsonPaths) {
