@@ -1,4 +1,4 @@
-// Supabase Authentication - Replaces Firebase Auth
+// Supabase Authentication
 const supabase = window.supabaseClient;
 
 async function redirectBasedOnRole(user) {
@@ -9,7 +9,7 @@ async function redirectBasedOnRole(user) {
 
     console.log(`[Login] Checking role for UID: ${user.id} in table: ${tableName}`);
 
-    // Supabase query - replaces Firestore getDoc
+    // Supabase query
     const { data, error } = await supabase
         .from(tableName)
         .select('role')
@@ -24,7 +24,7 @@ async function redirectBasedOnRole(user) {
     const role = data.role;
     console.log(`[Login] User role found: ${role}`);
 
-    // Portal validation - EXACT same logic as Firebase
+    // Portal validation
     if (path.includes("login-seller") && role !== "seller")
         throw new Error("Access denied. Seller account required.");
 
@@ -34,7 +34,7 @@ async function redirectBasedOnRole(user) {
     if (path.includes("login-customer") && role !== "customer")
         throw new Error("Access denied. Customer account required.");
 
-    // Redirect - EXACT same logic as Firebase
+    // Redirect
     if (role === "admin") window.location.href = "admin-dashboard.html";
     if (role === "seller") window.location.href = "seller-dashboard.html";
     if (role === "customer") window.location.href = "all-books.html";
@@ -42,7 +42,7 @@ async function redirectBasedOnRole(user) {
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    // Supabase auth state listener - replaces Firebase onAuthStateChanged
+    // Supabase auth state listener
     supabase.auth.onAuthStateChange((event, session) => {
         if (session?.user && window.location.pathname.includes("login-")) {
             redirectBasedOnRole(session.user).catch(console.error);
@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const password = document.getElementById('passwordInput').value;
 
         try {
-            // Supabase login - replaces Firebase signInWithEmailAndPassword
+            // Supabase login
             const { data, error } = await supabase.auth.signInWithPassword({
                 email: email,
                 password: password

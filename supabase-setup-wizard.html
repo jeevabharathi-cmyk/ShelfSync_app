@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShelfSync | Supabase Setup Wizard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .wizard-container {
+            max-width: 800px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .wizard-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .wizard-header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .wizard-header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .wizard-body {
+            padding: 40px;
+        }
+
+        .step {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .step-title {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .status-card {
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 4px solid;
+        }
+
+        .status-card.success {
+            background: #e8f5e9;
+            border-color: #4caf50;
+            color: #2e7d32;
+        }
+
+        .status-card.error {
+            background: #ffebee;
+            border-color: #f44336;
+            color: #c62828;
+        }
+
+        .status-card.warning {
+            background: #fff3e0;
+            border-color: #ff9800;
+            color: #e65100;
+        }
+
+        .status-card.info {
+            background: #e3f2fd;
+            border-color: #2196f3;
+            color: #0d47a1;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .instruction-list {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .instruction-list li {
+            margin: 15px 0;
+            line-height: 1.6;
+        }
+
+        .instruction-list strong {
+            color: #667eea;
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(102, 126, 234, 0.3);
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .log-output {
+            background: #1e1e1e;
+            color: #4caf50;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .log-output.visible {
+            display: block;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .link-button {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .link-button:hover {
+            text-decoration: underline;
+        }
+
+        .emoji {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wizard-container">
+        <div class="wizard-header">
+            <h1>🚀 Supabase Setup Wizard</h1>
+            <p>Let's get your ShelfSync Supabase backend ready!</p>
+        </div>
+
+        <div class="wizard-body">
+            <!-- Step 1: Checking Supabase Connection -->
+            <div class="step active" id="step1">
+                <h2 class="step-title">Step 1: Checking Supabase Configuration</h2>
+                <div id="connectionStatus" class="status-card info">
+                    <span class="loading"></span> Checking Supabase configuration...
+                </div>
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="checkSupabase()" id="checkBtn">Recheck Configuration</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Project Setup Instructions -->
+            <div class="step" id="step2">
+                <h2 class="step-title">Step 2: Create Supabase Project</h2>
+                <div class="status-card warning">
+                    <span class="emoji">⚠️</span>
+                    <strong>Supabase project not configured!</strong>
+                    <p style="margin-top: 10px;">You need to create a Supabase project and configure your credentials.</p>
+                </div>
+
+                <div class="instruction-list">
+                    <h3 style="margin-bottom: 15px;">Follow these steps:</h3>
+                    <ol>
+                        <li>
+                            <strong>Open Supabase Dashboard:</strong><br>
+                            <a href="https://supabase.com/dashboard" target="_blank" class="link-button">
+                                Click here to open Supabase Dashboard
+                            </a>
+                        </li>
+                        <li>
+                            <strong>Click "New Project"</strong> button
+                        </li>
+                        <li>
+                            <strong>Choose organization:</strong> Select or create an organization
+                        </li>
+                        <li>
+                            <strong>Project name:</strong> Enter "ShelfSync"
+                        </li>
+                        <li>
+                            <strong>Database password:</strong> Create a strong password
+                        </li>
+                        <li>
+                            <strong>Region:</strong> Select your nearest region
+                        </li>
+                        <li>
+                            <strong>Click "Create new project"</strong> and wait 2-3 minutes
+                        </li>
+                    </ol>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="showStep(1)">Back</button>
+                    <button class="btn btn-primary" onclick="showStep(3)">I've Created the Project</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Configure Credentials -->
+            <div class="step" id="step3">
+                <h2 class="step-title">Step 3: Configure Project Credentials</h2>
+                <div class="status-card info">
+                    <span class="emoji">🔧</span>
+                    <strong>Configure your Supabase credentials</strong>
+                    <p style="margin-top: 10px;">Get your project URL and API key from Supabase dashboard.</p>
+                </div>
+
+                <div class="instruction-list">
+                    <h3 style="margin-bottom: 15px;">Get your credentials:</h3>
+                    <ol>
+                        <li>In your Supabase project, go to <strong>Settings → API</strong></li>
+                        <li>Copy your <strong>Project URL</strong></li>
+                        <li>Copy your <strong>anon public</strong> key (not the service_role key!)</li>
+                        <li>Open <code>js/supabase.js</code> in your code editor</li>
+                        <li>Replace <code>YOUR_SUPABASE_PROJECT_URL</code> with your Project URL</li>
+                        <li>Replace <code>YOUR_SUPABASE_ANON_KEY</code> with your anon public key</li>
+                        <li>Save the file</li>
+                    </ol>
+                </div>
+
+                <div class="code-block">
+// Example js/supabase.js configuration:
+const SUPABASE_URL = "https://your-project.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...";
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="showStep(2)">Back</button>
+                    <button class="btn btn-primary" onclick="showStep(4)">I've Updated the Configuration</button>
+                </div>
+            </div>
+
+            <!-- Step 4: Database Setup -->
+            <div class="step" id="step4">
+                <h2 class="step-title">Step 4: Setup Database Schema</h2>
+                <div class="status-card info">
+                    <span class="emoji">🗄️</span>
+                    <strong>Create database tables and security policies</strong>
+                    <p style="margin-top: 10px;">Run the SQL setup commands to create your database schema.</p>
+                </div>
+
+                <div class="instruction-list">
+                    <h3 style="margin-bottom: 15px;">Database setup:</h3>
+                    <ol>
+                        <li>In your Supabase project, go to <strong>SQL Editor</strong></li>
+                        <li>Open the <code>SUPABASE_MIGRATION_GUIDE.md</code> file</li>
+                        <li>Copy and run all the SQL commands from the guide</li>
+                        <li>This will create tables, triggers, and security policies</li>
+                        <li>Verify the tables were created in the <strong>Table Editor</strong></li>
+                    </ol>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="showStep(3)">Back</button>
+                    <button class="btn btn-primary" onclick="showStep(5)">I've Run the SQL Setup</button>
+                </div>
+            </div>
+
+            <!-- Step 5: Success -->
+            <div class="step" id="step5">
+                <h2 class="step-title">✅ Setup Complete!</h2>
+                <div class="status-card success">
+                    <span class="emoji">🎉</span>
+                    <strong>Your Supabase backend is ready!</strong>
+                    <p style="margin-top: 10px;">You can now use ShelfSync with Supabase authentication and database.</p>
+                </div>
+
+                <div class="instruction-list">
+                    <h3 style="margin-bottom: 15px;">What's Next?</h3>
+                    <ul style="list-style: none;">
+                        <li>✅ Supabase project is configured</li>
+                        <li>✅ Database schema is created</li>
+                        <li>✅ Security policies are active</li>
+                        <li>✅ Authentication is ready</li>
+                        <li style="margin-top: 15px;">
+                            <strong>Now you can:</strong><br>
+                            <a href="pages/signup.html" class="link-button">Create an account →</a><br>
+                            <a href="pages/login-seller.html" class="link-button">Login as seller →</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="window.location.href='pages/signup.html'">
+                        Create Account
+                    </button>
+                    <button class="btn btn-secondary" onclick="window.location.href='pages/login-seller.html'">
+                        Go to Login
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auto-check on load
+        setTimeout(checkSupabase, 1000);
+
+        // Step navigation
+        window.showStep = function (stepNumber) {
+            document.querySelectorAll('.step').forEach(step => step.classList.remove('active'));
+            document.getElementById('step' + stepNumber).classList.add('active');
+        };
+
+        // Check Supabase configuration
+        window.checkSupabase = function () {
+            const statusDiv = document.getElementById('connectionStatus');
+            const checkBtn = document.getElementById('checkBtn');
+
+            checkBtn.disabled = true;
+            statusDiv.innerHTML = '<span class="loading"></span> Checking Supabase configuration...';
+            statusDiv.className = 'status-card info';
+
+            // Check if Supabase is configured by looking at the global variables
+            setTimeout(() => {
+                try {
+                    if (window.SUPABASE_URL && window.SUPABASE_URL !== "YOUR_SUPABASE_PROJECT_URL" &&
+                        window.SUPABASE_ANON_KEY && window.SUPABASE_ANON_KEY !== "YOUR_SUPABASE_ANON_KEY") {
+                        
+                        statusDiv.innerHTML = `
+                            <span class="emoji">✅</span>
+                            <strong>Supabase Configured!</strong>
+                            <p style="margin-top: 10px;">Your Supabase configuration looks good.</p>
+                        `;
+                        statusDiv.className = 'status-card success';
+                        setTimeout(() => showStep(5), 1500);
+
+                    } else {
+                        statusDiv.innerHTML = `
+                            <span class="emoji">⚠️</span>
+                            <strong>Supabase Not Configured</strong>
+                            <p style="margin-top: 10px;">You need to set up your Supabase project first.</p>
+                        `;
+                        statusDiv.className = 'status-card warning';
+                        setTimeout(() => showStep(2), 1500);
+                    }
+                } catch (error) {
+                    statusDiv.innerHTML = `
+                        <span class="emoji">❌</span>
+                        <strong>Configuration Error</strong>
+                        <p style="margin-top: 10px;">${error.message}</p>
+                    `;
+                    statusDiv.className = 'status-card error';
+                }
+
+                checkBtn.disabled = false;
+            }, 1000);
+        };
+    </script>
+</body>
+
+</html>

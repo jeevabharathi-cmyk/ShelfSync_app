@@ -96,7 +96,7 @@
                     <tbody id="inventoryBody">
                         <tr>
                             <td colspan="7" style="text-align: center; padding: 2rem;">Loading inventory from
-                                Firestore...</td>
+                                Supabase...</td>
                         </tr>
                     </tbody>
 
@@ -166,7 +166,7 @@
 
             } catch (error) {
                 console.error('Error loading inventory:', error);
-                body.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--error-color);">Error loading data from Firestore.</td></tr>';
+                body.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--error-color);">Error loading data from Supabase.</td></tr>';
             }
         }
 

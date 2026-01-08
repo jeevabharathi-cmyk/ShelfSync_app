@@ -1,13 +1,13 @@
 /**
  * Authentication Guard for Dashboard Pages
- * Replaces Firebase auth state checking with Supabase
+ * Provides Supabase authentication protection
  */
 
 const supabase = window.supabaseClient;
 
 async function checkAuthAndRole(requiredRole) {
     try {
-        // Get current user session - replaces Firebase onAuthStateChanged
+        // Get current user session
         const { data: { user }, error } = await supabase.auth.getUser();
         
         if (error || !user) {

@@ -14,13 +14,13 @@ document.addEventListener('DOMContentLoaded', loadBooksData);
 async function loadBooksData() {
     const grid = document.getElementById('booksGrid');
 
-    // Try to load Supabase dynamically - replaces Firebase
+    // Try to load Supabase dynamically
     try {
         if (window.location.protocol !== 'file:' && supabase && 
             window.SUPABASE_URL && window.SUPABASE_URL !== "YOUR_SUPABASE_PROJECT_URL") {
             console.log('Fetching books from Supabase...');
             
-            // Supabase query - replaces Firestore getDocs
+            // Supabase query
             const { data: books, error } = await supabase
                 .from('books')
                 .select('*');

@@ -1,6 +1,6 @@
 /**
  * Supabase Configuration for ShelfSync
- * Replaces Firebase Authentication and Firestore
+ * Provides authentication and database functionality
  */
 
 // Supabase Configuration - Replace with your actual values

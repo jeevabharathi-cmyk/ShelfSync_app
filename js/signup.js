@@ -1,4 +1,4 @@
-// Supabase Authentication - Replaces Firebase Auth
+// Supabase Authentication
 const supabase = window.supabaseClient;
 
 /**
@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            // 1. Create user in Supabase Authentication - replaces Firebase createUserWithEmailAndPassword
+            // 1. Create user in Supabase Authentication
             const { data, error } = await supabase.auth.signUp({
                 email: email,
                 password: password,
@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             alert("Account created successfully!");
 
-            // 3. Redirect based on role - EXACT same logic as Firebase
+            // 3. Redirect based on role
             if (role === 'seller') {
                 window.location.href = 'login-seller.html';
             } else {

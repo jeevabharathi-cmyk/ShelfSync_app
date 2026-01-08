@@ -1,132 +1,68 @@
-# 🔥 QUICK FIX: Firebase "Client is Offline" Error
+# 🚀 QUICK SETUP: Supabase Configuration Guide
 
-## THE PROBLEM
-Error: "Failed to get document because the client is offline"
-Reason: Your Firestore database doesn't exist yet in Firebase Console
+## THE SETUP
+Your ShelfSync application is now running on Supabase!
+Follow these steps to complete the setup process.
 
 ---
 
-## THE FIX (2 STEPS - 5 MINUTES)
+## THE SETUP (2 STEPS - 10 MINUTES)
 
-### STEP 1: Create Firestore Database ⚡
+### STEP 1: Create Supabase Project ⚡
 
 **DO THIS FIRST - IT'S REQUIRED!**
 
-1. **Open this link in your browser:**
+1. **Go to Supabase:**
    ```
-   https://console.firebase.google.com/project/shelfsync-6fedf/firestore
+   https://supabase.com
    ```
 
-2. **You will see a page with "Create database" button**
-   - Click the **"Create database"** button
+2. **Create a new project:**
+   - Click **"New Project"**
+   - Choose your organization
+   - Enter project name: **"ShelfSync"**
+   - Enter database password (save this!)
+   - Select region closest to you
+   - Click **"Create new project"**
 
-3. **Choose database location:**
-   - Select: **nam5 (us-central)** OR your nearest location
-   - Click **"Next"**
+3. **Wait 2-3 minutes** for project creation
 
-4. **Set security rules:**
-   - Select: **"Start in test mode"**
-   - Click **"Enable"**
-
-5. **Wait 1-2 minutes** for the database to be created
-   - You'll see "Cloud Firestore" interface when ready
+4. **Get your credentials:**
+   - Go to **Settings** → **API**
+   - Copy **Project URL**
+   - Copy **anon public** key
 
 ---
 
-### STEP 2: Create Your User Account 👤
+### STEP 2: Update Configuration 👤
 
 **After Step 1 is complete:**
 
-**Option A - Use the Simple Tool (RECOMMENDED):**
-
-1. Open this file in your browser (double-click it):
+1. **Edit your configuration file:**
    ```
-   C:\Users\jeeva bharathi\OneDrive\Desktop\ShelfSync-app\firebase-direct-fix.html
+   js/supabase.js
    ```
 
-2. Click the **"Create User Account"** button
+2. **Replace the placeholder values:**
+   ```javascript
+   const SUPABASE_URL = "YOUR_PROJECT_URL_HERE";
+   const SUPABASE_ANON_KEY = "YOUR_ANON_KEY_HERE";
+   ```
 
-3. Wait for success message
-
-4. Done! Go to login page
+3. **Run the database setup:**
+   - Go to your Supabase project dashboard
+   - Click **SQL Editor**
+   - Copy and paste the SQL from `SUPABASE_MIGRATION_GUIDE.md`
+   - Click **Run**
 
 ---
 
-**Option B - Manual (Browser Console):**
+## YOUR TEST CREDENTIALS
 
-1. Open your Seller Login page:
-   ```
-   C:\Users\jeeva bharathi\OneDrive\Desktop\ShelfSync-app\pages\login-seller.html
-   ```
-
-2. Press **F12** to open Developer Console
-
-3. Click on **"Console"** tab
-
-4. **Copy and paste this entire code:**
-
-```javascript
-(async function() {
-    const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js');
-    const { getAuth, createUserWithEmailAndPassword } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js');
-    const { getFirestore, doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
-    
-    const app = initializeApp({
-        apiKey: "AIzaSyDfyqcchPmY0MvKCaJQmwP0ILyf9UODMis",
-        authDomain: "shelfsync-6fedf.firebaseapp.com",
-        projectId: "shelfsync-6fedf",
-        storageBucket: "shelfsync-6fedf.firebasestorage.app",
-        messagingSenderId: "328141524902",
-        appId: "1:328141524902:web:5616c7b58d48deda3f0967"
-    });
-    
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    
-    const email = 'jackdoe628@gmail.com';
-    const password = 'TestPassword123';
-    
-    try {
-        console.log('Creating user...');
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        console.log('✅ User created! UID:', userCredential.user.uid);
-        
-        console.log('Creating seller profile...');
-        await setDoc(doc(db, 'sellers', userCredential.user.uid), {
-            email: email,
-            role: 'seller',
-            storeName: 'My Bookstore',
-            verified: true,
-            createdAt: new Date().toISOString()
-        });
-        
-        console.log('✅ SUCCESS! You can now login!');
-        alert('✅ Account created! You can now login.');
-        
-    } catch (error) {
-        if (error.code === 'auth/email-already-in-use') {
-            console.log('✅ User already exists! You can login now.');
-            alert('✅ User already exists! Try logging in.');
-        } else {
-            console.error('❌ Error:', error.message);
-            alert('Error: ' + error.message);
-        }
-    }
-})();
-```
-
-5. Press **Enter**
-
-6. Wait for success message
-
----
-
-## YOUR LOGIN CREDENTIALS
-
-After setup is complete, use these to login:
+After setup is complete, you can create a test account or use these if available:
 
 ```
-Email:    jackdoe628@gmail.com
+Email:    test@example.com
 Password: TestPassword123
 Role:     Seller
 ```
@@ -136,50 +72,51 @@ Role:     Seller
 ## VERIFY IT WORKED
 
 1. Go to your Seller Login page
-2. Enter the credentials above
-3. Click "Login"
-4. You should be redirected to the Seller Dashboard
+2. Try signing up with a new account
+3. Check that you can login
+4. You should be redirected to the appropriate dashboard
 
-If you still see an error, come back to this guide and check if you completed Step 1 properly.
+If you see connection errors, check that your Supabase configuration is correct.
 
 ---
 
-## COMMON ERRORS & FIXES
+## COMMON SETUP ISSUES & FIXES
 
-### "database (default) does not exist"
-→ **You skipped Step 1!** Go to Firebase Console and create the database.
+### "Supabase not configured"
+→ **Check js/supabase.js** - Make sure you updated the URL and key
 
-### "permission denied"
-→ **Database not in Test Mode.** Go to Firebase Console → Firestore → Rules tab
-   Change to:
-   ```
-   allow read, write: if request.time < timestamp.date(2026, 2, 6);
-   ```
+### "Invalid API key"
+→ **Wrong key copied.** Go to Supabase Settings → API → Copy the **anon public** key (not service role)
 
-### "email already in use"
-→ **Good! User exists.** Just try logging in with the credentials above.
+### "Database connection failed"
+→ **Tables not created.** Run the SQL setup from the migration guide
+
+### "Permission denied"
+→ **RLS policies missing.** Make sure you ran all the SQL commands including the policies
 
 ### Still not working?
-→ **Check Firebase Console:** https://console.firebase.google.com/project/shelfsync-6fedf/firestore
-   - Make sure you see "Cloud Firestore" with a database icon (not "Get started")
-   - Make sure you see "sellers" collection with at least 1 document
+→ **Check Supabase Dashboard:** Go to your project → Authentication → Users
+   - Try creating a user through the dashboard first
+   - Check that tables exist in Database → Tables
 
 ---
 
-## FILES TO USE
+## FILES TO REFERENCE
 
-1. **firebase-direct-fix.html** ← Use this! (Simple button to create user)
-2. **QUICK_FIX_GUIDE.md** ← You're reading this now
+1. **SUPABASE_MIGRATION_GUIDE.md** ← Complete setup instructions
+2. **MIGRATION_SUMMARY.md** ← What was changed
+3. **js/supabase.js** ← Configuration file to update
 
 ---
 
 ## SUMMARY
 
-✅ Step 1: Create Firestore database in Firebase Console (REQUIRED!)
-✅ Step 2: Create user account (use firebase-direct-fix.html)
-✅ Login with: jackdoe628@gmail.com / TestPassword123
+✅ Step 1: Create Supabase project and get credentials
+✅ Step 2: Update js/supabase.js with your credentials  
+✅ Step 3: Run SQL setup commands in Supabase dashboard
+✅ Step 4: Test signup/login functionality
 ✅ Done!
 
 ---
 
-Last Updated: 2026-01-06
+Last Updated: 2026-01-08

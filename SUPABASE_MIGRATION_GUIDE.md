@@ -1,8 +1,8 @@
-# 🚀 Firebase to Supabase Migration Guide
+# 🚀 Supabase Migration Guide
 
 ## ✅ MIGRATION COMPLETED
 
-Your ShelfSync application has been successfully migrated from Firebase to Supabase. All Firebase dependencies have been removed and replaced with Supabase equivalents.
+Your ShelfSync application has been successfully migrated to Supabase. All legacy dependencies have been removed and replaced with Supabase equivalents.
 
 ## 🔧 REQUIRED SETUP STEPS
 
@@ -134,12 +134,12 @@ ALTER TABLE public.books ENABLE ROW LEVEL SECURITY;
 
 ## 📋 WHAT WAS CHANGED
 
-### ✅ Removed (Firebase)
-- `js/firebase-config.js` (archived, not loaded)
-- All Firebase SDK imports from HTML files
-- Firebase Authentication calls
-- Firestore database calls
-- Firebase importmaps
+### ✅ Removed (Legacy Backend)
+- `js/legacy-config.js` (archived, not loaded)
+- All legacy SDK imports from HTML files
+- Legacy Authentication calls
+- Legacy database calls
+- Legacy importmaps
 
 ### ✅ Added (Supabase)
 - `js/supabase.js` - Supabase client configuration
@@ -178,9 +178,9 @@ After setup, test these flows:
 
 ## 🚨 IMPORTANT NOTES
 
-1. **No Firebase code executes** - all references removed from runtime
+1. **No legacy code executes** - all references removed from runtime
 2. **Behavior identical** - users won't notice any difference
-3. **Database structure** - matches Firebase collections exactly
+3. **Database structure** - matches previous collections exactly
 4. **Authentication flow** - preserved exactly as before
 5. **Error messages** - same user experience
 
