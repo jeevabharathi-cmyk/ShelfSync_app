@@ -60,15 +60,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
 
                 if (role === 'seller') {
-                    // Insert into sellers table
+                    // Insert into users table for universal login logic
                     const { error: sellerError } = await supabase
-                        .from('sellers')
+                        .from('users')
                         .insert(profileData);
                     
                     if (sellerError) {
                         console.error('Seller profile creation error:', sellerError);
-                        // Also insert into users table as fallback
-                        await supabase.from('users').insert(profileData);
                     }
                 } else if (role === 'admin') {
                     // Insert into users table for admin

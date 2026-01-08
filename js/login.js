@@ -4,35 +4,39 @@ const supabase = window.supabaseClient;
 async function redirectBasedOnRole(user) {
     const path = window.location.pathname;
 
-    // STRICT: Seller portal -> 'sellers' table, Others -> 'users' table
-    const tableName = path.includes("login-seller") ? "sellers" : "users";
+    console.log(`[Login] Checking role for UID: ${user.id} in users table`);
 
-    console.log(`[Login] Checking role for UID: ${user.id} in table: ${tableName}`);
-
-    // Supabase query
-    const { data, error } = await supabase
-        .from(tableName)
+    // Universal pattern - always check users table
+    const { data: profile, error: roleError } = await supabase
+        .from('users')
         .select('role')
         .eq('id', user.id)
         .single();
 
-    if (error || !data) {
-        console.error(`[Login] Document not found in ${tableName}:`, error);
-        throw new Error(`User profile not found in ${tableName}. Please contact support.`);
+    if (roleError || !profile) {
+        console.error(`[Login] User profile not found:`, roleError);
+        await supabase.auth.signOut();
+        throw new Error('User profile not found');
     }
 
-    const role = data.role;
+    const role = profile.role;
     console.log(`[Login] User role found: ${role}`);
 
     // Portal validation
-    if (path.includes("login-seller") && role !== "seller")
-        throw new Error("Access denied. Seller account required.");
+    if (path.includes("login-seller") && role !== "seller") {
+        await supabase.auth.signOut();
+        throw new Error("Unauthorized");
+    }
 
-    if (path.includes("login-admin") && role !== "admin")
-        throw new Error("Access denied. Admin account required.");
+    if (path.includes("login-admin") && role !== "admin") {
+        await supabase.auth.signOut();
+        throw new Error("Unauthorized");
+    }
 
-    if (path.includes("login-customer") && role !== "customer")
-        throw new Error("Access denied. Customer account required.");
+    if (path.includes("login-customer") && role !== "customer") {
+        await supabase.auth.signOut();
+        throw new Error("Unauthorized");
+    }
 
     // Redirect
     if (role === "admin") window.location.href = "admin-dashboard.html";
@@ -59,13 +63,16 @@ document.addEventListener("DOMContentLoaded", () => {
         const password = document.getElementById('passwordInput').value;
 
         try {
-            // Supabase login
+            // Universal login logic
             const { data, error } = await supabase.auth.signInWithPassword({
-                email: email,
-                password: password
+                email,
+                password
             });
 
-            if (error) throw error;
+            if (error) {
+                alert(error.message);
+                return;
+            }
 
             await redirectBasedOnRole(data.user);
         } catch (err) {

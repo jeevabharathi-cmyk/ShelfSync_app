@@ -24,49 +24,38 @@ document.addEventListener("DOMContentLoaded", () => {
         const email = document.getElementById('emailInput').value;
         const password = document.getElementById('passwordInput').value;
 
-        try {
-            // Supabase authentication
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email: email,
-                password: password
-            });
+        // Universal login logic
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password
+        });
 
-            if (error) throw error;
-
-            console.log(`[Admin Login] User authenticated: ${data.user.id}`);
-
-            // Validate admin role - check users table
-            const { data: userData, error: roleError } = await supabase
-                .from('users')
-                .select('role')
-                .eq('id', data.user.id)
-                .single();
-
-            console.log('[Admin Login] Users table query result:', { userData, roleError });
-
-            if (roleError || !userData) {
-                console.error('[Admin Login] User profile not found:', roleError);
-                await supabase.auth.signOut();
-                throw new Error('User profile not found. Please contact support.');
-            }
-
-            // Check if user has admin role
-            if (userData.role !== 'admin') {
-                console.log(`[Admin Login] Unauthorized role: ${userData.role}`);
-                await supabase.auth.signOut();
-                alert('Unauthorized access. Admin account required.');
-                return;
-            }
-
-            console.log('[Admin Login] Role validated, redirecting to admin-dashboard.html...');
-            // Add a small delay to ensure session is properly set
-            setTimeout(() => {
-                window.location.href = 'admin-dashboard.html';
-            }, 100);
-
-        } catch (err) {
-            console.error('[Admin Login] Error:', err);
-            alert(err.message);
+        if (error) {
+            alert(error.message);
+            return;
         }
+
+        const userId = data.user.id;
+
+        const { data: profile, error: profileError } = await supabase
+            .from('users')
+            .select('role')
+            .eq('id', userId)
+            .single();
+
+        if (roleError || !profile) {
+            alert('User profile not found');
+            await supabase.auth.signOut();
+            return;
+        }
+
+        // Admin login role-based redirect
+        if (profile.role !== 'admin') {
+            alert('Unauthorized');
+            await supabase.auth.signOut();
+            return;
+        }
+
+        window.location.href = 'admin-dashboard.html';
     });
 });

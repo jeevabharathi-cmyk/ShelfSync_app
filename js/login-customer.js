@@ -24,49 +24,38 @@ document.addEventListener("DOMContentLoaded", () => {
         const email = document.getElementById('emailInput').value;
         const password = document.getElementById('passwordInput').value;
 
-        try {
-            // Supabase authentication
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email: email,
-                password: password
-            });
+        // Universal login logic
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password
+        });
 
-            if (error) throw error;
-
-            console.log(`[Customer Login] User authenticated: ${data.user.id}`);
-
-            // Validate customer role
-            const { data: userData, error: roleError } = await supabase
-                .from('users')
-                .select('role')
-                .eq('id', data.user.id)
-                .single();
-
-            console.log('[Customer Login] Users table query result:', { userData, roleError });
-
-            if (roleError || !userData) {
-                console.error('[Customer Login] User profile not found:', roleError);
-                await supabase.auth.signOut();
-                throw new Error('User profile not found. Please contact support.');
-            }
-
-            // Check if user has customer role
-            if (userData.role !== 'customer') {
-                console.log(`[Customer Login] Unauthorized role: ${userData.role}`);
-                await supabase.auth.signOut();
-                alert('Unauthorized access. Customer account required.');
-                return;
-            }
-
-            console.log('[Customer Login] Role validated, redirecting to all-books.html...');
-            // Add a small delay to ensure session is properly set
-            setTimeout(() => {
-                window.location.href = 'all-books.html';
-            }, 100);
-
-        } catch (err) {
-            console.error('[Customer Login] Error:', err);
-            alert(err.message);
+        if (error) {
+            alert(error.message);
+            return;
         }
+
+        const userId = data.user.id;
+
+        const { data: profile, error: roleError } = await supabase
+            .from('users')
+            .select('role')
+            .eq('id', userId)
+            .single();
+
+        if (roleError || !profile) {
+            alert('User profile not found');
+            await supabase.auth.signOut();
+            return;
+        }
+
+        // Customer login role-based redirect
+        if (profile.role !== 'customer') {
+            alert('Unauthorized');
+            await supabase.auth.signOut();
+            return;
+        }
+
+        window.location.href = 'all-books.html';
     });
 });
