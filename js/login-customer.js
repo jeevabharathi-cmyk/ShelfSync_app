@@ -7,8 +7,15 @@
 const supabase = window.supabaseClient;
 
 document.addEventListener("DOMContentLoaded", () => {
+    console.log('[Customer Login] DOM loaded, Supabase client:', window.supabaseClient);
+    
     const form = document.getElementById("loginForm");
-    if (!form) return;
+    if (!form) {
+        console.error('[Customer Login] Login form not found!');
+        return;
+    }
+
+    console.log('[Customer Login] Login form found, setting up event listener');
 
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -35,6 +42,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 .eq('id', data.user.id)
                 .single();
 
+            console.log('[Customer Login] Users table query result:', { userData, roleError });
+
             if (roleError || !userData) {
                 console.error('[Customer Login] User profile not found:', roleError);
                 await supabase.auth.signOut();
@@ -49,9 +58,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            console.log('[Customer Login] Role validated, redirecting...');
-            // Redirect to customer dashboard
-            window.location.href = 'all-books.html';
+            console.log('[Customer Login] Role validated, redirecting to all-books.html...');
+            // Add a small delay to ensure session is properly set
+            setTimeout(() => {
+                window.location.href = 'all-books.html';
+            }, 100);
 
         } catch (err) {
             console.error('[Customer Login] Error:', err);

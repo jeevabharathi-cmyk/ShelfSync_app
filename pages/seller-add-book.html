@@ -830,6 +830,15 @@
         updateCharCount();
         updatePreview();
     </script>
+
+    <!-- Authentication Guard -->
+    <script src="../js/auth-guard.js"></script>
+    <script>
+        // Check seller authentication on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkAuthAndRole('seller');
+        });
+    </script>
 </body>
 
 </html>

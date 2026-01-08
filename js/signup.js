@@ -49,8 +49,47 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (error) throw error;
 
-            // 2. User profile creation handled by Supabase trigger
-            // No manual database insertion needed - trigger creates user/seller record
+            // 2. Manual database profile creation (required for auth-guard.js role checking)
+            if (data.user) {
+                const profileData = {
+                    id: data.user.id,
+                    email: email,
+                    first_name: firstName,
+                    last_name: lastName,
+                    role: role
+                };
+
+                if (role === 'seller') {
+                    // Insert into sellers table
+                    const { error: sellerError } = await supabase
+                        .from('sellers')
+                        .insert(profileData);
+                    
+                    if (sellerError) {
+                        console.error('Seller profile creation error:', sellerError);
+                        // Also insert into users table as fallback
+                        await supabase.from('users').insert(profileData);
+                    }
+                } else if (role === 'admin') {
+                    // Insert into users table for admin
+                    const { error: adminError } = await supabase
+                        .from('users')
+                        .insert(profileData);
+                    
+                    if (adminError) {
+                        console.error('Admin profile creation error:', adminError);
+                    }
+                } else {
+                    // Insert into users table for customer
+                    const { error: customerError } = await supabase
+                        .from('users')
+                        .insert(profileData);
+                    
+                    if (customerError) {
+                        console.error('Customer profile creation error:', customerError);
+                    }
+                }
+            }
 
             alert("Account created successfully!");
 

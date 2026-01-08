@@ -131,7 +131,15 @@
     <script>
         // Check admin authentication on page load
         document.addEventListener('DOMContentLoaded', async () => {
-            await checkAuthAndRole('admin');
+            console.log('[Admin Dashboard] Page loaded, checking authentication...');
+            try {
+                const user = await checkAuthAndRole('admin');
+                if (user) {
+                    console.log('[Admin Dashboard] Authentication successful for user:', user.id);
+                }
+            } catch (error) {
+                console.error('[Admin Dashboard] Authentication failed:', error);
+            }
         });
     </script>
 

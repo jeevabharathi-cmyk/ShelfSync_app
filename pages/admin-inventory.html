@@ -158,7 +158,7 @@
                         <td><span class="badge ${stockClass}">${book.stock}</span></td>
                         <td>
                             <button class="btn btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">View</button>
-                            <button class="btn btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.75rem; color: var(--error-color); border-color: var(--error-color);" onclick="deleteBook('${doc.id}')">Remove</button>
+                            <button class="btn btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.75rem; color: var(--error-color); border-color: var(--error-color);" onclick="deleteBook('${book.id}')">Remove</button>
                         </td>
                     `;
                     body.appendChild(tr);
@@ -173,7 +173,8 @@
         async function deleteBook(id) {
             if (confirm('Are you sure you want to remove this book from inventory?')) {
                 try {
-                    await db.collection('books').doc(id).delete();
+                    const { error } = await supabase.from('books').delete().eq('id', id);
+                    if (error) throw error;
                     loadInventory();
                 } catch (error) {
                     alert('Error deleting book: ' + error.message);
@@ -182,6 +183,15 @@
         }
 
         document.addEventListener('DOMContentLoaded', loadInventory);
+    </script>
+
+    <!-- Authentication Guard -->
+    <script src="../js/auth-guard.js"></script>
+    <script>
+        // Check admin authentication on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkAuthAndRole('admin');
+        });
     </script>
 </body>
 

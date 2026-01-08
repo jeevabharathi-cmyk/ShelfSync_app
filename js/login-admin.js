@@ -7,8 +7,15 @@
 const supabase = window.supabaseClient;
 
 document.addEventListener("DOMContentLoaded", () => {
+    console.log('[Admin Login] DOM loaded, Supabase client:', window.supabaseClient);
+    
     const form = document.getElementById("loginForm");
-    if (!form) return;
+    if (!form) {
+        console.error('[Admin Login] Login form not found!');
+        return;
+    }
+
+    console.log('[Admin Login] Login form found, setting up event listener');
 
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -28,12 +35,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
             console.log(`[Admin Login] User authenticated: ${data.user.id}`);
 
-            // Validate admin role
+            // Validate admin role - check users table
             const { data: userData, error: roleError } = await supabase
                 .from('users')
                 .select('role')
                 .eq('id', data.user.id)
                 .single();
+
+            console.log('[Admin Login] Users table query result:', { userData, roleError });
 
             if (roleError || !userData) {
                 console.error('[Admin Login] User profile not found:', roleError);
@@ -49,9 +58,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            console.log('[Admin Login] Role validated, redirecting...');
-            // Redirect to admin dashboard
-            window.location.href = 'admin-dashboard.html';
+            console.log('[Admin Login] Role validated, redirecting to admin-dashboard.html...');
+            // Add a small delay to ensure session is properly set
+            setTimeout(() => {
+                window.location.href = 'admin-dashboard.html';
+            }, 100);
 
         } catch (err) {
             console.error('[Admin Login] Error:', err);

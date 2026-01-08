@@ -270,7 +270,15 @@
     <script>
         // Check seller authentication on page load
         document.addEventListener('DOMContentLoaded', async () => {
-            await checkAuthAndRole('seller');
+            console.log('[Seller Dashboard] Page loaded, checking authentication...');
+            try {
+                const user = await checkAuthAndRole('seller');
+                if (user) {
+                    console.log('[Seller Dashboard] Authentication successful for user:', user.id);
+                }
+            } catch (error) {
+                console.error('[Seller Dashboard] Authentication failed:', error);
+            }
         });
     </script>
 

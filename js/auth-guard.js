@@ -23,12 +23,46 @@ async function checkAuthAndRole(requiredRole) {
         }
 
         // Check user role in database
-        const tableName = requiredRole === 'seller' ? 'sellers' : 'users';
-        const { data: userData, error: roleError } = await supabase
-            .from(tableName)
-            .select('role')
-            .eq('id', user.id)
-            .single();
+        let userData = null;
+        let roleError = null;
+
+        if (requiredRole === 'seller') {
+            // For sellers, check sellers table first, then users table as fallback
+            const { data: sellerData, error: sellerErr } = await supabase
+                .from('sellers')
+                .select('role')
+                .eq('id', user.id)
+                .single();
+
+            if (sellerData && sellerData.role === 'seller') {
+                userData = sellerData;
+            } else {
+                // Fallback to users table
+                const { data: userDataFallback, error: userErr } = await supabase
+                    .from('users')
+                    .select('role')
+                    .eq('id', user.id)
+                    .single();
+
+                if (userDataFallback && userDataFallback.role === 'seller') {
+                    userData = userDataFallback;
+                } else {
+                    roleError = userErr || sellerErr;
+                }
+            }
+        } else {
+            // For customers and admins, check users table
+            const { data: userDataDirect, error: userErrDirect } = await supabase
+                .from('users')
+                .select('role')
+                .eq('id', user.id)
+                .single();
+
+            console.log(`[Auth Guard] Users table query for ${requiredRole}:`, { userDataDirect, userErrDirect });
+
+            userData = userDataDirect;
+            roleError = userErrDirect;
+        }
 
         if (roleError || !userData || userData.role !== requiredRole) {
             // Wrong role or no profile - redirect to appropriate login
