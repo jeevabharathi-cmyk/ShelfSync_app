@@ -59,6 +59,56 @@
             }
         }
 
+        /* Dropdown Menu Styles */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-toggle::after {
+            content: ' ▼';
+            font-size: 0.7em;
+            margin-left: 0.5rem;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            border-radius: var(--radius-md);
+            z-index: 1000;
+            border: 1px solid #e5e7eb;
+        }
+
+        .dropdown:hover .dropdown-menu {
+            display: block;
+        }
+
+        .dropdown-item {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f3f4f6;
+            color: var(--primary-color);
+        }
+
+        .dropdown-item:first-child {
+            border-radius: var(--radius-md) var(--radius-md) 0 0;
+        }
+
+        .dropdown-item:last-child {
+            border-radius: 0 0 var(--radius-md) var(--radius-md);
+        }
+
         .hero h1 {
             color: white;
             font-size: 3.75rem;
@@ -111,6 +161,13 @@
                 <li><a href="index.html" class="nav-link active">Home</a></li>
                 <li><a href="pages/all-books.html" class="nav-link">Browse Books</a></li>
                 <li><a href="pages/cart.html" class="nav-link">Cart</a></li>
+                <li class="dropdown">
+                    <a href="#" class="nav-link dropdown-toggle">Seller Portal</a>
+                    <div class="dropdown-menu">
+                        <a href="pages/login-seller.html" class="dropdown-item">Seller Login</a>
+                        <a href="pages/signup.html" class="dropdown-item">Become a Seller</a>
+                    </div>
+                </li>
                 <li><a href="pages/login-customer.html" class="btn btn-outline">Login</a></li>
                 <li><a href="pages/signup.html" class="btn btn-primary">Sign Up</a></li>
             </ul>

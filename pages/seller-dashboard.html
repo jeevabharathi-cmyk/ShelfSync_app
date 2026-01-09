@@ -45,13 +45,17 @@
         <!-- Main Content -->
         <main class="dashboard-main">
             <header class="dashboard-header">
-                <h2>Seller Dashboard</h2>
+                <div>
+                    <h2>Seller Dashboard</h2>
+                    <p id="welcomeMessage" class="text-light" style="margin: 0; font-size: 0.9rem;">Welcome back! Manage your inventory and track your sales.</p>
+                </div>
                 <div style="display: flex; align-items: center; gap: var(--spacing-md);">
                     <a class="btn btn-primary" href="seller-add-book.html"
                         style="background-color: var(--accent-color);">+ Add New
                         Book</a>
                     <div
-                        style="width: 40px; height: 40px; background-color: var(--accent-color); border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center;">
+                        style="width: 40px; height: 40px; background-color: var(--accent-color); border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center;"
+                        title="Seller Profile">
                         S</div>
                 </div>
             </header>
@@ -61,18 +65,22 @@
                 <div class="stat-card">
                     <h3>$1,250</h3>
                     <p>Total Sales</p>
+                    <small class="text-light">💰 Revenue earned</small>
                 </div>
                 <div class="stat-card">
                     <h3>45</h3>
                     <p>Books Sold</p>
+                    <small class="text-light">📚 Units moved</small>
                 </div>
                 <div class="stat-card">
                     <h3>12</h3>
                     <p>Active Listings</p>
+                    <small class="text-light">📝 Live inventory</small>
                 </div>
                 <div class="stat-card">
                     <h3>4.9</h3>
                     <p>Seller Rating</p>
+                    <small class="text-light">⭐ Customer feedback</small>
                 </div>
             </div>
 
@@ -96,177 +104,11 @@
         </main>
     </div>
 
-    <script>
-        const ORDERS_KEY = 'shelfsync_orders_v1';
-
-        function loadOrders() {
-            try {
-                const raw = localStorage.getItem(ORDERS_KEY);
-                const parsed = raw ? JSON.parse(raw) : [];
-                return Array.isArray(parsed) ? parsed : [];
-            } catch {
-                return [];
-            }
-        }
-
-        function saveOrders(orders) {
-            localStorage.setItem(ORDERS_KEY, JSON.stringify(Array.isArray(orders) ? orders : []));
-        }
-
-        function formatDate(iso) {
-            try {
-                const d = new Date(iso);
-                return d.toLocaleString();
-            } catch {
-                return '';
-            }
-        }
-
-        function statusBadgeClass(status) {
-            const s = String(status || '').toLowerCase();
-            if (s === 'pending') return 'badge badge-warning';
-            if (s === 'processing') return 'badge badge-primary';
-            if (s === 'shipped') return 'badge badge-success';
-            if (s === 'delivered') return 'badge badge-success';
-            if (s === 'cancelled') return 'badge badge-error';
-            return 'badge badge-primary';
-        }
-
-        function firstItemTitle(order) {
-            const items = Array.isArray(order?.items) ? order.items : [];
-            const first = items[0];
-            if (!first) return '—';
-            return String(first.title || 'Book');
-        }
-
-        function customerName(order) {
-            return String(order?.delivery?.fullName || '—');
-        }
-
-        function orderActionLabel(order) {
-            const s = String(order?.status || '').toLowerCase();
-            if (s === 'pending' || s === 'processing') return 'Ship';
-            if (s === 'shipped') return 'Track';
-            if (s === 'delivered') return 'View';
-            return 'View';
-        }
-
-        function renderRecentOrders() {
-            const body = document.getElementById('recentOrdersBody');
-            if (!body) return;
-
-            const orders = loadOrders().slice(0, 6);
-            body.innerHTML = '';
-
-            if (orders.length === 0) {
-                const tr = document.createElement('tr');
-                const td = document.createElement('td');
-                td.colSpan = 6;
-                td.className = 'text-light';
-                td.style.padding = '1rem';
-                td.innerHTML = `
-                    No recent orders yet. Place an order from the cart page to see them here.<br>
-                    <button class="btn btn-outline btn-sm" style="margin-top: 0.5rem;" onclick="seedDemoOrders()">
-                        Seed Demo Orders
-                    </button>
-                `;
-                tr.appendChild(td);
-                body.appendChild(tr);
-                return;
-            }
-
-            orders.forEach((order) => {
-                const tr = document.createElement('tr');
-
-                const tdId = document.createElement('td');
-                tdId.textContent = `#${order.id || ''}`;
-
-                const tdBook = document.createElement('td');
-                tdBook.textContent = firstItemTitle(order);
-
-                const tdCust = document.createElement('td');
-                tdCust.textContent = customerName(order);
-
-                const tdDate = document.createElement('td');
-                tdDate.textContent = formatDate(order.createdAt);
-
-                const tdStatus = document.createElement('td');
-                const badge = document.createElement('span');
-                badge.className = statusBadgeClass(order.status);
-                badge.textContent = String(order.status || 'Pending');
-                tdStatus.appendChild(badge);
-
-                const tdAction = document.createElement('td');
-                const a = document.createElement('a');
-                a.className = 'btn btn-primary';
-                a.href = `ship-track-details.html?orderId=${encodeURIComponent(order.id || '')}`;
-                a.textContent = orderActionLabel(order);
-                a.style.padding = '0.25rem 0.5rem';
-                a.style.fontSize = '0.75rem';
-                tdAction.appendChild(a);
-
-                tr.appendChild(tdId);
-                tr.appendChild(tdBook);
-                tr.appendChild(tdCust);
-                tr.appendChild(tdDate);
-                tr.appendChild(tdStatus);
-                tr.appendChild(tdAction);
-                body.appendChild(tr);
-            });
-        }
-
-        function seedDemoOrders() {
-            try {
-                const demoOrders = [
-                    {
-                        id: `ORD-${Date.now() - 86400000}`,
-                        createdAt: new Date(Date.now() - 86400000).toISOString(),
-                        status: 'Pending',
-                        items: [{ title: 'Atomic Habits', price: 16.99, qty: 1 }],
-                        totals: { subtotal: 16.99, delivery: 2.0, tax: 0.85, total: 19.84 },
-                        payment: { method: 'gpay' },
-                        delivery: { fullName: 'Alice Johnson', phone: '+91 98765 43210', address: '123 Main St', city: 'Mumbai', pincode: '400001' },
-                        shipment: { carrier: '', trackingNumber: '', shippedAt: null, deliveredAt: null, notes: '' }
-                    },
-                    {
-                        id: `ORD-${Date.now() - 172800000}`,
-                        createdAt: new Date(Date.now() - 172800000).toISOString(),
-                        status: 'Shipped',
-                        items: [{ title: 'Deep Work', price: 14.50, qty: 2 }],
-                        totals: { subtotal: 29.00, delivery: 2.0, tax: 1.45, total: 32.45 },
-                        payment: { method: 'upi' },
-                        delivery: { fullName: 'Bob Smith', phone: '+91 87654 32109', address: '456 Oak Ave', city: 'Delhi', pincode: '110001' },
-                        shipment: { carrier: 'DTDC', trackingNumber: 'DT123456789', shippedAt: new Date(Date.now() - 86400000).toISOString(), deliveredAt: null, notes: '' }
-                    },
-                    {
-                        id: `ORD-${Date.now() - 259200000}`,
-                        createdAt: new Date(Date.now() - 259200000).toISOString(),
-                        status: 'Delivered',
-                        items: [{ title: 'The Alchemist', price: 12.99, qty: 1 }],
-                        totals: { subtotal: 12.99, delivery: 2.0, tax: 0.65, total: 15.64 },
-                        payment: { method: 'card' },
-                        delivery: { fullName: 'Charlie Brown', phone: '+91 76543 21098', address: '789 Pine Rd', city: 'Bangalore', pincode: '560001' },
-                        shipment: { carrier: 'BlueDart', trackingNumber: 'BD987654321', shippedAt: new Date(Date.now() - 172800000).toISOString(), deliveredAt: new Date(Date.now() - 86400000).toISOString(), notes: '' }
-                    }
-                ];
-
-                const existingOrders = loadOrders();
-                const combinedOrders = [...demoOrders, ...existingOrders];
-                saveOrders(combinedOrders);
-                renderRecentOrders();
-            } catch (error) {
-                console.error('Error seeding demo orders:', error);
-                alert('Failed to seed demo orders. Please try again.');
-            }
-        }
-
-        renderRecentOrders();
-    </script>
-
     <!-- Supabase Authentication Guard -->
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="../js/supabase.js"></script>
     <script src="../js/auth-guard.js"></script>
+    <script src="../js/seller-dashboard.js"></script>
     <script>
         // Check seller authentication on page load
         document.addEventListener('DOMContentLoaded', async () => {
@@ -281,7 +123,6 @@
             }
         });
     </script>
-    <script>checkAuthAndRole("seller"); </script>
 
 </body>
 
