@@ -4,9 +4,19 @@
  */
 
 // Get Supabase client
-const supabase = window.supabaseClient;
-
 document.addEventListener("DOMContentLoaded", () => {
+    const waitForSupabase = () => {
+        if (window.supabaseClient) {
+            initializeLogin();
+        } else {
+            setTimeout(waitForSupabase, 100);
+        }
+    };
+    waitForSupabase();
+});
+
+function initializeLogin() {
+    const supabase = window.supabaseClient;
     console.log('[Admin Login] DOM loaded, Supabase client:', window.supabaseClient);
     
     const form = document.getElementById("loginForm");
@@ -37,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const userId = data.user.id;
 
-        const { data: profile, error: profileError } = await supabase
+        const { data: profile, error: roleError } = await supabase
             .from('users')
             .select('role')
             .eq('id', userId)
@@ -58,4 +68,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
         window.location.href = 'admin-dashboard.html';
     });
-});
+}

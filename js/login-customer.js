@@ -4,9 +4,19 @@
  */
 
 // Get Supabase client
-const supabase = window.supabaseClient;
-
 document.addEventListener("DOMContentLoaded", () => {
+    const waitForSupabase = () => {
+        if (window.supabaseClient) {
+            initializeLogin();
+        } else {
+            setTimeout(waitForSupabase, 100);
+        }
+    };
+    waitForSupabase();
+});
+
+function initializeLogin() {
+    const supabase = window.supabaseClient;
     console.log('[Customer Login] DOM loaded, Supabase client:', window.supabaseClient);
     
     const form = document.getElementById("loginForm");
@@ -58,4 +68,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
         window.location.href = 'all-books.html';
     });
-});
+}

@@ -6,9 +6,30 @@
  *   checkAuthAndRole("customer")
  */
 
-const supabase = window.supabaseClient;
+document.addEventListener('DOMContentLoaded', () => {
+    const waitForSupabase = () => {
+        if (window.supabaseClient) {
+            initializeAuthGuard();
+        } else {
+            setTimeout(waitForSupabase, 100);
+        }
+    };
+    waitForSupabase();
+});
+
+function initializeAuthGuard() {
+    const supabase = window.supabaseClient;
+    setupLogout(supabase);
+}
 
 async function checkAuthAndRole(requiredRole) {
+  const supabase = window.supabaseClient;
+  if (!supabase) {
+    console.error('[Auth Guard] Supabase client not available');
+    redirectToLogin(requiredRole);
+    return;
+  }
+
   try {
     // 1️⃣ Check authentication
     const { data: authData, error: authError } = await supabase.auth.getUser();
@@ -36,6 +57,7 @@ async function checkAuthAndRole(requiredRole) {
 
     // ✅ Access granted
     console.log(`[Auth Guard] Access granted as ${requiredRole}`);
+    return authData.user;
   } catch (err) {
     console.error("[Auth Guard] Unexpected error:", err);
     redirectToLogin(requiredRole);
@@ -51,4 +73,23 @@ function redirectToLogin(role) {
   } else {
     window.location.href = "login-customer.html";
   }
+}
+
+// Setup logout functionality
+function setupLogout(supabase) {
+    const logoutLinks = document.querySelectorAll('a[href="../index.html"]:not(.logo)');
+    logoutLinks.forEach(link => {
+        if (link.textContent.toLowerCase().includes('logout')) {
+            link.addEventListener('click', async (e) => {
+                e.preventDefault();
+                try {
+                    await supabase.auth.signOut();
+                    window.location.href = '../index.html';
+                } catch (error) {
+                    console.error('Logout error:', error);
+                    window.location.href = '../index.html';
+                }
+            });
+        }
+    });
 }

@@ -1,5 +1,17 @@
 // Supabase Authentication
-const supabase = window.supabaseClient;
+document.addEventListener('DOMContentLoaded', () => {
+    const waitForSupabase = () => {
+        if (window.supabaseClient) {
+            initializeLogin();
+        } else {
+            setTimeout(waitForSupabase, 100);
+        }
+    };
+    waitForSupabase();
+});
+
+function initializeLogin() {
+    const supabase = window.supabaseClient;
 
 async function redirectBasedOnRole(user) {
     const path = window.location.pathname;
@@ -44,8 +56,6 @@ async function redirectBasedOnRole(user) {
     if (role === "customer") window.location.href = "all-books.html";
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-
     // Supabase auth state listener
     supabase.auth.onAuthStateChange((event, session) => {
         if (session?.user && window.location.pathname.includes("login-")) {
@@ -79,4 +89,4 @@ document.addEventListener("DOMContentLoaded", () => {
             alert(err.message);
         }
     });
-});
+}

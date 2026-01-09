@@ -1,13 +1,18 @@
 // Supabase Authentication
-const supabase = window.supabaseClient;
-
-/**
- * Signup logic for ShelfSync
- * Handles user registration with Supabase Auth
- * User profile creation handled by database trigger
- */
-
 document.addEventListener('DOMContentLoaded', () => {
+    // Wait for supabase client to be available
+    const waitForSupabase = () => {
+        if (window.supabaseClient) {
+            initializeSignup();
+        } else {
+            setTimeout(waitForSupabase, 100);
+        }
+    };
+    waitForSupabase();
+});
+
+function initializeSignup() {
+    const supabase = window.supabaseClient;
     const signupForm = document.getElementById('signupForm');
     if (!signupForm) return;
 
@@ -34,6 +39,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
+            console.log('Starting signup process...');
+            
             // 1. Create user in Supabase Authentication
             const { data, error } = await supabase.auth.signUp({
                 email: email,
@@ -47,7 +54,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            if (error) throw error;
+            if (error) {
+                console.error('Signup error:', error);
+                throw error;
+            }
+
+            console.log('Auth user created:', data.user?.id);
 
             // 2. Manual database profile creation (required for auth-guard.js role checking)
             if (data.user) {
@@ -59,40 +71,27 @@ document.addEventListener('DOMContentLoaded', () => {
                     role: role
                 };
 
-                if (role === 'seller') {
-                    // Insert into users table for universal login logic
-                    const { error: sellerError } = await supabase
-                        .from('users')
-                        .insert(profileData);
-                    
-                    if (sellerError) {
-                        console.error('Seller profile creation error:', sellerError);
-                    }
-                } else if (role === 'admin') {
-                    // Insert into users table for admin
-                    const { error: adminError } = await supabase
-                        .from('users')
-                        .insert(profileData);
-                    
-                    if (adminError) {
-                        console.error('Admin profile creation error:', adminError);
-                    }
-                } else {
-                    // Insert into users table for customer
-                    const { error: customerError } = await supabase
-                        .from('users')
-                        .insert(profileData);
-                    
-                    if (customerError) {
-                        console.error('Customer profile creation error:', customerError);
-                    }
+                console.log('Inserting profile data:', profileData);
+
+                // Insert into users table for all roles
+                const { error: profileError } = await supabase
+                    .from('users')
+                    .insert(profileData);
+                
+                if (profileError) {
+                    console.error('Profile creation error:', profileError);
+                    throw profileError;
                 }
+
+                console.log('Profile created successfully');
             }
 
             alert("Account created successfully!");
 
             // 3. Redirect based on role
-            if (role === 'seller') {
+            if (role === 'admin') {
+                window.location.href = 'login-admin.html';
+            } else if (role === 'seller') {
                 window.location.href = 'login-seller.html';
             } else {
                 window.location.href = 'login-customer.html';
@@ -111,5 +110,5 @@ document.addEventListener('DOMContentLoaded', () => {
             alert(message);
         }
     });
-});
+}
 

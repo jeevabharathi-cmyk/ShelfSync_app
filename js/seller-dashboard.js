@@ -4,7 +4,19 @@
  */
 
 // Get Supabase client
-const supabase = window.supabaseClient;
+document.addEventListener('DOMContentLoaded', () => {
+    const waitForSupabase = () => {
+        if (window.supabaseClient) {
+            initializeSellerDashboard();
+        } else {
+            setTimeout(waitForSupabase, 100);
+        }
+    };
+    waitForSupabase();
+});
+
+function initializeSellerDashboard() {
+    const supabase = window.supabaseClient;
 
 // Dashboard state
 let currentUser = null;
@@ -18,39 +30,10 @@ let sellerStats = {
 /**
  * Initialize seller dashboard
  */
-async function initializeSellerDashboard() {
+async function initializeDashboard() {
     try {
-        console.log('[Seller Dashboard] Initializing dashboard...');
-        
-        // Get current user
-        const { data: { user }, error } = await supabase.auth.getUser();
-        if (error || !user) {
-            console.error('[Seller Dashboard] No authenticated user found');
-            window.location.href = 'login-seller.html';
-            return;
-        }
-
-        currentUser = user;
-        console.log('[Seller Dashboard] User authenticated:', user.id);
-
-        // Load seller profile
-        await loadSellerProfile();
-        
-        // Load seller statistics
-        await loadSellerStats();
-        
-        // Load recent orders
-        await loadRecentOrders();
-        
-        // Setup logout functionality
-        setupLogout();
-        
-        console.log('[Seller Dashboard] Dashboard initialized successfully');
-        
-    } catch (error) {
-        console.error('[Seller Dashboard] Initialization error:', error);
-        alert('Failed to load dashboard. Please try refreshing the page.');
-    }
+        // Call the dashboard initialization
+        await initializeDashboard();
 }
 
 /**
@@ -351,10 +334,7 @@ function seedDemoOrders() {
 
 // Make functions available globally
 window.seedDemoOrders = seedDemoOrders;
-window.initializeSellerDashboard = initializeSellerDashboard;
+window.initializeSellerDashboard = initializeDashboard;
 
-// Initialize dashboard when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('[Seller Dashboard] DOM loaded, initializing...');
-    initializeSellerDashboard();
-});
+// Initialize dashboard when DOM is loaded - called from main function
+}

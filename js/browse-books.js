@@ -1,5 +1,17 @@
 // Supabase will be loaded dynamically to support file:// protocol
-const supabase = window.supabaseClient;
+document.addEventListener('DOMContentLoaded', () => {
+    const waitForSupabase = () => {
+        if (window.supabaseClient) {
+            initializeBrowseBooks();
+        } else {
+            setTimeout(waitForSupabase, 100);
+        }
+    };
+    waitForSupabase();
+});
+
+function initializeBrowseBooks() {
+    const supabase = window.supabaseClient;
 
 // Load books data from JSON file
 let allBooks = [];
@@ -11,7 +23,6 @@ const booksPerPage = 24;
 console.log('browse-books.js loaded successfully');
 
 // Initialize Books Data
-document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded, starting book data loading...');
     console.log('booksData available:', typeof booksData !== 'undefined' ? booksData.length : 'undefined');
     console.log('Current location:', window.location.href);
@@ -35,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
             loadEmbeddedBooks();
         }
     }, 5000);
-});
+}
 
 // Load books data
 async function loadBooksData() {
