@@ -12,7 +12,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function initializeLogin() {
   const supabase = window.supabaseClient;
-  const BASE = "/ShelfSync_app/pages/";
   let handled = false; // prevents double redirects
 
   async function redirectBasedOnRole(user) {
@@ -55,9 +54,9 @@ function initializeLogin() {
     }
 
     // Redirect
-    if (role === "admin") window.location.href = BASE + "admin-dashboard.html";
-    if (role === "seller") window.location.href = BASE + "seller-dashboard.html";
-    if (role === "customer") window.location.href = BASE + "all-books.html";
+    if (role === "admin") window.location.href = "admin-dashboard.html";
+    if (role === "seller") window.location.href = "seller-dashboard.html";
+    if (role === "customer") window.location.href = "all-books.html";
   }
 
   // Handle login once only

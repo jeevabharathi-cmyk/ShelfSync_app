@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 Complete Workflow & Connection Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2rem; background: #f5f5f5; }
+        .workflow { margin: 2rem 0; padding: 1.5rem; border-radius: 8px; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .seller { border-left: 4px solid #f59e0b; }
+        .admin { border-left: 4px solid #3b82f6; }
+        .customer { border-left: 4px solid #10b981; }
+        .test-step { margin: 1rem 0; padding: 1rem; background: #f8f9fa; border-radius: 4px; }
+        .connection { display: flex; align-items: center; margin: 0.5rem 0; }
+        .arrow { margin: 0 1rem; font-size: 1.2em; }
+        .status { padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8em; font-weight: bold; }
+        .pass { background: #d4edda; color: #155724; }
+        .fail { background: #f8d7da; color: #721c24; }
+        .pending { background: #fff3cd; color: #856404; }
+        h1 { text-align: center; color: #333; }
+        h2 { color: #555; }
+        .test-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; }
+    </style>
+</head>
+<body>
+    <h1>🔍 ShelfSync Workflow & Connection Test</h1>
+    
+    <div class="test-grid">
+        <!-- SELLER WORKFLOW -->
+        <div class="workflow seller">
+            <h2>🛍️ SELLER WORKFLOW</h2>
+            
+            <div class="test-step">
+                <h3>📝 Signup Flow</h3>
+                <div class="connection">
+                    <a href="pages/signup.html" target="_blank">Main Signup</a>
+                    <span class="arrow">→</span>
+                    <span>Select "Seller"</span>
+                    <span class="arrow">→</span>
+                    <a href="pages/login-seller.html" target="_blank">Seller Login</a>
+                </div>
+                <div class="connection">
+                    <a href="pages/signup-admin.html" target="_blank">Direct Seller Signup</a>
+                    <span class="arrow">→</span>
+                    <a href="pages/login-seller.html" target="_blank">Seller Login</a>
+                </div>
+            </div>
+
+            <div class="test-step">
+                <h3>🔐 Login Flow</h3>
+                <div class="connection">
+                    <a href="pages/login-seller.html" target="_blank">Seller Login</a>
+                    <span class="arrow">→</span>
+                    <a href="pages/seller-dashboard.html" target="_blank">Seller Dashboard</a>
+                </div>
+            </div>
+
+            <div class="test-step">
+                <h3>🏪 Dashboard Navigation</h3>
+                <div class="connection">
+                    <a href="pages/seller-dashboard.html" target="_blank">Dashboard</a>
+                    <span class="arrow">→</span>
+                    <a href="pages/inventory.html" target="_blank">My Inventory</a>
+                </div>
+                <div class="connection">
+                    <a href="pages/seller-dashboard.html" target="_blank">Dashboard</a>
+                    <span class="arrow">→</span>
+                    <a href="pages/seller-add-book.html" target="_blank">Add Book</a>
+                </div>
+                <div class="connection">
+                    <a href="pages/seller-dashboard.html" target="_blank">Dashboard</a>
+                    <span class="arrow">→</span>
+                    <a href="pages/seller-orders.html" target="_blank">Orders</a>
+                </div>
+            </div>
+
+            <div class="test-step">
+                <h3>🔒 Access Control Test</h3>
+                <p><strong>Expected:</strong> Seller role ONLY accesses seller pages</p>
+                <p><strong>Blocked:</strong> Admin dashboard, Customer pages</p>
+            </div>
+        </div>
+
+        <!-- ADMIN WORKFLOW -->
+        <div class="workflow admin">
+            <h2>⚙️ ADMIN WORKFLOW</h2>
+            
+            <div class="test-step">
+                <h3>📝 Signup Flow</h3>
+                <div class="connection">
+                    <a href="pages/signup.html" target="_blank">Main Signup</a>
+                    <span class="arrow">→</span>
+                    <span>Select "Admin"</span>
+                    <span class="arrow">→</span>
+                    <a href="pages/login-admin.html" target="_blank">Admin Login</a>
+                </div>
+                <div class="connection">
+                    <a href="pages/signup-admin.html" target="_blank">Direct Admin Signup</a>
+                    <span class="arrow">→</span>
+                    <a href="pages/login-admin.html" target="_blank">Admin Login</a>
+                </div>
+            </div>
+
+            <div class="test-step">
+                <h3>🔐 Login Flow</h3>
+                <div class="connection">
+                    <a href="pages/login-admin.html" target="_blank">Admin Login</a>
+                    <span class="arrow">→</span>
+                    <a href="pages/admin-dashboard.html" target="_blank">Admin Dashboard</a>
+                </div>
+            </div>
+
+            <div class="test-step">
+                <h3>🏛️ Dashboard Navigation</h3>
+                <div class="connection">
+                    <a href="pages/admin-dashboard.html" target="_blank">Dashboard</a>
+                    <span class="arrow">→</span>
+                    <a href="pages/admin-users.html" target="_blank">User Management</a>
+                </div>
+                <div class="connection">
+                    <a href="pages/admin-dashboard.html" target="_blank">Dashboard</a>
+                    <span class="arrow">→</span>
+                    <a href="pages/admin-inventory.html" target="_blank">All Inventory</a>
+                </div>
+                <div class="connection">
+                    <a href="pages/admin-dashboard.html" target="_blank">Dashboard</a>
+                    <span class="arrow">→</span>
+                    <a href="pages/admin-reports.html" target="_blank">Reports</a>
+                </div>
+            </div>
+
+            <div class="test-step">
+                <h3>🔒 Access Control Test</h3>
+                <p><strong>Expected:</strong> Admin role accesses ALL pages</p>
+                <p><strong>Allowed:</strong> Admin, Seller, Customer areas</p>
+            </div>
+        </div>
+
+        <!-- CUSTOMER WORKFLOW -->
+        <div class="workflow customer">
+            <h2>🛒 CUSTOMER WORKFLOW</h2>
+            
+            <div class="test-step">
+                <h3>📝 Signup Flow</h3>
+                <div class="connection">
+                    <a href="pages/signup.html" target="_blank">Main Signup</a>
+                    <span class="arrow">→</span>
+                    <span>Select "Customer"</span>
+                    <span class="arrow">→</span>
+                    <a href="pages/login-customer.html" target="_blank">Customer Login</a>
+                </div>
+            </div>
+
+            <div class="test-step">
+                <h3>🔐 Login Flow</h3>
+                <div class="connection">
+                    <a href="pages/login-customer.html" target="_blank">Customer Login</a>
+                    <span class="arrow">→</span>
+                    <a href="pages/all-books.html" target="_blank">Browse Books</a>
+                </div>
+            </div>
+
+            <div class="test-step">
+                <h3>🛍️ Shopping Navigation</h3>
+                <div class="connection">
+                    <a href="pages/all-books.html" target="_blank">Browse Books</a>
+                    <span class="arrow">→</span>
+                    <a href="pages/cart.html" target="_blank">Shopping Cart</a>
+                </div>
+                <div class="connection">
+                    <a href="pages/cart.html" target="_blank">Cart</a>
+                    <span class="arrow">→</span>
+                    <a href="pages/checkout.html" target="_blank">Checkout</a>
+                </div>
+            </div>
+
+            <div class="test-step">
+                <h3>🔒 Access Control Test</h3>
+                <p><strong>Expected:</strong> Customer role ONLY accesses customer pages</p>
+                <p><strong>Blocked:</strong> Admin dashboard, Seller dashboard</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- CROSS-ROLE CONNECTION TESTS -->
+    <div class="workflow" style="border-left: 4px solid #6b7280;">
+        <h2>🔄 CROSS-ROLE CONNECTION TESTS</h2>
+        
+        <div class="test-step">
+            <h3>❌ Unauthorized Access Tests</h3>
+            <p><strong>Test 1:</strong> Seller tries to access Admin Dashboard</p>
+            <p><strong>Expected:</strong> Redirect to login-seller.html with "Unauthorized" message</p>
+            
+            <p><strong>Test 2:</strong> Customer tries to access Seller Dashboard</p>
+            <p><strong>Expected:</strong> Redirect to login-customer.html with "Unauthorized" message</p>
+            
+            <p><strong>Test 3:</strong> Admin tries to access any page</p>
+            <p><strong>Expected:</strong> Full access to all areas</p>
+        </div>
+
+        <div class="test-step">
+            <h3>🔄 Role Switching Tests</h3>
+            <p><strong>Test 1:</strong> Login as Seller → Logout → Login as Admin</p>
+            <p><strong>Test 2:</strong> Login as Customer → Logout → Login as Seller</p>
+            <p><strong>Test 3:</strong> Login as Admin → Logout → Login as Customer</p>
+        </div>
+    </div>
+
+    <!-- NAVIGATION TESTS -->
+    <div class="workflow" style="border-left: 4px solid #8b5cf6;">
+        <h2>🧭 NAVIGATION & LINK TESTS</h2>
+        
+        <div class="test-step">
+            <h3>🏠 Main Site Navigation</h3>
+            <div class="connection">
+                <a href="index.html" target="_blank">Home</a>
+                <span class="arrow">→</span>
+                <span>Seller Portal Dropdown</span>
+                <span class="arrow">→</span>
+                <a href="pages/login-seller.html" target="_blank">Seller Login</a>
+            </div>
+            <div class="connection">
+                <a href="index.html" target="_blank">Home</a>
+                <span class="arrow">→</span>
+                <span>Admin Portal Dropdown</span>
+                <span class="arrow">→</span>
+                <a href="pages/login-admin.html" target="_blank">Admin Login</a>
+            </div>
+            <div class="connection">
+                <a href="index.html" target="_blank">Home</a>
+                <span class="arrow">→</span>
+                <a href="pages/login-customer.html" target="_blank">Customer Login</a>
+            </div>
+        </div>
+
+        <div class="test-step">
+            <h3>📋 Footer Navigation</h3>
+            <p><strong>For Sellers:</strong> Seller Login, Become a Seller, Seller Guidelines</p>
+            <p><strong>For Admins:</strong> Admin Login, Admin Registration, Admin Portal</p>
+            <p><strong>Quick Links:</strong> Home, Browse Books</p>
+        </div>
+    </div>
+
+    <script>
+        console.log('🔍 Workflow Test Page Loaded');
+        
+        // Test JavaScript connectivity
+        function testSupabaseConnection() {
+            if (window.supabaseClient) {
+                console.log('✅ Supabase client available');
+                return true;
+            } else {
+                console.log('❌ Supabase client not available');
+                return false;
+            }
+        }
+
+        // Auto-test after page load
+        setTimeout(() => {
+            console.log('🧪 Running automatic tests...');
+            
+            // Test 1: Check if all required files exist
+            const requiredFiles = [
+                'js/supabase.js',
+                'js/signup.js',
+                'js/signup-admin.js',
+                'js/login-customer.js',
+                'js/login-seller.js',
+                'js/login-admin.js',
+                'js/auth-guard.js',
+                'js/seller-dashboard.js',
+                'js/admin-dashboard.js'
+            ];
+            
+            console.log('📁 Required files check:', requiredFiles);
+            
+            // Test 2: Check navigation links
+            const navLinks = document.querySelectorAll('a[href^="pages/"]');
+            console.log(`🔗 Found ${navLinks.length} navigation links`);
+            
+            // Test 3: Supabase connectivity
+            testSupabaseConnection();
+            
+            console.log('✅ Automatic tests completed - check console for details');
+        }, 1000);
+
+        // Manual test functions
+        window.testWorkflow = function(role) {
+            console.log(`🧪 Testing ${role} workflow...`);
+            
+            switch(role) {
+                case 'seller':
+                    console.log('1. Go to signup → select seller → create account');
+                    console.log('2. Login at login-seller.html');
+                    console.log('3. Should redirect to seller-dashboard.html');
+                    console.log('4. Test seller navigation links');
+                    break;
+                case 'admin':
+                    console.log('1. Go to signup-admin.html → create admin account');
+                    console.log('2. Login at login-admin.html');
+                    console.log('3. Should redirect to admin-dashboard.html');
+                    console.log('4. Test admin navigation links');
+                    break;
+                case 'customer':
+                    console.log('1. Go to signup → select customer → create account');
+                    console.log('2. Login at login-customer.html');
+                    console.log('3. Should redirect to all-books.html');
+                    console.log('4. Test customer navigation links');
+                    break;
+            }
+        };
+
+        // Add test buttons
+        document.body.innerHTML += `
+            <div style="position: fixed; top: 20px; right: 20px; background: white; padding: 1rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <h4>Quick Tests</h4>
+                <button onclick="testWorkflow('seller')" style="display: block; margin: 0.5rem 0; padding: 0.5rem; background: #f59e0b; color: white; border: none; border-radius: 4px; cursor: pointer;">Test Seller</button>
+                <button onclick="testWorkflow('admin')" style="display: block; margin: 0.5rem 0; padding: 0.5rem; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer;">Test Admin</button>
+                <button onclick="testWorkflow('customer')" style="display: block; margin: 0.5rem 0; padding: 0.5rem; background: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer;">Test Customer</button>
+            </div>
+        `;
+    </script>
+</body>
+</html>

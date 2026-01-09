@@ -786,21 +786,26 @@
         </div>
     </footer>
     <!-- Supabase Configuration and Logic -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="../js/supabase.js"></script>
     <script src="../js/cart-manager.js"></script>
     <script>
         // Add debugging before loading browse-books.js
-        console.log('Page loaded, checking booksData...');
-        console.log('booksData available:', typeof booksData !== 'undefined');
+        console.log('🔍 Page loaded, checking booksData...');
+        console.log('📊 booksData available:', typeof booksData !== 'undefined');
         if (typeof booksData !== 'undefined') {
-            console.log('booksData length:', booksData.length);
+            console.log('📚 booksData length:', booksData.length);
+            console.log('📖 First book:', booksData[0]?.title);
+        } else {
+            console.log('❌ booksData is undefined - this might be the issue!');
         }
         
         // Check if required elements exist
         window.addEventListener('DOMContentLoaded', () => {
-            console.log('DOM loaded, checking elements...');
-            console.log('booksGrid element:', document.getElementById('booksGrid') ? 'found' : 'NOT FOUND');
-            console.log('pageInfo element:', document.getElementById('pageInfo') ? 'found' : 'NOT FOUND');
-            console.log('paginationContainer element:', document.getElementById('paginationContainer') ? 'found' : 'NOT FOUND');
+            console.log('🔍 DOM loaded, checking elements...');
+            console.log('📋 booksGrid element:', document.getElementById('booksGrid') ? 'found' : 'NOT FOUND');
+            console.log('📋 pageInfo element:', document.getElementById('pageInfo') ? 'found' : 'NOT FOUND');
+            console.log('📋 paginationContainer element:', document.getElementById('paginationContainer') ? 'found' : 'NOT FOUND');
         });
     </script>
     <script src="../js/browse-books.js"></script>

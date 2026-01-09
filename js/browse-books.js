@@ -1,3 +1,12 @@
+// Load books data from JSON file
+let allBooks = [];
+let displayBooks = [];
+let currentPage = 1;
+const booksPerPage = 24;
+
+// Add immediate console log to test if script loads
+console.log('browse-books.js loaded successfully');
+
 // Supabase will be loaded dynamically to support file:// protocol
 document.addEventListener('DOMContentLoaded', () => {
     const waitForSupabase = () => {
@@ -13,18 +22,9 @@ document.addEventListener('DOMContentLoaded', () => {
 function initializeBrowseBooks() {
     const supabase = window.supabaseClient;
 
-// Load books data from JSON file
-let allBooks = [];
-let displayBooks = [];
-let currentPage = 1;
-const booksPerPage = 24;
-
-// Add immediate console log to test if script loads
-console.log('browse-books.js loaded successfully');
-
-// Initialize Books Data
+    // Initialize Books Data
     console.log('DOM loaded, starting book data loading...');
-    console.log('booksData available:', typeof booksData !== 'undefined' ? booksData.length : 'undefined');
+    console.log('booksData available:', typeof booksData !== 'undefined' ? (booksData ? booksData.length : 'null') : 'undefined');
     console.log('Current location:', window.location.href);
     console.log('Supabase client:', typeof supabase !== 'undefined' ? 'available' : 'not available');
     
@@ -39,13 +39,13 @@ console.log('browse-books.js loaded successfully');
         loadBooksData();
     }, 100);
     
-    // Fallback timeout - if nothing loads after 5 seconds, show embedded books
+    // Fallback timeout - if nothing loads after 3 seconds, show embedded books
     setTimeout(() => {
         if (allBooks.length === 0) {
             console.warn('Timeout reached, loading embedded books as fallback');
             loadEmbeddedBooks();
         }
-    }, 5000);
+    }, 3000);
 }
 
 // Load books data
@@ -58,11 +58,36 @@ async function loadBooksData() {
         grid.innerHTML = '<div class="loading-spinner">📚 Loading books from database...</div>';
     }
     
-    // Try Supabase first
+    // First priority: Check if booksData global variable is available
+    if (typeof booksData !== 'undefined' && Array.isArray(booksData) && booksData.length > 0) {
+        console.log('✅ Found booksData global variable with', booksData.length, 'books');
+        
+        try {
+            // Process in chunks to avoid blocking the UI
+            allBooks = [...booksData]; // Create a copy
+            displayBooks = [...allBooks];
+            
+            console.log('📚 Books loaded successfully, showing first page...');
+            
+            // Update page info immediately
+            updatePageInfo();
+            
+            // Show first page with a small delay to ensure UI updates
+            setTimeout(() => {
+                showPage(1);
+            }, 50);
+            return;
+        } catch (error) {
+            console.error('❌ Error processing booksData:', error);
+            // Fall through to other methods
+        }
+    }
+    
+    // Second priority: Try Supabase
     try {
         if (supabase && supabase.supabaseUrl && 
             supabase.supabaseUrl !== "YOUR_SUPABASE_PROJECT_URL") {
-            console.log('Fetching books from Supabase...');
+            console.log('🔄 Fetching books from Supabase...');
             
             // Supabase query
             const { data: books, error } = await supabase
@@ -88,75 +113,51 @@ async function loadBooksData() {
                     language: book.language,
                     description: book.description
                 }));
-                console.log('Loaded ' + allBooks.length + ' books from Supabase');
+                console.log('✅ Loaded ' + allBooks.length + ' books from Supabase');
                 displayBooks = [...allBooks];
                 updatePageInfo();
                 showPage(1);
                 return;
             }
         } else {
-            console.log('Supabase not configured, trying fallback data...');
+            console.log('⚠️ Supabase not configured, trying fallback data...');
         }
     } catch (error) {
-        console.warn('Supabase error, trying fallback data:', error);
+        console.warn('⚠️ Supabase error, trying fallback data:', error);
     }
     
-    // Fallback to global variable
-    if (typeof booksData !== 'undefined' && Array.isArray(booksData) && booksData.length > 0) {
-        console.log('Using booksData global variable with', booksData.length, 'books');
-        
-        try {
-            // Process in chunks to avoid blocking the UI
-            allBooks = [...booksData]; // Create a copy
-            displayBooks = [...allBooks];
-            
-            console.log('Books loaded successfully, showing first page...');
-            
-            // Update page info immediately
-            updatePageInfo();
-            
-            // Show first page with a small delay to ensure UI updates
-            setTimeout(() => {
-                showPage(1);
-            }, 50);
-            return;
-        } catch (error) {
-            console.error('Error processing booksData:', error);
-            // Fall through to other methods
-        }
-    }
-    
-    console.log('booksData not available or invalid, trying local files...');
-    
-    // Try to load local JSON files
+    // Third priority: Try to load local JSON files
+    console.log('🔄 Trying to load from local JSON files...');
     const jsonPaths = ['../books-database.json', './books-database.json', 'books-database.json'];
     
     for (const path of jsonPaths) {
         try {
-            console.log('Trying to fetch:', path);
+            console.log('🔄 Trying to fetch:', path);
             const response = await fetch(path);
             if (response.ok) {
                 const data = await response.json();
                 if (data.books && data.books.length > 0) {
                     allBooks = data.books;
-                    console.log('Loaded ' + allBooks.length + ' books from JSON file:', path);
+                    console.log('✅ Loaded ' + allBooks.length + ' books from JSON file:', path);
                     displayBooks = [...allBooks];
+                    updatePageInfo();
                     showPage(1);
                     return;
                 }
             }
         } catch (error) {
-            console.log('Failed to load from', path, ':', error.message);
+            console.log('❌ Failed to load from', path, ':', error.message);
         }
     }
     
-    console.log('All JSON loading failed, using embedded books...');
+    // Last resort: Use embedded books
+    console.log('⚠️ All loading methods failed, using embedded books as last resort...');
     loadEmbeddedBooks();
 }
 
 // Fallback embedded books data
 function loadEmbeddedBooks() {
-    console.log('Using embedded fallback books');
+    console.log('📚 Using embedded fallback books');
     allBooks = [
         { "title": "The Great Gatsby", "author": "F. Scott Fitzgerald", "price": 5437.33, "category": "FICTION", "condition": "USED", "stock": "Limited Stock", "gradient": "sapiens", "isbn": "9780743273565", "cover": "https://covers.openlibrary.org/b/isbn/9780743273565-L.jpg" },
         { "title": "1984", "author": "George Orwell", "price": 1840.94, "category": "FICTION", "condition": "NEW", "stock": "Limited Stock", "gradient": "orwell", "isbn": "9780451524935", "cover": "https://covers.openlibrary.org/b/isbn/9780451524935-L.jpg" },
@@ -169,10 +170,23 @@ function loadEmbeddedBooks() {
         { "title": "Atomic Habits", "author": "James Clear", "price": 1919.79, "category": "BUSINESS", "condition": "USED", "stock": "In Stock", "gradient": "alchemist", "isbn": "9780735211292", "cover": "https://covers.openlibrary.org/b/isbn/9780735211292-L.jpg" },
         { "title": "The Lean Startup", "author": "Eric Ries", "price": 6818.45, "category": "BUSINESS", "condition": "NEW", "stock": "Limited Stock", "gradient": "gatsby", "isbn": "9780307887894", "cover": "https://covers.openlibrary.org/b/isbn/9780307887894-L.jpg" },
         { "title": "Clean Code", "author": "Robert C. Martin", "price": 4806.53, "category": "SCIENCE & TECH", "condition": "LIKE NEW", "stock": "Low Stock", "gradient": "sapiens", "isbn": "9780132350884", "cover": "https://covers.openlibrary.org/b/isbn/9780132350884-L.jpg" },
-        { "title": "Sapiens", "author": "Yuval Noah Harari", "price": 828.34, "category": "HISTORY", "condition": "NEW", "stock": "Low Stock", "gradient": "orwell", "isbn": "9780062316097", "cover": "https://covers.openlibrary.org/b/isbn/9780062316097-L.jpg" }
+        { "title": "Sapiens", "author": "Yuval Noah Harari", "price": 828.34, "category": "HISTORY", "condition": "NEW", "stock": "Low Stock", "gradient": "orwell", "isbn": "9780062316097", "cover": "https://covers.openlibrary.org/b/isbn/9780062316097-L.jpg" },
+        { "title": "Thinking, Fast and Slow", "author": "Daniel Kahneman", "price": 4565, "category": "NON-FICTION", "condition": "LIKE NEW", "stock": "Low Stock", "gradient": "orwell", "isbn": "9780374533557", "cover": "https://covers.openlibrary.org/b/isbn/9780374533557-L.jpg" },
+        { "title": "The Power of Now", "author": "Eckhart Tolle", "price": 6838.37, "category": "NON-FICTION", "condition": "NEW", "stock": "In Stock", "gradient": "gatsby", "isbn": "9781577314806", "cover": "https://covers.openlibrary.org/b/isbn/9781577314806-L.jpg" },
+        { "title": "Educated", "author": "Tara Westover", "price": 1521.39, "category": "NON-FICTION", "condition": "LIKE NEW", "stock": "In Stock", "gradient": "patterns", "isbn": "9780399590504", "cover": "https://covers.openlibrary.org/b/isbn/9780399590504-L.jpg" },
+        { "title": "Becoming", "author": "Michelle Obama", "price": 5810, "category": "NON-FICTION", "condition": "LIKE NEW", "stock": "In Stock", "gradient": "code", "isbn": "9781524763138", "cover": "https://covers.openlibrary.org/b/isbn/9781524763138-L.jpg" },
+        { "title": "Zero to One", "author": "Peter Thiel", "price": 1323.85, "category": "BUSINESS", "condition": "LIKE NEW", "stock": "In Stock", "gradient": "alchemist", "isbn": "9780804139298", "cover": "https://covers.openlibrary.org/b/isbn/9780804139298-L.jpg" },
+        { "title": "The 7 Habits of Highly Effective People", "author": "Stephen Covey", "price": 2679.24, "category": "BUSINESS", "condition": "LIKE NEW", "stock": "Limited Stock", "gradient": "sapiens", "isbn": "9781982137274", "cover": "https://covers.openlibrary.org/b/isbn/9781982137274-L.jpg" },
+        { "title": "Deep Work", "author": "Cal Newport", "price": 1973.74, "category": "BUSINESS", "condition": "LIKE NEW", "stock": "Limited Stock", "gradient": "alchemist", "isbn": "9781455586691", "cover": "https://covers.openlibrary.org/b/isbn/9781455586691-L.jpg" },
+        { "title": "Good to Great", "author": "Jim Collins", "price": 1762.09, "category": "BUSINESS", "condition": "LIKE NEW", "stock": "In Stock", "gradient": "code", "isbn": "9780066620992", "cover": "https://covers.openlibrary.org/b/isbn/9780066620992-L.jpg" },
+        { "title": "A Brief History of Time", "author": "Stephen Hawking", "price": 1826, "category": "SCIENCE & TECH", "condition": "LIKE NEW", "stock": "In Stock", "gradient": "code", "isbn": "9780553380163", "cover": "https://covers.openlibrary.org/b/isbn/9780553380163-L.jpg" },
+        { "title": "The Selfish Gene", "author": "Richard Dawkins", "price": 1688.22, "category": "SCIENCE & TECH", "condition": "USED", "stock": "Limited Stock", "gradient": "patterns", "isbn": "9780198788607", "cover": "https://covers.openlibrary.org/b/isbn/9780198788607-L.jpg" },
+        { "title": "Cosmos", "author": "Carl Sagan", "price": 5429.86, "category": "SCIENCE & TECH", "condition": "NEW", "stock": "Low Stock", "gradient": "alchemist", "isbn": "9780345539434", "cover": "https://covers.openlibrary.org/b/isbn/9780345539434-L.jpg" },
+        { "title": "The Art of War", "author": "Sun Tzu", "price": 7006.03, "category": "HISTORY", "condition": "NEW", "stock": "Limited Stock", "gradient": "orwell", "isbn": "9781599869773", "cover": "https://covers.openlibrary.org/b/isbn/9781599869773-L.jpg" }
     ];
     displayBooks = [...allBooks];
-    console.log('Embedded books loaded:', allBooks.length, 'books');
+    console.log('✅ Embedded books loaded:', allBooks.length, 'books');
+    updatePageInfo();
     showPage(1);
 }
 

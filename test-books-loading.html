@@ -6,33 +6,35 @@
     <title>Test Books Loading</title>
 </head>
 <body>
-    <h1>Books Loading Test</h1>
-    <div id="status">Loading...</div>
-    <div id="count"></div>
-    <div id="sample"></div>
+    <h1>Books Data Loading Test</h1>
+    <div id="results"></div>
 
     <script src="books-data.js"></script>
     <script>
-        console.log('Test page loaded');
-        console.log('booksData type:', typeof booksData);
-        console.log('booksData available:', typeof booksData !== 'undefined');
+        console.log('Testing books data loading...');
+        
+        const results = document.getElementById('results');
         
         if (typeof booksData !== 'undefined') {
-            console.log('booksData length:', booksData.length);
-            document.getElementById('status').textContent = 'Books data loaded successfully!';
-            document.getElementById('count').textContent = `Total books: ${booksData.length}`;
+            console.log('✅ booksData is available');
+            console.log('📊 Total books:', booksData.length);
             
-            if (booksData.length > 0) {
-                document.getElementById('sample').innerHTML = `
-                    <h3>First book:</h3>
-                    <p>Title: ${booksData[0].title}</p>
-                    <p>Author: ${booksData[0].author}</p>
-                    <p>Price: ₹${booksData[0].price}</p>
-                `;
-            }
+            results.innerHTML = `
+                <h2>✅ Success!</h2>
+                <p><strong>Total books found:</strong> ${booksData.length}</p>
+                <p><strong>First book:</strong> ${booksData[0]?.title || 'N/A'}</p>
+                <p><strong>Last book:</strong> ${booksData[booksData.length - 1]?.title || 'N/A'}</p>
+                <h3>Sample books:</h3>
+                <ul>
+                    ${booksData.slice(0, 10).map(book => `<li>${book.title} by ${book.author} - ₹${book.price}</li>`).join('')}
+                </ul>
+            `;
         } else {
-            console.error('booksData is not available');
-            document.getElementById('status').textContent = 'ERROR: Books data not loaded!';
+            console.log('❌ booksData is not available');
+            results.innerHTML = `
+                <h2>❌ Error!</h2>
+                <p>booksData is not available. Check if books-data.js is loading correctly.</p>
+            `;
         }
     </script>
 </body>

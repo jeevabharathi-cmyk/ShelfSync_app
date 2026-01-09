@@ -5,71 +5,137 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Debug Books Loading</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
-        .success { background: #d4edda; color: #155724; }
-        .error { background: #f8d7da; color: #721c24; }
-        .info { background: #d1ecf1; color: #0c5460; }
+        body { font-family: Arial, sans-serif; margin: 2rem; }
+        .test { margin: 1rem 0; padding: 1rem; border: 1px solid #ddd; border-radius: 8px; }
+        .success { background: #d4edda; border-color: #c3e6cb; }
+        .error { background: #f8d7da; border-color: #f5c6cb; }
+        .info { background: #d1ecf1; border-color: #bee5eb; }
     </style>
 </head>
 <body>
-    <h1>Books Loading Debug</h1>
-    <div id="results"></div>
+    <h1>🔍 ShelfSync Books Loading Debug</h1>
+    
+    <div id="test1" class="test">
+        <h3>Test 1: books-data.js Loading</h3>
+        <div id="result1">Testing...</div>
+    </div>
+    
+    <div id="test2" class="test">
+        <h3>Test 2: books-database.json Loading</h3>
+        <div id="result2">Testing...</div>
+    </div>
+    
+    <div id="test3" class="test">
+        <h3>Test 3: Browse Books Functionality</h3>
+        <div id="result3">Testing...</div>
+    </div>
 
+    <!-- Load books-data.js -->
     <script src="books-data.js"></script>
+    
     <script>
-        const results = document.getElementById('results');
-        
-        function addResult(message, type = 'info') {
-            const div = document.createElement('div');
-            div.className = `status ${type}`;
-            div.textContent = message;
-            results.appendChild(div);
-            console.log(message);
-        }
-
-        // Test 1: Check if booksData is loaded
-        addResult('Test 1: Checking booksData availability...');
-        if (typeof booksData !== 'undefined') {
-            addResult(`✓ booksData is available with ${booksData.length} books`, 'success');
+        // Test 1: Check books-data.js
+        function test1() {
+            const result = document.getElementById('result1');
+            const test = document.getElementById('test1');
             
-            // Test 2: Check data structure
-            if (booksData.length > 0) {
-                const firstBook = booksData[0];
-                addResult(`✓ First book: ${firstBook.title} by ${firstBook.author}`, 'success');
-                addResult(`✓ Price: ₹${firstBook.price}`, 'success');
-                addResult(`✓ Category: ${firstBook.category}`, 'success');
+            if (typeof booksData !== 'undefined' && Array.isArray(booksData)) {
+                test.className = 'test success';
+                result.innerHTML = `
+                    ✅ <strong>SUCCESS!</strong><br>
+                    📚 Total books: ${booksData.length}<br>
+                    📖 First book: "${booksData[0]?.title}" by ${booksData[0]?.author}<br>
+                    💰 Price range: ₹${Math.min(...booksData.map(b => b.price))} - ₹${Math.max(...booksData.map(b => b.price))}
+                `;
+            } else {
+                test.className = 'test error';
+                result.innerHTML = `
+                    ❌ <strong>FAILED!</strong><br>
+                    booksData is ${typeof booksData}<br>
+                    This means books-data.js is not loading correctly.
+                `;
+            }
+        }
+        
+        // Test 2: Check books-database.json
+        async function test2() {
+            const result = document.getElementById('result2');
+            const test = document.getElementById('test2');
+            
+            try {
+                const response = await fetch('books-database.json');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.books && data.books.length > 0) {
+                        test.className = 'test success';
+                        result.innerHTML = `
+                            ✅ <strong>SUCCESS!</strong><br>
+                            📚 Total books: ${data.books.length}<br>
+                            📖 First book: "${data.books[0]?.title}" by ${data.books[0]?.author}
+                        `;
+                    } else {
+                        test.className = 'test error';
+                        result.innerHTML = `❌ <strong>FAILED!</strong><br>JSON file exists but no books found.`;
+                    }
+                } else {
+                    test.className = 'test error';
+                    result.innerHTML = `❌ <strong>FAILED!</strong><br>HTTP ${response.status}: ${response.statusText}`;
+                }
+            } catch (error) {
+                test.className = 'test error';
+                result.innerHTML = `❌ <strong>FAILED!</strong><br>Error: ${error.message}`;
+            }
+        }
+        
+        // Test 3: Simulate browse books functionality
+        function test3() {
+            const result = document.getElementById('result3');
+            const test = document.getElementById('test3');
+            
+            // Check if we have data from either source
+            let books = [];
+            let source = '';
+            
+            if (typeof booksData !== 'undefined' && Array.isArray(booksData) && booksData.length > 0) {
+                books = booksData;
+                source = 'books-data.js';
             }
             
-            // Test 3: Check for duplicates or issues
-            const titles = booksData.map(book => book.title);
-            const uniqueTitles = new Set(titles);
-            addResult(`✓ Total books: ${booksData.length}, Unique titles: ${uniqueTitles.size}`, 'info');
-            
-            // Test 4: Check categories
-            const categories = [...new Set(booksData.map(book => book.category))];
-            addResult(`✓ Categories: ${categories.join(', ')}`, 'info');
-            
-            // Test 5: Check price range
-            const prices = booksData.map(book => book.price);
-            const minPrice = Math.min(...prices);
-            const maxPrice = Math.max(...prices);
-            addResult(`✓ Price range: ₹${minPrice.toFixed(2)} - ₹${maxPrice.toFixed(2)}`, 'info');
-            
-        } else {
-            addResult('✗ booksData is not available!', 'error');
+            if (books.length > 0) {
+                test.className = 'test success';
+                
+                // Test pagination
+                const booksPerPage = 24;
+                const totalPages = Math.ceil(books.length / booksPerPage);
+                const firstPageBooks = books.slice(0, booksPerPage);
+                
+                result.innerHTML = `
+                    ✅ <strong>SUCCESS!</strong><br>
+                    📊 Data source: ${source}<br>
+                    📚 Total books: ${books.length}<br>
+                    📄 Total pages: ${totalPages}<br>
+                    📋 Books per page: ${booksPerPage}<br>
+                    📖 First page books: ${firstPageBooks.length}<br>
+                    <br>
+                    <strong>Sample books from first page:</strong><br>
+                    ${firstPageBooks.slice(0, 5).map(book => 
+                        `• ${book.title} by ${book.author} - ₹${book.price} (${book.category})`
+                    ).join('<br>')}
+                `;
+            } else {
+                test.className = 'test error';
+                result.innerHTML = `❌ <strong>FAILED!</strong><br>No books data available from any source.`;
+            }
         }
-
-        // Test 6: Simulate pagination
-        addResult('Test 6: Simulating pagination...');
-        if (typeof booksData !== 'undefined' && booksData.length > 0) {
-            const booksPerPage = 24;
-            const totalPages = Math.ceil(booksData.length / booksPerPage);
-            addResult(`✓ Total pages with ${booksPerPage} books per page: ${totalPages}`, 'success');
+        
+        // Run tests
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('🔍 Running debug tests...');
             
-            const firstPageBooks = booksData.slice(0, booksPerPage);
-            addResult(`✓ First page would show ${firstPageBooks.length} books`, 'success');
-        }
+            test1();
+            test2();
+            test3();
+        });
     </script>
 </body>
 </html>
