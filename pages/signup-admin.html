@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Registration | ShelfSync</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Supabase Configuration and Logic -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="../js/supabase.js"></script>
+    <script src="../js/signup-admin.js"></script>
+
+    <style>
+        .auth-container {
+            max-width: 500px;
+            margin: var(--spacing-2xl) auto;
+            padding: var(--spacing-xl);
+            border-top: 4px solid var(--secondary-color);
+            /* Admin accent */
+        }
+
+        .auth-links {
+            text-align: center;
+            margin-top: var(--spacing-lg);
+            font-size: var(--small-size);
+        }
+
+        .auth-links a {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .role-switcher {
+            display: flex;
+            justify-content: center;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .role-switcher a {
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--radius-md);
+            font-size: var(--small-size);
+            color: var(--text-light);
+        }
+
+        .role-switcher a.active {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        .admin-notice {
+            background-color: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .admin-notice h4 {
+            color: #92400e;
+            margin: 0 0 0.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        .admin-notice p {
+            color: #92400e;
+            margin: 0;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="../index.html" class="logo">
+                <span>📚 ShelfSync</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="all-books.html" class="nav-link">Browse Books</a></li>
+                <li><a href="login-customer.html" class="btn btn-outline">Login</a></li>
+                <li><a href="signup.html" class="btn btn-primary">Sign Up</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Admin Registration Form -->
+    <div class="container">
+        <div class="card auth-container">
+            <div class="text-center" style="margin-bottom: var(--spacing-lg);">
+                <h2>Admin Registration</h2>
+                <p class="text-light">Create an administrator account</p>
+            </div>
+
+            <div class="role-switcher">
+                <a href="signup.html">Customer</a>
+                <a href="signup.html">Seller</a>
+                <a href="signup-admin.html" class="active">Admin</a>
+            </div>
+
+            <div class="admin-notice">
+                <h4>⚠️ Administrator Account</h4>
+                <p>Admin accounts have full platform access including user management, inventory oversight, and system configuration. Only create admin accounts for authorized personnel.</p>
+            </div>
+
+            <form id="adminSignupForm">
+                <div class="grid-2"
+                    style="gap: var(--spacing-md); grid-template-columns: 1fr 1fr; margin-bottom: var(--spacing-md);">
+                    <div>
+                        <label class="form-label">First Name</label>
+                        <input type="text" id="firstName" class="form-control" placeholder="John" required>
+                    </div>
+                    <div>
+                        <label class="form-label">Last Name</label>
+                        <input type="text" id="lastName" class="form-control" placeholder="Doe" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" id="email" class="form-control" placeholder="admin@shelfsync.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Admin Department</label>
+                    <select id="department" class="form-control" required>
+                        <option value="">Select Department</option>
+                        <option value="operations">Operations</option>
+                        <option value="customer-service">Customer Service</option>
+                        <option value="inventory">Inventory Management</option>
+                        <option value="finance">Finance</option>
+                        <option value="technical">Technical</option>
+                        <option value="general">General Administration</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Employee ID (Optional)</label>
+                    <input type="text" id="employeeId" class="form-control" placeholder="EMP001">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="password" class="form-control" placeholder="Create a strong password"
+                        required minlength="8">
+                    <small class="text-light">Minimum 8 characters required for admin accounts</small>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Confirm Password</label>
+                    <input type="password" id="confirmPassword" class="form-control" placeholder="Confirm password"
+                        required>
+                </div>
+
+                <div class="form-group" style="font-size: var(--small-size);">
+                    <label style="display: flex; align-items: start; gap: 0.5rem;">
+                        <input type="checkbox" id="termsCheckbox" required style="margin-top: 0.25rem;">
+                        <span>I agree to the <a href="#" style="color: var(--primary-color);">Terms of Service</a>, 
+                            <a href="#" style="color: var(--primary-color);">Privacy Policy</a>, and 
+                            <a href="#" style="color: var(--primary-color);">Admin Code of Conduct</a>.</span>
+                    </label>
+                </div>
+
+                <div class="form-group" style="font-size: var(--small-size);">
+                    <label style="display: flex; align-items: start; gap: 0.5rem;">
+                        <input type="checkbox" id="authorizationCheckbox" required style="margin-top: 0.25rem;">
+                        <span>I confirm that I am authorized to create an administrator account and have received proper approval from ShelfSync management.</span>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block"
+                    style="background-color: var(--secondary-color);">Create Admin Account</button>
+            </form>
+
+            <div class="auth-links">
+                <p>Already have an admin account? <a href="login-admin.html">Login Here</a></p>
+                <p style="margin-top: 10px; border-top: 1px solid #eee; padding-top: 10px;">
+                    <small>Need help? <a href="#" style="color: var(--secondary-color);">Contact IT Support</a></small>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2025 ShelfSync. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+
+</html>

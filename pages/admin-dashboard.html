@@ -59,20 +59,24 @@
             <!-- Stats -->
             <div class="stats-grid">
                 <div class="stat-card">
-                    <h3 class="text-accent">$45k</h3>
-                    <p>Total Revenue</p>
-                </div>
-                <div class="stat-card">
                     <h3 class="text-accent">1,240</h3>
                     <p>Total Users</p>
+                    <small class="text-light">👥 Platform members</small>
                 </div>
                 <div class="stat-card">
                     <h3 class="text-accent">8,500</h3>
                     <p>Books Listed</p>
+                    <small class="text-light">📚 Active inventory</small>
                 </div>
                 <div class="stat-card">
-                    <h3 class="text-accent">4.8</h3>
-                    <p>Platform Rating</p>
+                    <h3 class="text-accent">156</h3>
+                    <p>Total Orders</p>
+                    <small class="text-light">🛒 Completed transactions</small>
+                </div>
+                <div class="stat-card">
+                    <h3 class="text-accent">$45k</h3>
+                    <p>Total Revenue</p>
+                    <small class="text-light">💰 Platform earnings</small>
                 </div>
             </div>
 
@@ -128,7 +132,7 @@
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="../js/supabase.js"></script>
     <script src="../js/auth-guard.js"></script>
-    <script>checkAuthAndRole("admin"); </script>
+    <script src="../js/admin-dashboard.js"></script>
     <script>
         // Check admin authentication on page load
         document.addEventListener('DOMContentLoaded', async () => {
@@ -138,6 +142,11 @@
                 if (user) {
                     console.log('[Admin Dashboard] Authentication successful for user:', user.id);
                 }
+            } catch (error) {
+                console.error('[Admin Dashboard] Authentication failed:', error);
+            }
+        });
+    </script>
             } catch (error) {
                 console.error('[Admin Dashboard] Authentication failed:', error);
             }

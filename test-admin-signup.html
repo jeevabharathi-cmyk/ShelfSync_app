@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Admin Signup Flow</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2rem; }
+        .test-section { margin: 2rem 0; padding: 1rem; border: 1px solid #ccc; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Admin Signup Workflow Test</h1>
+    
+    <div class="test-section info">
+        <h2>📋 Test Checklist</h2>
+        <ul>
+            <li>✅ Admin signup page created: <a href="pages/signup-admin.html" target="_blank">signup-admin.html</a></li>
+            <li>✅ Admin signup JavaScript created: js/signup-admin.js</li>
+            <li>✅ Admin dashboard JavaScript created: js/admin-dashboard.js</li>
+            <li>✅ Navigation updated with admin links</li>
+            <li>✅ Footer updated with admin section</li>
+            <li>✅ Main signup page updated with admin option</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>🔗 Admin Workflow Links</h2>
+        <p><strong>Step 1:</strong> <a href="pages/signup-admin.html" target="_blank">Admin Registration</a></p>
+        <p><strong>Step 2:</strong> <a href="pages/login-admin.html" target="_blank">Admin Login</a></p>
+        <p><strong>Step 3:</strong> <a href="pages/admin-dashboard.html" target="_blank">Admin Dashboard</a></p>
+    </div>
+
+    <div class="test-section">
+        <h2>🎯 Test Scenarios</h2>
+        <ol>
+            <li><strong>Admin Registration:</strong>
+                <ul>
+                    <li>Go to <a href="pages/signup-admin.html" target="_blank">Admin Signup</a></li>
+                    <li>Fill form with test data (use strong password)</li>
+                    <li>Check both authorization checkboxes</li>
+                    <li>Submit and verify account creation</li>
+                </ul>
+            </li>
+            <li><strong>Admin Login:</strong>
+                <ul>
+                    <li>Go to <a href="pages/login-admin.html" target="_blank">Admin Login</a></li>
+                    <li>Login with created credentials</li>
+                    <li>Verify redirect to admin dashboard</li>
+                </ul>
+            </li>
+            <li><strong>Admin Dashboard:</strong>
+                <ul>
+                    <li>Verify admin-specific stats display</li>
+                    <li>Check user management features</li>
+                    <li>Test logout functionality</li>
+                </ul>
+            </li>
+        </ol>
+    </div>
+
+    <div class="test-section success">
+        <h2>✅ Expected Results</h2>
+        <ul>
+            <li>Admin can register with enhanced security requirements</li>
+            <li>Admin login redirects to admin-dashboard.html</li>
+            <li>Admin dashboard shows platform-wide statistics</li>
+            <li>All navigation links work correctly</li>
+            <li>Role-based access control functions properly</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>🔧 Quick Navigation Test</h2>
+        <p>Test all admin-related navigation:</p>
+        <ul>
+            <li><a href="index.html" target="_blank">Home Page</a> → Check Admin Portal dropdown</li>
+            <li><a href="pages/signup.html" target="_blank">Main Signup</a> → Check admin option in role dropdown</li>
+            <li><a href="pages/signup-admin.html" target="_blank">Admin Signup</a> → Test form validation</li>
+            <li><a href="pages/login-admin.html" target="_blank">Admin Login</a> → Test authentication</li>
+        </ul>
+    </div>
+
+    <script>
+        console.log('🧪 Admin Signup Test Page Loaded');
+        console.log('📝 Test the complete admin workflow using the links above');
+    </script>
+</body>
+</html>
