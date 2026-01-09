@@ -1,92 +1,92 @@
 // Supabase Authentication
-document.addEventListener('DOMContentLoaded', () => {
-    const waitForSupabase = () => {
-        if (window.supabaseClient) {
-            initializeLogin();
-        } else {
-            setTimeout(waitForSupabase, 100);
-        }
-    };
-    waitForSupabase();
+document.addEventListener("DOMContentLoaded", () => {
+  const waitForSupabase = () => {
+    if (window.supabaseClient) {
+      initializeLogin();
+    } else {
+      setTimeout(waitForSupabase, 100);
+    }
+  };
+  waitForSupabase();
 });
 
 function initializeLogin() {
-    const supabase = window.supabaseClient;
+  const supabase = window.supabaseClient;
+  const BASE = "/ShelfSync_app/pages/";
+  let handled = false; // prevents double redirects
 
-async function redirectBasedOnRole(user) {
+  async function redirectBasedOnRole(user) {
     const path = window.location.pathname;
 
-    console.log(`[Login] Checking role for UID: ${user.id} in users table`);
+    console.log(`[Login] Checking role for UID: ${user.id}`);
 
-    // Universal pattern - always check users table
-    const { data: profile, error: roleError } = await supabase
-        .from('users')
-        .select('role')
-        .eq('id', user.id)
-        .single();
+    const { data: profile, error } = await supabase
+      .from("users")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
 
-    if (roleError || !profile) {
-        console.error(`[Login] User profile not found:`, roleError);
-        await supabase.auth.signOut();
-        throw new Error('User profile not found');
+    if (error) {
+      console.error(error);
+      throw new Error("Database error");
+    }
+
+    if (!profile) {
+      throw new Error("User profile not created yet. Please try again.");
     }
 
     const role = profile.role;
-    console.log(`[Login] User role found: ${role}`);
+    console.log(`[Login] Role = ${role}`);
 
-    // Portal validation
+    // Portal enforcement
     if (path.includes("login-seller") && role !== "seller") {
-        await supabase.auth.signOut();
-        throw new Error("Unauthorized");
+      await supabase.auth.signOut();
+      throw new Error("Not a Seller account");
     }
 
     if (path.includes("login-admin") && role !== "admin") {
-        await supabase.auth.signOut();
-        throw new Error("Unauthorized");
+      await supabase.auth.signOut();
+      throw new Error("Not an Admin account");
     }
 
     if (path.includes("login-customer") && role !== "customer") {
-        await supabase.auth.signOut();
-        throw new Error("Unauthorized");
+      await supabase.auth.signOut();
+      throw new Error("Not a Customer account");
     }
 
     // Redirect
-    if (role === "admin") window.location.href = "admin-dashboard.html";
-    if (role === "seller") window.location.href = "seller-dashboard.html";
-    if (role === "customer") window.location.href = "all-books.html";
-}
+    if (role === "admin") window.location.href = BASE + "admin-dashboard.html";
+    if (role === "seller") window.location.href = BASE + "seller-dashboard.html";
+    if (role === "customer") window.location.href = BASE + "all-books.html";
+  }
 
-    // Supabase auth state listener
-    supabase.auth.onAuthStateChange((event, session) => {
-        if (session?.user && window.location.pathname.includes("login-")) {
-            redirectBasedOnRole(session.user).catch(console.error);
-        }
+  // Handle login once only
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (handled) return;
+
+    if (event === "SIGNED_IN" && session?.user) {
+      handled = true;
+      redirectBasedOnRole(session.user).catch(err => alert(err.message));
+    }
+  });
+
+  // Login form
+  const form = document.getElementById("loginForm");
+  if (!form) return;
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById("emailInput").value;
+    const password = document.getElementById("passwordInput").value;
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password
     });
 
-    const form = document.getElementById("loginForm");
-    if (!form) return;
-
-    form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        const email = document.getElementById('emailInput').value;
-        const password = document.getElementById('passwordInput').value;
-
-        try {
-            // Universal login logic
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email,
-                password
-            });
-
-            if (error) {
-                alert(error.message);
-                return;
-            }
-
-            await redirectBasedOnRole(data.user);
-        } catch (err) {
-            alert(err.message);
-        }
-    });
+    if (error) {
+      alert(error.message);
+    }
+  });
 }
