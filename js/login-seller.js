@@ -1,11 +1,7 @@
-/**
- * Seller Login Authentication (FIXED)
- */
-
 document.addEventListener("DOMContentLoaded", () => {
   const waitForSupabase = () => {
     if (window.supabaseClient) {
-      initializeLogin();
+      init();
     } else {
       setTimeout(waitForSupabase, 100);
     }
@@ -13,14 +9,11 @@ document.addEventListener("DOMContentLoaded", () => {
   waitForSupabase();
 });
 
-function initializeLogin() {
+function init() {
   const supabase = window.supabaseClient;
 
   const form = document.getElementById("loginForm");
-  if (!form) {
-    console.error("Login form not found");
-    return;
-  }
+  if (!form) return;
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -28,13 +21,8 @@ function initializeLogin() {
     const email = document.getElementById("emailInput").value;
     const password = document.getElementById("passwordInput").value;
 
-    const submitBtn = e.target.querySelector("button[type='submit']");
-    const originalText = submitBtn.textContent;
-    submitBtn.textContent = "Logging in...";
-    submitBtn.disabled = true;
-
     try {
-      // 1️⃣ Login
+      // 1️⃣ Authenticate
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
@@ -46,46 +34,33 @@ function initializeLogin() {
       }
 
       const userId = data.user.id;
-      console.log("Logged in UID:", userId);
 
       // 2️⃣ Fetch role from public.users
       const { data: profile, error: profileError } = await supabase
         .from("users")
         .select("role")
         .eq("id", userId)
-        .maybeSingle();
+        .single();
 
-      if (profileError) {
-        console.error(profileError);
-        throw new Error("Profile lookup failed");
-      }
-
-      if (!profile) {
+      if (profileError || !profile) {
         await supabase.auth.signOut();
-        throw new Error("User profile not found. Please sign up again.");
+        alert("User profile not found. Please sign up again.");
+        return;
       }
 
-      console.log("User role:", profile.role);
-
-      // 3️⃣ Enforce seller-only access
+      // 3️⃣ Enforce seller portal
       if (profile.role !== "seller") {
         await supabase.auth.signOut();
-        throw new Error("This account is not a Seller account.");
+        alert("Only seller accounts can login here.");
+        return;
       }
 
-      // 4️⃣ Redirect
-      submitBtn.textContent = "Success!";
-      setTimeout(() => {
-        window.location.href = "seller-dashboard.html";
-      }, 400);
+      // 4️⃣ Redirect to seller dashboard
+      window.location.href = "seller-dashboard.html";
 
     } catch (err) {
-      alert(err.message);
-    } finally {
-      setTimeout(() => {
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
-      }, 800);
+      console.error(err);
+      alert("Login failed.");
     }
   });
 }
