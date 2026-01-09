@@ -48,27 +48,52 @@ function initializeLogin() {
             });
 
             if (error) {
+                console.error('[Seller Login] Auth error:', error);
                 alert(error.message);
                 return;
             }
 
+            console.log('[Seller Login] Auth successful, user ID:', data.user.id);
+
             const userId = data.user.id;
 
+            // Query user profile with detailed logging
+            console.log('[Seller Login] Querying user profile for ID:', userId);
+            
             const { data: profile, error: roleError } = await supabase
                 .from('users')
                 .select('role, first_name, last_name')
                 .eq('id', userId)
                 .single();
 
-            if (roleError || !profile) {
-                alert('User profile not found');
+            console.log('[Seller Login] Profile query result:', { profile, roleError });
+
+            if (roleError) {
+                console.error('[Seller Login] Profile query error:', roleError);
+                
+                // Check if it's a "no rows" error (user profile doesn't exist)
+                if (roleError.code === 'PGRST116') {
+                    alert('User profile not found. Please contact support or try signing up again.');
+                } else {
+                    alert(`Database error: ${roleError.message}`);
+                }
                 await supabase.auth.signOut();
                 return;
             }
 
+            if (!profile) {
+                console.error('[Seller Login] No profile returned from query');
+                alert('User profile not found. Please contact support or try signing up again.');
+                await supabase.auth.signOut();
+                return;
+            }
+
+            console.log('[Seller Login] Profile found:', profile);
+
             // Seller login role-based redirect
             if (profile.role !== 'seller') {
-                alert('Unauthorized - Seller account required');
+                console.warn('[Seller Login] User role mismatch. Expected: seller, Got:', profile.role);
+                alert(`Unauthorized - Seller account required. Your account type: ${profile.role}`);
                 await supabase.auth.signOut();
                 return;
             }
@@ -85,7 +110,7 @@ function initializeLogin() {
             }, 500);
 
         } catch (error) {
-            console.error('[Seller Login] Login error:', error);
+            console.error('[Seller Login] Unexpected error:', error);
             alert('Login failed. Please try again.');
         } finally {
             // Reset button state if still on page

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Seller Login</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2rem; }
+        .test { margin: 1rem 0; padding: 1rem; border: 1px solid #ddd; border-radius: 8px; }
+        .success { background: #d4edda; border-color: #c3e6cb; }
+        .error { background: #f8d7da; border-color: #f5c6cb; }
+        .info { background: #d1ecf1; border-color: #bee5eb; }
+        input, button { padding: 0.5rem; margin: 0.25rem; }
+        button { background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Seller Login Debug Tool</h1>
+    
+    <div class="test info">
+        <h3>Test Seller Account</h3>
+        <p>Enter the email of the seller account you're trying to login with:</p>
+        <input type="email" id="testEmail" placeholder="seller@example.com" style="width: 300px;">
+        <button onclick="testSellerAccount()">Test Account</button>
+        <div id="testResult" style="margin-top: 1rem;"></div>
+    </div>
+
+    <div class="test info">
+        <h3>Create Test Seller Account</h3>
+        <p>Create a test seller account for testing:</p>
+        <input type="email" id="newEmail" placeholder="testseller@example.com" style="width: 200px;">
+        <input type="password" id="newPassword" placeholder="password123" style="width: 150px;">
+        <button onclick="createTestSeller()">Create Test Seller</button>
+        <div id="createResult" style="margin-top: 1rem;"></div>
+    </div>
+
+    <div class="test info">
+        <h3>List All Users</h3>
+        <button onclick="listAllUsers()">Show All Users in Database</button>
+        <div id="usersResult" style="margin-top: 1rem;"></div>
+    </div>
+
+    <!-- Supabase -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    
+    <script>
+        let supabase;
+        
+        // Wait for Supabase to load
+        const waitForSupabase = () => {
+            if (window.supabaseClient) {
+                supabase = window.supabaseClient;
+                console.log('✅ Supabase client loaded');
+            } else {
+                setTimeout(waitForSupabase, 100);
+            }
+        };
+        waitForSupabase();
+
+        async function testSellerAccount() {
+            const email = document.getElementById('testEmail').value;
+            const result = document.getElementById('testResult');
+            
+            if (!email) {
+                result.innerHTML = '❌ Please enter an email address';
+                return;
+            }
+
+            try {
+                result.innerHTML = '🔍 Checking account...';
+                
+                // Check if user exists in users table
+                const { data: users, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('email', email);
+
+                if (error) {
+                    result.innerHTML = `❌ Database error: ${error.message}`;
+                    return;
+                }
+
+                if (users.length === 0) {
+                    result.innerHTML = `❌ No user found with email: ${email}`;
+                    return;
+                }
+
+                const user = users[0];
+                result.innerHTML = `
+                    ✅ <strong>User Found!</strong><br>
+                    📧 Email: ${user.email}<br>
+                    👤 Name: ${user.first_name} ${user.last_name}<br>
+                    🏷️ Role: ${user.role}<br>
+                    🆔 ID: ${user.id}<br>
+                    📅 Created: ${new Date(user.created_at).toLocaleString()}
+                `;
+                
+                if (user.role !== 'seller') {
+                    result.innerHTML += `<br><br>⚠️ <strong>Issue:</strong> This account has role "${user.role}" but you're trying to login as seller.`;
+                }
+                
+            } catch (error) {
+                result.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+
+        async function createTestSeller() {
+            const email = document.getElementById('newEmail').value;
+            const password = document.getElementById('newPassword').value;
+            const result = document.getElementById('createResult');
+            
+            if (!email || !password) {
+                result.innerHTML = '❌ Please enter both email and password';
+                return;
+            }
+
+            try {
+                result.innerHTML = '🔄 Creating test seller account...';
+                
+                // 1. Create auth user
+                const { data, error } = await supabase.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: {
+                        data: {
+                            first_name: 'Test',
+                            last_name: 'Seller',
+                            role: 'seller'
+                        }
+                    }
+                });
+
+                if (error) {
+                    result.innerHTML = `❌ Auth error: ${error.message}`;
+                    return;
+                }
+
+                // 2. Create profile
+                if (data.user) {
+                    const profileData = {
+                        id: data.user.id,
+                        email: email,
+                        first_name: 'Test',
+                        last_name: 'Seller',
+                        role: 'seller'
+                    };
+
+                    const { error: profileError } = await supabase
+                        .from('users')
+                        .insert(profileData);
+                    
+                    if (profileError) {
+                        result.innerHTML = `❌ Profile error: ${profileError.message}`;
+                        return;
+                    }
+                }
+
+                result.innerHTML = `
+                    ✅ <strong>Test Seller Created!</strong><br>
+                    📧 Email: ${email}<br>
+                    🔑 Password: ${password}<br>
+                    🏷️ Role: seller<br>
+                    <br>
+                    You can now try logging in with these credentials at 
+                    <a href="pages/login-seller.html" target="_blank">Seller Login</a>
+                `;
+                
+            } catch (error) {
+                result.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+
+        async function listAllUsers() {
+            const result = document.getElementById('usersResult');
+            
+            try {
+                result.innerHTML = '🔍 Loading all users...';
+                
+                const { data: users, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    result.innerHTML = `❌ Error: ${error.message}`;
+                    return;
+                }
+
+                if (users.length === 0) {
+                    result.innerHTML = '📭 No users found in database';
+                    return;
+                }
+
+                let html = `<strong>📊 Found ${users.length} users:</strong><br><br>`;
+                
+                users.forEach(user => {
+                    const roleColor = user.role === 'seller' ? '#f59e0b' : 
+                                    user.role === 'admin' ? '#3b82f6' : '#10b981';
+                    
+                    html += `
+                        <div style="margin: 0.5rem 0; padding: 0.5rem; border-left: 3px solid ${roleColor}; background: #f8f9fa;">
+                            📧 ${user.email} | 
+                            👤 ${user.first_name} ${user.last_name} | 
+                            🏷️ <strong>${user.role}</strong> | 
+                            📅 ${new Date(user.created_at).toLocaleDateString()}
+                        </div>
+                    `;
+                });
+                
+                result.innerHTML = html;
+                
+            } catch (error) {
+                result.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>

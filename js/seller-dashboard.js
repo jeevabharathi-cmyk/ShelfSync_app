@@ -15,9 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
     waitForSupabase();
 });
 
-function initializeSellerDashboard() {
-    const supabase = window.supabaseClient;
-
 // Dashboard state
 let currentUser = null;
 let sellerStats = {
@@ -27,19 +24,59 @@ let sellerStats = {
     sellerRating: 4.9
 };
 
+function initializeSellerDashboard() {
+    const supabase = window.supabaseClient;
+    
+    // Call the dashboard initialization
+    initializeDashboard();
+}
+
 /**
  * Initialize seller dashboard
  */
 async function initializeDashboard() {
+    const supabase = window.supabaseClient;
+    
     try {
-        // Call the dashboard initialization
-        await initializeDashboard();
+        console.log('[Seller Dashboard] Initializing dashboard...');
+        
+        // Get current user
+        const { data: { user }, error } = await supabase.auth.getUser();
+        if (error || !user) {
+            console.error('[Seller Dashboard] No authenticated user found');
+            window.location.href = 'login-seller.html';
+            return;
+        }
+
+        currentUser = user;
+        console.log('[Seller Dashboard] User authenticated:', user.id);
+
+        // Load seller profile
+        await loadSellerProfile();
+        
+        // Load seller statistics
+        await loadSellerStats();
+        
+        // Load recent orders
+        await loadRecentOrders();
+        
+        // Setup logout functionality
+        setupLogout();
+        
+        console.log('[Seller Dashboard] Dashboard initialized successfully');
+        
+    } catch (error) {
+        console.error('[Seller Dashboard] Initialization error:', error);
+        alert('Failed to load dashboard. Please try refreshing the page.');
+    }
 }
 
 /**
  * Load seller profile information
  */
 async function loadSellerProfile() {
+    const supabase = window.supabaseClient;
+    
     try {
         const { data: profile, error } = await supabase
             .from('users')
@@ -77,6 +114,8 @@ async function loadSellerProfile() {
  * Load seller statistics from Supabase
  */
 async function loadSellerStats() {
+    const supabase = window.supabaseClient;
+    
     try {
         // Try to load real stats from Supabase
         const { data: books, error: booksError } = await supabase
@@ -254,6 +293,7 @@ function getActionLabel(status) {
  * Setup logout functionality
  */
 function setupLogout() {
+    const supabase = window.supabaseClient;
     const logoutLinks = document.querySelectorAll('a[href="../index.html"]');
     logoutLinks.forEach(link => {
         if (link.textContent.toLowerCase().includes('logout')) {
