@@ -1,5 +1,5 @@
 // seller-add-book.js
-// Securely adds books for logged-in sellers using Supabase RLS
+// Securely adds books for logged-in sellers using Supabase RLS (GitHub Pages compatible)
 
 document.addEventListener("DOMContentLoaded", async () => {
   // Wait until Supabase loads
@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     e.preventDefault();
 
     try {
-      // Get active session (THIS is what RLS trusts)
+      // Get active session
       const { data: { session }, error: sessionError } =
         await supabase.auth.getSession();
 
@@ -28,9 +28,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
       }
 
-      const user = session.user; // trusted auth.uid()
+      const user = session.user;
+      const accessToken = session.access_token; // THIS is what RLS needs
 
-      // Read form fields
+      // Read form values
       const title = form.querySelector('[name="title"]')?.value.trim();
       const author = form.querySelector('[name="author"]')?.value.trim();
 
@@ -39,17 +40,23 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
       }
 
-      // Insert book (RLS validates seller_id === auth.uid())
+      // Insert book WITH JWT header so Postgres can see auth.uid()
       const { error } = await supabase
         .from("books")
         .insert({
           title,
           author,
           seller_id: user.id
+        })
+        .select()
+        .single()
+        .throwOnError()
+        .withHeaders({
+          Authorization: `Bearer ${accessToken}`
         });
 
       if (error) {
-        console.error("❌ Supabase insert error:", error);
+        console.error("❌ Insert failed:", error);
         alert("Failed to add book: " + error.message);
         return;
       }
