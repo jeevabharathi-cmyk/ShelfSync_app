@@ -32,6 +32,13 @@ export const supabaseClient = createClient(
 // Make client available globally
 window.supabaseClient = supabaseClient;
 
+// Force JWT on every request - Critical for RLS
+supabaseClient.auth.onAuthStateChange((event, session) => {
+  if (session) {
+    supabaseClient.rest.setAuth(session.access_token);
+  }
+});
+
 // Initialize Supabase client only if not already initialized
 if (!window.supabaseClient) {
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
