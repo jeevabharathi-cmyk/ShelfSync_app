@@ -1,0 +1,103 @@
+// seller-add-book.js
+// Securely adds books for logged-in sellers using Supabase RLS (GitHub Pages compatible)
+
+document.addEventListener("DOMContentLoaded", async () => {
+  // Wait until Supabase loads
+  while (!window.supabaseClient) {
+    await new Promise(r => setTimeout(r, 100));
+  }
+
+@@ -10,63 +6,39 @@ document.addEventListener("DOMContentLoaded", async () => {
+  const supabase = window.supabaseClient;
+  const form = document.getElementById("addBookForm");
+
+  if (!form) {
+    console.error("❌ addBookForm not found");
+    return;
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    try {
+      // Get active session
+      const { data: { session }, error: sessionError } =
+        await supabase.auth.getSession();
+
+      if (sessionError || !session) {
+        alert("Session expired. Please log in again.");
+        return;
+      }
+
+      const user = session.user;
+      const accessToken = session.access_token; // THIS is what RLS needs
+
+      // Read form values
+      const title = form.querySelector('[name="title"]')?.value.trim();
+      const author = form.querySelector('[name="author"]')?.value.trim();
+
+      if (!title || !author) {
+        alert("Title and Author are required.");
+        return;
+      }
+
+      // Insert book WITH JWT header so Postgres can see auth.uid()
+      const { error } = await supabase
+        .from("books")
+        .insert({
+          title,
+          author,
+          seller_id: user.id
+        })
+        .select()
+        .single()
+        .throwOnError()
+        .withHeaders({
+          Authorization: `Bearer ${accessToken}`
+        });
+
+      if (error) {
+        console.error("❌ Insert failed:", error);
+        alert("Failed to add book: " + error.message);
+        return;
+      }
+
+      alert("✅ Book published successfully!");
+      form.reset();
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      alert("Not logged in");
+      return;
+    }
+
+    } catch (err) {
+      console.error("❌ Unexpected error:", err);
+      alert("Something went wrong. Try again.");
+    const user = session.user;
+
+    const title = form.title.value.trim();
+    const author = form.author.value.trim();
+    const price = parseFloat(form.price.value);
+    const stock = parseInt(form.stock.value);
+    const description = form.description.value;
+
+    const { error } = await supabase.from("books").insert({
+      title,
+      author,
+      price,
+      stock,
+      description,
+      seller_id: user.id
+    });
+
+    if (error) {
+      console.error("Insert failed:", error);
+      alert(error.message);
+      return;
+    }
+
+    alert("Book published!");
+    form.reset();
+  });
+});
+});
