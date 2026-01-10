@@ -9,9 +9,6 @@
     <link rel="stylesheet" href="../css/layout.css">
     <link rel="stylesheet" href="../css/components.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-    <script src="../js/free-map.js"></script>
     <script src="../js/cart-manager.js"></script>
     <style>
         :root {
@@ -678,6 +675,16 @@
             </div>
 
             <div id="addAddressForm" style="display:none;">
+                <div class="form-group">
+                    <label style="font-size: 0.9rem; font-weight: 600; margin-bottom: 8px; display: block;">Google Maps
+                        API Key</label>
+                    <input type="text" class="api-key-input" id="gmapsApiKey"
+                        placeholder="Enter your Google Maps API key (optional)">
+                    <small style="color: var(--ss-text-light); font-size: 0.8rem;">Get your free API key from <a
+                            href="https://console.cloud.google.com/google/maps-apikey" target="_blank"
+                            style="color: var(--ss-primary);">Google Cloud Console</a></small>
+                </div>
+
                 <button class="btn btn-outline"
                     style="margin-bottom:15px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;"
                     onclick="useCurrentLocation()">
@@ -1032,9 +1039,26 @@
             document.getElementById('addressList').style.display = 'none';
             document.getElementById('addAddressForm').style.display = 'block';
 
-            // Initialize FREE OpenStreetMap (no API key needed!)
-            setTimeout(() => initializeMap(), 100);
+            // Load map if not already loaded
+            if (!isMapLoaded) {
+                setTimeout(() => loadGoogleMaps(), 100);
+            } else if (map) {
+                // Trigger resize to fix display issues
+                setTimeout(() => {
+                    google.maps.event.trigger(map, 'resize');
+                    map.setCenter(marker.getPosition());
+                }, 100);
+            }
         }
+
+        function useCurrentLocation() {
+            const btn = event.currentTarget;
+            const originalText = btn.innerHTML;
+
+            if (window.location.protocol === 'file:') {
+                showMapError('Geolocation requires a local server (localhost).');
+                return;
+            }
 
             if (!navigator.geolocation) {
                 showMapError('Your browser does not support geolocation.');
