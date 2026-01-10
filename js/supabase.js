@@ -7,6 +7,7 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 // Supabase Configuration - Replace with your actual values
+const SUPABASE_URL = "https://rgthabuxucbhlklzlkwy.supabase.co";
 const SUPABASE_URL = "https://rgthabuxcblhklzlkwy.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJndGhhYnV4dWNiaGxrbHpsa3d5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4MDIzODMsImV4cCI6MjA4MzM3ODM4M30.uOZ7Oabk5PSBn0fszhVrzUIBs7l5LyukBdVD1eX497U";
 
@@ -31,13 +32,6 @@ export const supabaseClient = createClient(
 
 // Make client available globally
 window.supabaseClient = supabaseClient;
-
-// Force JWT on every request - Critical for RLS
-supabaseClient.auth.onAuthStateChange((event, session) => {
-  if (session) {
-    supabaseClient.rest.setAuth(session.access_token);
-  }
-});
 
 // Initialize Supabase client only if not already initialized
 if (!window.supabaseClient) {
