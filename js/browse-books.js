@@ -122,23 +122,73 @@ function showPage(page) {
 function renderBooks(books) {
     const grid = document.getElementById("booksGrid");
 
-    if (!books.length) {
-        grid.innerHTML = "No books found";
+    if (!books || books.length === 0) {
+        grid.innerHTML = `<div class="loading-spinner">No books found</div>`;
         return;
     }
 
-    grid.innerHTML = books.map(book => `
-    <div class="card premium">
-        <div class="book-cover-container">
-            <img class="book-cover" src="${book.cover}">
-        </div>
-        <div class="card-content">
-            <h3>${book.title}</h3>
-            <p>${book.author}</p>
-            <div class="price">₹${book.price}</div>
-        </div>
-    </div>
-    `).join("");
+    grid.innerHTML = books.map(book => {
+        const stockText = typeof book.stock === "number"
+            ? (book.stock > 0 ? "In Stock" : "Out of Stock")
+            : (book.stock || "In Stock");
+
+        const stockClass = stockText.toLowerCase().replace(/\s+/g, "-");
+
+        return `
+        <div class="card premium">
+            <div class="book-cover-container">
+                <img class="book-cover"
+                     src="${book.cover}"
+                     alt="${book.title}"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+
+                <div class="book-cover ${book.gradient || "sapiens"}" style="display:none;">
+                    <div class="book-cover-placeholder">${book.title}</div>
+                </div>
+
+                <div class="book-cover-overlay">
+                    <button class="quick-view-btn" onclick="openQuickView('${book.isbn}')">Quick View</button>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <h3 class="card-title">${book.title}</h3>
+                <p class="card-subtitle">${book.author}</p>
+
+                <div class="book-meta">
+                    <span class="book-tag tag-category">${book.category}</span>
+                    <span class="book-tag tag-condition">${book.condition}</span>
+                </div>
+
+                <div class="book-stock ${stockClass}">
+                    <span class="stock-dot"></span> ${stockText}
+                </div>
+
+                <div class="card-footer">
+                    <div class="price-container">
+                        <div class="book-price">
+                            ₹${Number(book.price).toLocaleString("en-IN")}
+                        </div>
+                    </div>
+
+                    <div class="card-actions">
+                        <!-- CART IMAGE BUTTON -->
+                        <button class="btn-cart-img"
+                                onclick="addToCart('${book.title.replace(/'/g,"\\'")}', ${book.price})"
+                                title="Add to Cart">
+                            <img src="https://cdn-icons-png.flaticon.com/512/1170/1170678.png" alt="Cart">
+                        </button>
+
+                        <!-- BUY NOW BUTTON -->
+                        <button class="btn-buy"
+                                onclick="buyNow('${book.title.replace(/'/g,"\\'")}', ${book.price})">
+                            Buy Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+    }).join("");
 }
 
 /* -------------------------------
