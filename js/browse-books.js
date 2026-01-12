@@ -174,14 +174,14 @@ function renderBooks(books) {
                     <div class="card-actions">
                         <!-- CART IMAGE BUTTON -->
                         <button class="btn-cart-img"
-                                onclick="addToCart('${book.title.replace(/'/g, "\\'")}', ${book.price})"
+                                onclick="addToCart('${book.isbn}')"
                                 title="Add to Cart">
                             <img src="https://cdn-icons-png.flaticon.com/512/1170/1170678.png" alt="Cart">
                         </button>
 
                         <!-- BUY NOW BUTTON -->
                         <button class="btn-buy"
-                                onclick="buyNow('${book.title.replace(/'/g, "\\'")}', ${book.price})">
+                                onclick="buyNow('${book.isbn}')">
                             Buy Now
                         </button>
                     </div>
@@ -282,8 +282,8 @@ window.openQuickView = function (isbn) {
                     ShelfSync ensures you get the best quality books at the most competitive prices.
                 </p>
                 <div class="modal-actions">
-                    <button class="btn btn-primary" onclick="addToCart('${book.title.replace(/'/g, "\\'")}', ${book.price})">Add to Cart</button>
-                    <button class="btn btn-outline" onclick="buyNow('${book.title.replace(/'/g, "\\'")}', ${book.price})">Buy Now</button>
+                    <button class="btn btn-primary" onclick="addToCart('${book.isbn}')">Add to Cart</button>
+                    <button class="btn btn-outline" onclick="buyNow('${book.isbn}')">Buy Now</button>
                 </div>
             </div>
         </div>
@@ -312,22 +312,28 @@ window.addEventListener('click', function (event) {
 /* -------------------------------
    Cart Helpers (Missing in all-books.html)
 --------------------------------*/
-window.addToCart = (title, price) => {
-    if (window.CartManager) {
-        window.CartManager.addToCart({ title, price });
+window.addToCart = (isbn) => {
+    // Find the full book object by ISBN
+    const book = allBooks.find(b => b.isbn === isbn);
+
+    if (book && window.CartManager) {
+        window.CartManager.addToCart(book);
         const notification = document.getElementById('quickCartNotification');
         const message = document.getElementById('quickCartMessage');
         if (notification && message) {
-            message.textContent = `"${title}" has been added to your cart.`;
+            message.textContent = `"${book.title}" has been added to your cart.`;
             notification.classList.add('show');
             setTimeout(() => notification.classList.remove('show'), 5000);
         }
     }
 };
 
-window.buyNow = (title, price) => {
-    if (window.CartManager) {
-        window.CartManager.addToCart({ title, price });
+window.buyNow = (isbn) => {
+    // Find the full book object by ISBN
+    const book = allBooks.find(b => b.isbn === isbn);
+
+    if (book && window.CartManager) {
+        window.CartManager.addToCart(book);
         window.location.href = 'cart.html';
     }
 };
