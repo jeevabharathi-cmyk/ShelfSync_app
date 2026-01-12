@@ -12,27 +12,8 @@
     <!-- Supabase Configuration and Logic -->
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="../js/supabase.js"></script>
-    <script>
-        let books = [];
+    <script src="../js/browse-books.js"></script>
 
-        async function loadBooksFromSupabase() {
-            const { data, error } = await supabaseClient
-                .from("books")
-                .select("*")
-                
-            if (error) {
-                console.error("Supabase error:", error);
-                return;
-            }
-
-            console.log("Books from DB:", data);
-            books = data;
-            renderBooks(books);
-            updatePageInfo();
-        }
-
-        document.addEventListener("DOMContentLoaded", loadBooksFromSupabase);
-    </script>
     <style>
         .browse-container {
             display: grid;

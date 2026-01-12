@@ -410,12 +410,14 @@ window.goToCart = () => {
 };
 
 window.handleSearch = (query) => {
-    const q = query.toLowerCase();
+    const q = query.toLowerCase().trim();
+
     displayBooks = allBooks.filter(book =>
-        book.title.toLowerCase().includes(q) ||
-        book.author.toLowerCase().includes(q) ||
-        book.isbn.includes(q)
+        (book.title && book.title.toLowerCase().includes(q)) ||
+        (book.author && book.author.toLowerCase().includes(q)) ||
+        (book.isbn && String(book.isbn).includes(q))
     );
+
     showPage(1);
 };
 
