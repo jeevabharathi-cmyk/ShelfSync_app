@@ -1,4 +1,6 @@
 // Load books data from JSON file
+let supabase;
+let fallbackTimer = null;
 let allBooks = [];
 let displayBooks = [];
 let currentPage = 1;
@@ -20,13 +22,13 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initializeBrowseBooks() {
-    const supabase = window.supabaseClient;
+    supabase = window.supabaseClient;
 
-    // Initialize Books Data
-    console.log('DOM loaded, starting book data loading...');
-    console.log('booksData available:', typeof booksData !== 'undefined' ? (booksData ? booksData.length : 'null') : 'undefined');
-    console.log('Current location:', window.location.href);
-    console.log('Supabase client:', typeof supabase !== 'undefined' ? 'available' : 'not available');
+    if (supabase && supabase.supabaseUrl) {
+        console.log('Supabase client:', supabase.supabaseUrl);
+    } else {
+        console.log('Supabase client not found');
+    }
     
     // Show loading state immediately
     const grid = document.getElementById('booksGrid');
@@ -40,16 +42,19 @@ function initializeBrowseBooks() {
     }, 100);
     
     // Fallback timeout - if nothing loads after 3 seconds, show embedded books
-    setTimeout(() => {
-        if (allBooks.length === 0) {
+    fallbackTimer = setTimeout(() => {
+        if (!allBooks || allBooks.length === 0) {
             console.warn('Timeout reached, loading embedded books as fallback');
             loadEmbeddedBooks();
         }
     }, 3000);
+
+
 }
 
 // Load books data
 async function loadBooksData() {
+    clearTimeout(fallbackTimer);
     console.log('loadBooksData called');
     
     // Update loading message
