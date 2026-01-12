@@ -760,17 +760,16 @@ if (!user) {
                     title: formData.title,
                     author: formData.author,
                     isbn: formData.isbn || null,
-                    category: formData.category,
-                    language: formData.language,
+                    category: formData.category.toLowerCase(),
+                    language: formData.language.toLowerCase(),
                     publisher: formData.publisher || null,
-                    format: formData.format,
-                    condition: formData.condition,
+                    format: formData.format.toLowerCase(),
+                    condition: formData.condition.toLowerCase(),
                     price: parseFloat(formData.price),
                     stock: parseInt(formData.stock),
                     description: formData.description,
                     cover: imageUrl,
-
-                    seller_id: user.id,        // 🔥 THIS IS MANDATORY
+                    seller_id: user.id,
                     created_at: new Date().toISOString()
                 };
 
