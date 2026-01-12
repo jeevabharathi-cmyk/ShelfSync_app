@@ -640,6 +640,74 @@
                 max-width: none;
             }
         }
+
+        /* Premium Pagination Styles */
+        #paginationContainer {
+            margin-top: 3rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        #paginationContainer button {
+            min-width: 45px;
+            height: 45px;
+            padding: 0 15px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background: white;
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        #paginationContainer button:hover:not(:disabled) {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(44, 82, 130, 0.2);
+        }
+
+        #paginationContainer button.btn-primary {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 12px rgba(44, 82, 130, 0.3);
+        }
+
+        #paginationContainer button:disabled {
+            background: #f8fafc;
+            color: #cbd5e1;
+            border-color: #e2e8f0;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        #paginationContainer span {
+            color: var(--text-light);
+            font-weight: 600;
+            padding: 0 5px;
+        }
+
+        /* Responsive adjustments for pagination */
+        @media (max-width: 600px) {
+            #paginationContainer button {
+                min-width: 40px;
+                height: 40px;
+                padding: 0 10px;
+                font-size: 0.85rem;
+            }
+        }
     </style>
 </head>
 
@@ -731,8 +799,7 @@
                 <div class="grid-3" id="booksGrid">
                     <div class="loading-spinner">📚 Loading books...</div>
                 </div>
-                <div id="paginationContainer"
-                    style="display: flex; justify-content: center; gap: var(--spacing-sm); margin-top: var(--spacing-2xl); flex-wrap: wrap;">
+                <div id="paginationContainer">
                 </div>
             </main>
         </div>
@@ -786,7 +853,7 @@
             </div>
         </div>
     </footer>
-    <script src="../js/cart-manager.js"></script>    
+    <script src="../js/cart-manager.js"></script>
 </body>
 
 </html>
