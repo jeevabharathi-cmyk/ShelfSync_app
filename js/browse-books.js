@@ -174,14 +174,14 @@ function renderBooks(books) {
                     <div class="card-actions">
                         <!-- CART IMAGE BUTTON -->
                         <button class="btn-cart-img"
-                                onclick="addToCart('${book.title.replace(/'/g,"\\'")}', ${book.price})"
+                                onclick="addToCart('${book.title.replace(/'/g, "\\'")}', ${book.price})"
                                 title="Add to Cart">
                             <img src="https://cdn-icons-png.flaticon.com/512/1170/1170678.png" alt="Cart">
                         </button>
 
                         <!-- BUY NOW BUTTON -->
                         <button class="btn-buy"
-                                onclick="buyNow('${book.title.replace(/'/g,"\\'")}', ${book.price})">
+                                onclick="buyNow('${book.title.replace(/'/g, "\\'")}', ${book.price})">
                             Buy Now
                         </button>
                     </div>
@@ -241,9 +241,102 @@ window.handleSearch = q => {
 window.handleSort = () => {
     const v = document.getElementById("sortSelect").value;
 
-    if (v === "price-low") displayBooks.sort((a,b)=>a.price-b.price);
-    else if (v === "price-high") displayBooks.sort((a,b)=>b.price-a.price);
+    if (v === "price-low") displayBooks.sort((a, b) => a.price - b.price);
+    else if (v === "price-high") displayBooks.sort((a, b) => b.price - a.price);
     else displayBooks = [...allBooks];
 
     showPage(1);
+};
+
+/* -------------------------------
+   Quick View Functionality
+--------------------------------*/
+window.openQuickView = function (isbn) {
+    const book = allBooks.find(b => b.isbn === isbn);
+    if (!book) return;
+
+    const modal = document.getElementById('quickViewModal');
+    const modalBody = document.getElementById('modalBody');
+
+    const stockText = typeof book.stock === "number"
+        ? (book.stock > 0 ? "In Stock" : "Out of Stock")
+        : (book.stock || "In Stock");
+
+    modalBody.innerHTML = `
+        <div class="quick-view-container">
+            <div class="quick-view-image">
+                <img src="${book.cover}" alt="${book.title}" onerror="this.src='https://via.placeholder.com/400x600?text=${encodeURIComponent(book.title)}'">
+            </div>
+            <div class="quick-view-details">
+                <h2 class="modal-title">${book.title}</h2>
+                <p class="modal-author">by ${book.author}</p>
+                <div class="modal-meta">
+                    <span class="book-tag tag-category">${book.category}</span>
+                    <span class="book-tag tag-condition">${book.condition}</span>
+                    <span class="book-tag">${stockText}</span>
+                </div>
+                <div class="modal-price">₹${Number(book.price).toLocaleString("en-IN")}</div>
+                <p class="modal-description">
+                    Experience the magic of "${book.title}", a remarkable ${book.category.toLowerCase()} work by ${book.author}. 
+                    This copy is in ${book.condition.toLowerCase()} condition and is currently ${stockText.toLowerCase()}. 
+                    ShelfSync ensures you get the best quality books at the most competitive prices.
+                </p>
+                <div class="modal-actions">
+                    <button class="btn btn-primary" onclick="addToCart('${book.title.replace(/'/g, "\\'")}', ${book.price})">Add to Cart</button>
+                    <button class="btn btn-outline" onclick="buyNow('${book.title.replace(/'/g, "\\'")}', ${book.price})">Buy Now</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden'; // Prevent scrolling
+};
+
+window.closeModal = function () {
+    const modal = document.getElementById('quickViewModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto'; // Restore scrolling
+    }
+};
+
+// Close modal when clicking outside
+window.addEventListener('click', function (event) {
+    const modal = document.getElementById('quickViewModal');
+    if (event.target == modal) {
+        closeModal();
+    }
+});
+
+/* -------------------------------
+   Cart Helpers (Missing in all-books.html)
+--------------------------------*/
+window.addToCart = (title, price) => {
+    if (window.CartManager) {
+        window.CartManager.addToCart({ title, price });
+        const notification = document.getElementById('quickCartNotification');
+        const message = document.getElementById('quickCartMessage');
+        if (notification && message) {
+            message.textContent = `"${title}" has been added to your cart.`;
+            notification.classList.add('show');
+            setTimeout(() => notification.classList.remove('show'), 5000);
+        }
+    }
+};
+
+window.buyNow = (title, price) => {
+    if (window.CartManager) {
+        window.CartManager.addToCart({ title, price });
+        window.location.href = 'cart.html';
+    }
+};
+
+window.hideNotification = () => {
+    const notification = document.getElementById('quickCartNotification');
+    if (notification) notification.classList.remove('show');
+};
+
+window.goToCart = () => {
+    window.location.href = 'cart.html';
 };
