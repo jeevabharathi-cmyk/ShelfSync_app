@@ -210,8 +210,14 @@ function renderBooks(books) {
     // Use requestAnimationFrame to avoid blocking the UI
     requestAnimationFrame(() => {
         const html = books.map(book => {
-            const stockClass = book.stock.toLowerCase().replace(' ', '-');
+            const stockText = typeof book.stock === "number"
+                ? (book.stock > 0 ? "In Stock" : "Out of Stock")
+                : book.stock;
+
+            const stockClass = stockText.toLowerCase().replace(/\s+/g, '-');
+
             const isLiked = localStorage.getItem(`liked_${book.isbn}`) === 'true';
+
 
             return `
             <div class="card premium">
@@ -241,7 +247,7 @@ function renderBooks(books) {
                     </div>
                     <div class="book-stock ${stockClass}">
                         <span class="stock-dot"></span>
-                        ${book.stock}
+                        ${stockText}
                     </div>
                     <div class="card-footer">
                         <div class="price-container">
