@@ -210,17 +210,70 @@ function updatePageInfo() {
 function updatePagination() {
     const totalPages = Math.ceil(displayBooks.length / booksPerPage);
     const box = document.getElementById("paginationContainer");
-    if (!box) return;
+    if (!box || totalPages <= 1) {
+        if (box) box.innerHTML = "";
+        return;
+    }
 
     box.innerHTML = "";
 
-    for (let i = 1; i <= totalPages; i++) {
+    // Helper to create buttons
+    const createBtn = (page, text, active = false, disabled = false) => {
         const btn = document.createElement("button");
-        btn.textContent = i;
-        btn.className = i === currentPage ? "btn-primary" : "btn-outline";
-        btn.onclick = () => showPage(i);
-        box.appendChild(btn);
+        btn.textContent = text || page;
+        btn.className = active ? "btn-primary" : "btn-outline";
+        if (disabled) {
+            btn.disabled = true;
+            btn.style.opacity = "0.5";
+            btn.style.cursor = "default";
+        } else {
+            btn.onclick = () => {
+                showPage(page);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            };
+        }
+        return btn;
+    };
+
+    // Previous Button
+    box.appendChild(createBtn(currentPage - 1, "← Prev", false, currentPage === 1));
+
+    // Page Numbers Logic
+    const delta = 2; // Number of pages to show around current
+    const range = [];
+    for (let i = Math.max(2, currentPage - delta); i <= Math.min(totalPages - 1, currentPage + delta); i++) {
+        range.push(i);
     }
+
+    // First Page
+    box.appendChild(createBtn(1, "1", currentPage === 1));
+
+    if (currentPage - delta > 2) {
+        const span = document.createElement("span");
+        span.textContent = "...";
+        span.style.padding = "0 10px";
+        box.appendChild(span);
+    }
+
+    // Middle Pages
+    range.forEach(i => {
+        box.appendChild(createBtn(i, i, i === currentPage));
+    });
+
+    if (currentPage + delta < totalPages - 1) {
+        const span = document.createElement("span");
+        span.textContent = "...";
+        span.style.padding = "0 10px";
+        box.appendChild(span);
+    }
+
+    // Last Page
+    if (totalPages > 1) {
+        box.appendChild(createBtn(totalPages, totalPages, currentPage === totalPages));
+    }
+
+    // Next Button
+    box.appendChild(createBtn(currentPage + 1, "Next →", false, currentPage === totalPages));
 }
 
 /* -------------------------------
