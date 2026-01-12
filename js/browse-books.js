@@ -1,73 +1,76 @@
-/* ================================
-   ShelfSync – Browse Books Engine
-   ================================ */
+/* ===============================
+   ShelfSync Browse Books Engine
+   =============================== */
 
-let supabase = null;
 let allBooks = [];
 let displayBooks = [];
+let sellerBooks = [];
 let currentPage = 1;
 const booksPerPage = 24;
 
-/* ----------------------------
-   Boot
------------------------------*/
+/* -------------------------------
+   Startup
+--------------------------------*/
 document.addEventListener("DOMContentLoaded", () => {
+    console.log("Browse Books Initialized");
     waitForSupabase();
 });
 
 function waitForSupabase() {
     if (window.supabaseClient) {
-        supabase = window.supabaseClient;
-        init();
+        loadAllBooks();
     } else {
         setTimeout(waitForSupabase, 100);
     }
 }
 
-/* ----------------------------
-   Init
------------------------------*/
-async function init() {
-    const grid = document.getElementById("booksGrid");
-    grid.innerHTML = `<div class="loading-spinner">📚 Loading books...</div>`;
+/* -------------------------------
+   Master Loader
+--------------------------------*/
+async function loadAllBooks() {
+    showLoader("Loading 2000+ books...");
 
-    const jsonBooks = await loadJSONBooks();
-    const sellerBooks = await loadSellerBooks();
+    const jsonBooks = await loadJsonBooks();
+    const seller = await loadSellerBooks();
 
-    allBooks = [...jsonBooks, ...sellerBooks];
+    // Merge both sources
+    allBooks = [...jsonBooks, ...seller];
     displayBooks = [...allBooks];
 
-    updatePageInfo();
+    console.log("TOTAL BOOKS:", allBooks.length);
+
     showPage(1);
 }
 
-/* ----------------------------
-   Load JSON (2000 books)
------------------------------*/
-async function loadJSONBooks() {
+/* -------------------------------
+   Load JSON Books
+--------------------------------*/
+async function loadJsonBooks() {
     try {
         const res = await fetch("../books-database.json");
         const data = await res.json();
-
-        return data.books.map(b => ({
-            ...b,
-            cover: b.cover || `https://covers.openlibrary.org/b/isbn/${b.isbn}-L.jpg`
-        }));
+        console.log("JSON books:", data.books.length);
+        return data.books;
     } catch (e) {
-        console.warn("JSON failed, using embedded data");
-        return embeddedBooks();
+        console.error("JSON load failed", e);
+        return [];
     }
 }
 
-/* ----------------------------
-   Load Seller Supabase books
------------------------------*/
+/* -------------------------------
+   Load Seller Books
+--------------------------------*/
 async function loadSellerBooks() {
-    if (!supabase) return [];
-
     try {
-        const { data, error } = await supabase.from("books").select("*");
+        const supabase = window.supabaseClient;
+
+        const { data, error } = await supabase
+            .from("books")
+            .select("*");
+
         if (error) throw error;
+
+        console.log("Seller books:", data.length);
 
         return data.map(b => ({
             title: b.title,
@@ -76,37 +79,51 @@ async function loadSellerBooks() {
             category: b.category,
             condition: b.condition,
             stock: b.stock || "In Stock",
-            isbn: b.isbn,
-            cover: b.cover || `https://via.placeholder.com/300x420?text=${encodeURIComponent(b.title)}`,
+            isbn: b.isbn || Math.random().toString(),
+            cover: b.cover || "https://via.placeholder.com/400x600?text=Book",
             gradient: "sapiens"
         }));
+
     } catch (e) {
-        console.warn("Supabase failed");
+        console.warn("Supabase failed, continuing without seller books");
         return [];
     }
 }
 
-/* ----------------------------
-   Pagination
------------------------------*/
-function showPage(page) {
-    currentPage = page;
-    const start = (page - 1) * booksPerPage;
-    const end = start + booksPerPage;
-    renderBooks(displayBooks.slice(start, end));
-    updatePageInfo();
-    updatePagination();
-    window.scrollTo({ top: 0, behavior: "smooth" });
+/* -------------------------------
+   UI Rendering
+--------------------------------*/
+function showLoader(msg) {
+    const grid = document.getElementById("booksGrid");
+    if (grid) {
+        grid.innerHTML = `<div class="loading-spinner">📚 ${msg}</div>`;
+    }
 }
 
-/* ----------------------------
-   Premium UI Renderer
------------------------------*/
+/* -------------------------------
+   Pagination
+--------------------------------*/
+function showPage(page) {
+    currentPage = page;
+
+    const start = (page - 1) * booksPerPage;
+    const end = start + booksPerPage;
+
+    const pageBooks = displayBooks.slice(start, end);
+
+    renderBooks(pageBooks);
+    updatePageInfo();
+    updatePagination();
+}
+
+/* -------------------------------
+   Render Cards (OLD UI)
+--------------------------------*/
 function renderBooks(books) {
     const grid = document.getElementById("booksGrid");
 
     if (!books.length) {
-        grid.innerHTML = "<div>No books found</div>";
+        grid.innerHTML = "No books found";
         return;
     }
 
@@ -115,74 +132,68 @@ function renderBooks(books) {
         <div class="book-cover-container">
             <img class="book-cover" src="${book.cover}">
         </div>
-
         <div class="card-content">
             <h3>${book.title}</h3>
-            <p>by ${book.author}</p>
-
-            <div class="book-meta">
-                <span>${book.category}</span>
-                <span>${book.condition}</span>
-            </div>
-
-            <div class="price">₹${Number(book.price).toLocaleString("en-IN")}</div>
-
-            <button class="btn-buy" onclick="addToCart('${book.title.replace(/'/g,"\\'")}', ${book.price})">
-                Add to Cart
-            </button>
+            <p>${book.author}</p>
+            <div class="price">₹${book.price}</div>
         </div>
     </div>
     `).join("");
 }
 
-/* ----------------------------
-   Search, Sort, Filters
------------------------------*/
+/* -------------------------------
+   Page Info
+--------------------------------*/
+function updatePageInfo() {
+    const el = document.getElementById("pageInfo");
+    if (!el) return;
+
+    const start = (currentPage - 1) * booksPerPage + 1;
+    const end = Math.min(currentPage * booksPerPage, displayBooks.length);
+
+    el.textContent = `Showing ${start}-${end} of ${displayBooks.length} books`;
+}
+
+/* -------------------------------
+   Pagination Buttons
+--------------------------------*/
+function updatePagination() {
+    const totalPages = Math.ceil(displayBooks.length / booksPerPage);
+    const box = document.getElementById("paginationContainer");
+    if (!box) return;
+
+    box.innerHTML = "";
+
+    for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement("button");
+        btn.textContent = i;
+        btn.className = i === currentPage ? "btn-primary" : "btn-outline";
+        btn.onclick = () => showPage(i);
+        box.appendChild(btn);
+    }
+}
+
+/* -------------------------------
+   Search
+--------------------------------*/
 window.handleSearch = q => {
     q = q.toLowerCase();
     displayBooks = allBooks.filter(b =>
         b.title.toLowerCase().includes(q) ||
-        b.author.toLowerCase().includes(q) ||
-        String(b.isbn).includes(q)
+        b.author.toLowerCase().includes(q)
     );
     showPage(1);
 };
 
+/* -------------------------------
+   Sorting
+--------------------------------*/
 window.handleSort = () => {
     const v = document.getElementById("sortSelect").value;
+
     if (v === "price-low") displayBooks.sort((a,b)=>a.price-b.price);
-    if (v === "price-high") displayBooks.sort((a,b)=>b.price-a.price);
-    if (v === "title") displayBooks.sort((a,b)=>a.title.localeCompare(b.title));
+    else if (v === "price-high") displayBooks.sort((a,b)=>b.price-a.price);
+    else displayBooks = [...allBooks];
+
     showPage(1);
 };
-
-/* ----------------------------
-   UI helpers
------------------------------*/
-function updatePageInfo() {
-    const el = document.getElementById("pageInfo");
-    if (el) el.textContent = `Showing ${displayBooks.length} books`;
-}
-
-function updatePagination() {
-    const el = document.getElementById("paginationContainer");
-    el.innerHTML = "";
-    const pages = Math.ceil(displayBooks.length / booksPerPage);
-
-    for (let i=1;i<=pages;i++){
-        const b=document.createElement("button");
-        b.textContent=i;
-        b.onclick=()=>showPage(i);
-        el.appendChild(b);
-    }
-}
-
-/* ----------------------------
-   Embedded fallback
------------------------------*/
-function embeddedBooks(){
-    return [
-        { title:"The Alchemist",author:"Paulo Coelho",price:5957,category:"FICTION",condition:"NEW",isbn:"9780062315007",cover:"https://covers.openlibrary.org/b/isbn/9780062315007-L.jpg"},
-        { title:"Atomic Habits",author:"James Clear",price:1919,category:"BUSINESS",condition:"NEW",isbn:"9780735211292",cover:"https://covers.openlibrary.org/b/isbn/9780735211292-L.jpg"}
-    ];
-}
