@@ -76,48 +76,7 @@
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td style="font-weight: 500;">The Great Gatsby</td>
-                            <td style="color: var(--text-light);">978-0743273565</td>
-                            <td>$12.99</td>
-                            <td>45</td>
-                            <td><span class="badge badge-success">In Stock</span></td>
-                            <td>
-                                <button class="btn btn-outline"
-                                    style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Edit</button>
-                                <button class="btn btn-outline"
-                                    style="padding: 0.25rem 0.5rem; font-size: 0.75rem; color: var(--error-color); border-color: var(--error-color);">Delete</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="font-weight: 500;">1984</td>
-                            <td style="color: var(--text-light);">978-0451524935</td>
-                            <td>$10.50</td>
-                            <td>5</td>
-                            <td><span class="badge badge-warning">Low Stock</span></td>
-                            <td>
-                                <button class="btn btn-outline"
-                                    style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Edit</button>
-                                <button class="btn btn-outline"
-                                    style="padding: 0.25rem 0.5rem; font-size: 0.75rem; color: var(--error-color); border-color: var(--error-color);">Delete</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="font-weight: 500;">Clean Code</td>
-                            <td style="color: var(--text-light);">978-0132350884</td>
-                            <td>$35.00</td>
-                            <td>0</td>
-                            <td><span class="badge" style="background-color: #f1f5f9; color: var(--text-light);">Out of
-                                    Stock</span></td>
-                            <td>
-                                <button class="btn btn-outline"
-                                    style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Edit</button>
-                                <button class="btn btn-outline"
-                                    style="padding: 0.25rem 0.5rem; font-size: 0.75rem; color: var(--error-color); border-color: var(--error-color);">Delete</button>
-                            </td>
-                        </tr>
-                    </tbody>
+                    <tbody id="inventoryTable"></tbody>
                 </table>
             </div>
 
@@ -140,6 +99,57 @@
         document.addEventListener('DOMContentLoaded', async () => {
             await checkAuthAndRole('seller');
         });
+    </script>
+    <script>
+        async function loadInventory() {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+
+            const { data, error } = await supabaseClient
+                .from("books")
+                .select("*")
+                .eq("seller_id", user.id);
+
+            if (error) {
+                console.error(error);
+                return;
+            }
+
+            displayInventory(data);
+        }
+
+        function displayInventory(data) {
+            const table = document.getElementById("inventoryTable");
+            table.innerHTML = "";
+
+            data.forEach(book => {
+                let status = "In Stock";
+                let badge = "badge-success";
+
+                if (book.stock === 0) {
+                    status = "Out of Stock";
+                    badge = "";
+                } else if (book.stock < 5) {
+                    status = "Low Stock";
+                    badge = "badge-warning";
+                }
+
+                table.innerHTML += `
+                <tr>
+                    <td>${book.title}</td>
+                    <td>${book.isbn || "-"}</td>
+                    <td>$${book.price}</td>
+                    <td>${book.stock}</td>
+                    <td><span class="badge ${badge}">${status}</span></td>
+                    <td>
+                        <button class="btn btn-outline">Edit</button>
+                        <button class="btn btn-outline" style="color:red">Delete</button>
+                    </td>
+                </tr>
+                `;
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", loadInventory);
     </script>
 
 </body>
