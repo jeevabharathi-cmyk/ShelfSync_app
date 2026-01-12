@@ -748,6 +748,14 @@
                 }
                 
                 // Prepare book data for database
+                // Get authenticated user
+const { data: { user } } = await window.supabaseClient.auth.getUser();
+
+if (!user) {
+  throw new Error("Not authenticated");
+}
+
+                // Prepare book data for database
                 const bookData = {
                     title: formData.title,
                     author: formData.author,
@@ -760,9 +768,12 @@
                     price: parseFloat(formData.price),
                     stock: parseInt(formData.stock),
                     description: formData.description,
-                    cover: imageUrl, // Store the public URL
+                    cover: imageUrl,
+
+                    seller_id: user.id,        // 🔥 THIS IS MANDATORY
                     created_at: new Date().toISOString()
                 };
+
                 
                 // Insert book into database
                 const { data: insertData, error: insertError } = await window.supabaseClient
